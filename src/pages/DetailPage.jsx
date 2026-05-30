@@ -1,55 +1,40 @@
-import { useLocation } from 'react-router-dom'
-import { useParams, useNavigate } from 'react-router-dom'
-import DetailModal from '../components/DetailModal'
-import { useEffect, useState } from 'react'
-import * as api from '../services/api'
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import DetailModal from '../components/DetailModal';
+import * as api from '../services/api';
+
+const loaders = {
+  market: api.getMarketIndices,
+  crypto: api.getCryptoPrices,
+  stock: api.getUsStocks,
+  news: api.getNews,
+  community: api.getCommunityPosts,
+};
 
 export default function DetailPage() {
   const { type, id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const [item, setItem] = useState(location.state?.item ?? null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (item) return;
-
-    // Fallback: fetch single item by type/id if not provided through navigation state
     async function fetchItem() {
       try {
-        let res = null
-        switch (type) {
-          case 'market':
-            res = await api.getMarketIndices();
-            break;
-          case 'crypto':
-            res = await api.getCryptoPrices();
-            break;
-          case 'stock':
-            res = await api.getUsStocks();
-            break;
-          case 'news':
-            res = await api.getNews();
-            break;
-          case 'community':
-            res = await api.getCommunityPosts();
-            break;
-          default:
-            res = [];
-        }
-
-        const found = Array.isArray(res) ? res.find((x) => String(x.id) === String(decodeURIComponent(id)) || String(x.symbol) === decodeURIComponent(id) || String(x.title) === decodeURIComponent(id)) : null;
+        const data = await (loaders[type]?.() ?? Promise.resolve([]));
+        const decodedId = decodeURIComponent(id);
+        const found = data.find((entry) => [entry.id, entry.symbol, entry.title].some((value) => String(value) === decodedId));
         setItem(found || null);
-      } catch (err) {
-        console.error('Failed to load detail item', err);
+        if (!found) setError('상세 정보를 찾을 수 없습니다.');
+      } catch {
+        setError('상세 정보를 불러오지 못했습니다.');
       }
     }
-
     fetchItem();
-  }, [type, id, item]);
+  }, [id, item, type]);
 
-  const close = () => navigate(-1);
-
+  if (error) return <div className="p-8 text-white">{error}</div>;
   if (!item) return <div className="p-8 text-white">상세 정보를 불러오는 중입니다.</div>;
-
-  return <DetailModal open={true} type={type} item={item} onClose={close} />;
+  return <DetailModal open type={type} item={item} onClose={() => navigate(-1)} />;
 }

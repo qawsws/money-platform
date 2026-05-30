@@ -8,6 +8,9 @@ export default defineConfig({
     tailwindcss(),
   ],
   server: {
+    proxy: {
+      '/api/auth': 'http://127.0.0.1:3001',
+    },
     watch: {
       ignored: ['**/mockServiceWorker.js'],
     },

@@ -20,4 +20,16 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
+  webServer: [
+    {
+      command: 'node server/auth-server.js',
+      url: 'http://127.0.0.1:3001/api/auth/health',
+      reuseExistingServer: true,
+    },
+    {
+      command: 'npm run dev:web -- --host 127.0.0.1',
+      url: 'http://localhost:5173',
+      reuseExistingServer: true,
+    },
+  ],
 });

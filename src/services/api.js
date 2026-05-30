@@ -3,53 +3,38 @@ const BASE = import.meta.env.VITE_API_BASE || '';
 async function request(path, opts) {
   const res = await fetch(`${BASE}${path}`, opts);
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || res.statusText);
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.message || res.statusText);
   }
   return res.json();
 }
 
-export function getMarketIndices() {
-  return request('/api/market/indices');
-}
+export const getMarketIndices = () => request('/api/market/indices');
+export const getCryptoPrices = () => request('/api/crypto');
+export const getUsStocks = () => request('/api/stocks/us');
+export const getNews = () => request('/api/news');
+export const getCommunityPosts = () => request('/api/community');
 
-export function getCryptoPrices() {
-  return request('/api/crypto');
-}
+export const postCommunityLike = (id) => request('/api/community/like', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ id }),
+});
 
-export function getUsStocks() {
-  return request('/api/stocks/us');
-}
+export const postCommunityView = (id) => request('/api/community/view', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ id }),
+});
 
-export function getNews() {
-  return request('/api/news');
-}
+export const postLogin = ({ username, password }) => request('/api/auth/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ username, password }),
+});
 
-export function getCommunityPosts() {
-  return request('/api/community');
-}
-
-export function postCommunityLike(id) {
-  return request('/api/community/like', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id }),
-  });
-}
-
-export function postCommunityView(id) {
-  return request('/api/community/view', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id }),
-  });
-}
-
-// 간단한 로그인 API 호출 (개발용)
-export function postLogin({ username, password }) {
-  return request('/api/auth/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password }),
-  });
-}
+export const postSignup = (profile) => request('/api/auth/signup', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(profile),
+});
