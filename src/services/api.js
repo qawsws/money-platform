@@ -38,3 +38,7 @@ export const postSignup = (profile) => request('/api/auth/signup', {
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify(profile),
 });
+
+export const getCurrentUser = (token) => request('/api/auth/me', {
+  headers: { Authorization: `Bearer ${token}` },
+});

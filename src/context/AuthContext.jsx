@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState } from 'react';
-import { postLogin, postSignup } from '../services/api';
+import { getCurrentUser, postLogin, postSignup } from '../services/api';
 import { useFavoritesStore } from '../store/favoritesStore';
 
 const AuthContext = createContext(null);
@@ -19,6 +19,16 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     setFavoritesUser(user?.username || null);
   }, [user, setFavoritesUser]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('mp_token');
+    if (!token) return;
+    getCurrentUser(token).then((res) => setUser(res.user)).catch(() => {
+      setUser(null);
+      localStorage.removeItem('mp_user');
+      localStorage.removeItem('mp_token');
+    });
+  }, []);
 
   const remember = (res) => {
     setUser(res.user);
