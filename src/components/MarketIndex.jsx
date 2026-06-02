@@ -1,47 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import SectionHeader from './SectionHeader';
 import { getMarketIndices } from '../services/api';
-import LoadingSkeleton from './LoadingSkeleton';
 import ErrorMessage from './ErrorMessage';
+import LoadingSkeleton from './LoadingSkeleton';
+import SectionHeader from './SectionHeader';
+
+const t = { title: '\uC624\uB298\uC758 \uC2DC\uC7A5', description: '\uC8FC\uC694 \uC9C0\uC218\uC758 \uD750\uB984\uC744 \uD55C\uB208\uC5D0 \uD655\uC778\uD558\uC138\uC694.' };
 
 export default function MarketIndex({ onOpenDetail }) {
-  const { data = [], isLoading, error } = useQuery({
-    queryKey: ['market', 'indices'],
-    queryFn: getMarketIndices,
-  });
-
-  return (
-    <section id="market" className="py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <SectionHeader title="주요 시장 지수" description="실시간 시장 지수를 확인하세요." />
-        {isLoading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map((id) => <LoadingSkeleton key={id} className="p-6 h-28" />)}
-          </div>
-        )}
-        {error && <ErrorMessage error={error} />}
-        {!isLoading && !error && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {data.map((index) => (
-              <button
-                type="button"
-                key={index.id}
-                onClick={() => onOpenDetail?.(index)}
-                className="text-left bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-gray-600 hover:shadow-lg transition-all duration-300"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-gray-300 font-medium">{index.name}</h3>
-                  <span className="text-sm font-bold text-blue-300">{index.icon}</span>
-                </div>
-                <p className="text-2xl font-bold text-white mb-2">{index.value}</p>
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${index.isPositive ? 'bg-green-900 text-green-200' : 'bg-red-900 text-red-200'}`}>
-                  {index.isPositive ? '▲' : '▼'} {index.change}
-                </span>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-    </section>
-  );
+  const { data = [], isLoading, error } = useQuery({ queryKey: ['market', 'indices'], queryFn: getMarketIndices });
+  return <section id="market" className="py-7"><div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"><SectionHeader title={t.title} description={t.description} />{isLoading && <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">{[1, 2, 3, 4].map((id) => <LoadingSkeleton key={id} className="h-28 p-4" />)}</div>}{error && <ErrorMessage error={error} />}{!isLoading && !error && <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">{data.map((item) => <button type="button" key={item.id} onClick={() => onOpenDetail?.(item)} className="rounded-md border border-slate-200 bg-white p-4 text-left hover:border-blue-300 hover:shadow-sm"><div className="flex justify-between gap-2 text-sm text-slate-500"><span>{item.name}</span><span>{item.icon}</span></div><p className="mt-3 text-xl font-bold text-slate-950">{item.value}</p><p className={`mt-1 text-sm font-semibold ${item.isPositive ? 'text-red-500' : 'text-blue-600'}`}>{item.change}</p></button>)}</div>}</div></section>;
 }

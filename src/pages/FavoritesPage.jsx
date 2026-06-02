@@ -1,40 +1,21 @@
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { useFavoritesStore } from '../store/favoritesStore';
-import { getCryptoPrices, getUsStocks } from '../services/api';
-import SectionHeader from '../components/SectionHeader';
-import LoadingSkeleton from '../components/LoadingSkeleton';
 import ErrorMessage from '../components/ErrorMessage';
+import LoadingSkeleton from '../components/LoadingSkeleton';
+import SectionHeader from '../components/SectionHeader';
+import { useAuth } from '../context/AuthContext';
+import { getCryptoPrices, getUsStocks } from '../services/api';
+import { useFavoritesStore } from '../store/favoritesStore';
+
+const t = { title: '\uC990\uACA8\uCC3E\uAE30', guest: '\uB85C\uADF8\uC778 \uD6C4 \uAD00\uC2EC \uC885\uBAA9\uC744 \uD655\uC778\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4.', crypto: '\uC554\uD638\uD654\uD3D0', stocks: '\uBBF8\uAD6D \uC8FC\uC2DD', empty: '\uC544\uC9C1 \uCD94\uAC00\uD55C \uC885\uBAA9\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.' };
 
 export default function FavoritesPage() {
-  const { user } = useAuth();
-  const favorites = useFavoritesStore((state) => state.favorites);
-  const navigate = useNavigate();
-  const crypto = useQuery({ queryKey: ['crypto'], queryFn: getCryptoPrices });
-  const stocks = useQuery({ queryKey: ['stocks', 'us'], queryFn: getUsStocks });
-  const favoriteCryptos = (crypto.data || []).filter((item) => favorites.includes(`crypto:${item.id}`));
-  const favoriteStocks = (stocks.data || []).filter((item) => favorites.includes(`stock:${item.id}`));
-  const openDetail = (type, item) => navigate(`/detail/${type}/${item.id}`, { state: { item } });
-
-  if (!user) return <section className="py-12"><div className="max-w-4xl mx-auto px-4 text-center text-white"><SectionHeader title="즐겨찾기" description="로그인 후 나만의 즐겨찾기를 확인할 수 있습니다." /><div className="mt-10 rounded-lg border border-gray-700 bg-gray-900 p-10 text-gray-300">로그인하면 코인과 주식 즐겨찾기를 사용자별로 저장할 수 있습니다.</div></div></section>;
-
-  return (
-    <section className="py-12">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <SectionHeader title="즐겨찾기" description={`${user.username}님의 관심 종목입니다.`} />
-        <FavoriteSection title="암호화폐" query={crypto} empty="즐겨찾기에 추가한 암호화폐가 없습니다.">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">{favoriteCryptos.map((item) => <button key={item.id} type="button" onClick={() => openDetail('crypto', item)} className="text-left bg-gray-800 rounded-lg p-6 border border-gray-700"><h3 className="text-white font-bold">{item.name}</h3><p className="text-gray-400 text-sm mb-3">{item.symbol}</p><p className="text-white text-xl">{item.price}</p><p className={item.isPositive ? 'text-green-400' : 'text-red-400'}>{item.change}</p></button>)}</div>
-        </FavoriteSection>
-        <FavoriteSection title="미국 주식" query={stocks} empty="즐겨찾기에 추가한 주식이 없습니다.">
-          <div className="space-y-4">{favoriteStocks.map((item) => <button key={item.id} type="button" onClick={() => openDetail('stock', item)} className="w-full text-left bg-gray-800 rounded-lg p-4 border border-gray-700 flex justify-between gap-4"><div><p className="text-white font-bold">{item.symbol} · {item.name}</p><p className="text-gray-400 text-sm">{item.description}</p></div><div className="text-right"><p className="text-white">{item.price}</p><p className={item.isPositive ? 'text-green-400' : 'text-red-400'}>{item.change}</p></div></button>)}</div>
-        </FavoriteSection>
-      </div>
-    </section>
-  );
+  const { user } = useAuth(); const favorites = useFavoritesStore((state) => state.favorites); const navigate = useNavigate();
+  const crypto = useQuery({ queryKey: ['crypto'], queryFn: getCryptoPrices }); const stocks = useQuery({ queryKey: ['stocks', 'us'], queryFn: getUsStocks });
+  const coins = (crypto.data || []).filter((item) => favorites.includes(`crypto:${item.id}`)); const shares = (stocks.data || []).filter((item) => favorites.includes(`stock:${item.id}`));
+  const open = (type, item) => navigate(`/detail/${type}/${item.id}`, { state: { item } });
+  if (!user) return <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8"><SectionHeader title={t.title} description={t.guest} /></main>;
+  return <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8"><SectionHeader title={t.title} description={`${user.username}\uB2D8\uC774 \uC800\uC7A5\uD55C \uAD00\uC2EC \uC885\uBAA9\uC785\uB2C8\uB2E4.`} /><Group title={t.crypto} query={crypto} empty={t.empty}>{coins.map((item) => <Asset key={item.id} item={item} onClick={() => open('crypto', item)} />)}</Group><Group title={t.stocks} query={stocks} empty={t.empty}>{shares.map((item) => <Asset key={item.id} item={item} onClick={() => open('stock', item)} />)}</Group></main>;
 }
-
-function FavoriteSection({ title, query, empty, children }) {
-  const isEmpty = !query.isLoading && !query.error && children.props.children.length === 0;
-  return <div className="mb-8 border border-gray-700 bg-gray-900 p-6 rounded-lg"><h2 className="text-xl font-semibold text-white mb-4">{title}</h2>{query.isLoading && <LoadingSkeleton className="p-6 h-24" />}{query.error && <ErrorMessage error={query.error} />}{isEmpty && <p className="text-gray-400">{empty}</p>}{children}</div>;
-}
+function Group({ title, query, empty, children }) { return <section className="mb-5 overflow-hidden rounded-md border border-slate-200 bg-white"><h2 className="border-b border-slate-200 bg-slate-50 px-4 py-3 font-bold">{title}</h2>{query.isLoading && <LoadingSkeleton className="m-4 h-20 p-4" />}{query.error && <div className="p-4"><ErrorMessage error={query.error} /></div>}{!query.isLoading && !query.error && children.length === 0 && <p className="p-6 text-sm text-slate-500">{empty}</p>}<div className="divide-y divide-slate-100">{children}</div></section>; }
+function Asset({ item, onClick }) { return <button type="button" onClick={onClick} className="flex w-full justify-between gap-4 px-4 py-4 text-left hover:bg-slate-50"><div><b>{item.symbol || item.name}</b><p className="text-sm text-slate-500">{item.name}</p></div><div className="text-right"><b>{item.price}</b><p className={`text-sm ${item.isPositive ? 'text-red-500' : 'text-blue-600'}`}>{item.change}</p></div></button>; }

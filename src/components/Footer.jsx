@@ -2,13 +2,10 @@ import { Link } from 'react-router-dom';
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 border-t border-gray-800 mt-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div><Link to="/" className="text-lg font-bold text-white">MoneyPlatform</Link><p className="text-gray-400 text-sm mt-2">투자 정보를 한곳에서 간편하게 확인하세요.</p></div>
-          <nav className="flex flex-wrap gap-4 text-sm text-gray-400"><a href="#market" className="hover:text-white">시장</a><a href="#news" className="hover:text-white">뉴스</a><a href="#community" className="hover:text-white">커뮤니티</a><Link to="/portfolio" className="hover:text-white">포트폴리오</Link><Link to="/favorites" className="hover:text-white">즐겨찾기</Link></nav>
-        </div>
-        <p className="border-t border-gray-800 pt-6 mt-6 text-center text-gray-500 text-sm">&copy; 2026 MoneyPlatform. 교육용 투자 정보 서비스입니다.</p>
+    <footer className="mt-14 border-t border-slate-200 bg-white">
+      <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-7 text-sm text-slate-500 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
+        <div><Link to="/" className="font-bold text-slate-800">MoneyPlatform</Link><p className="mt-1">{'\uD22C\uC790 \uC815\uBCF4\uB97C \uD55C\uACF3\uC5D0\uC11C \uAC04\uD3B8\uD558\uAC8C \uD655\uC778\uD558\uC138\uC694.'}</p></div>
+        <p>&copy; 2026 MoneyPlatform. {'\uAD50\uC721\uC6A9 \uD22C\uC790 \uC815\uBCF4 \uC11C\uBE44\uC2A4\uC785\uB2C8\uB2E4.'}</p>
       </div>
     </footer>
   );

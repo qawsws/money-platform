@@ -1,31 +1,17 @@
 import { useFavoritesStore } from '../store/favoritesStore';
 
+const t = {
+  market: '\uC2DC\uC7A5 \uC9C0\uC218', crypto: '\uC554\uD638\uD654\uD3D0', stock: '\uBBF8\uAD6D \uC8FC\uC2DD', news: '\uB274\uC2A4', community: '\uCEE4\uBBA4\uB2C8\uD2F0',
+  detail: '\uC0C1\uC138 \uC815\uBCF4', favorite: '\uC990\uACA8\uCC3E\uAE30', remove: '\uC990\uACA8\uCC3E\uAE30 \uD574\uC81C', close: '\uB2EB\uAE30',
+};
+const Row = ({ label, value }) => <div className="flex justify-between gap-4 border-b border-slate-100 py-3 text-sm"><span className="text-slate-500">{label}</span><b>{value}</b></div>;
+
 export default function DetailModal({ open, type, item, onClose }) {
-  const favorites = useFavoritesStore((s) => s.favorites);
-  const toggle = useFavoritesStore((s) => s.toggle);
+  const favorites = useFavoritesStore((state) => state.favorites);
+  const toggle = useFavoritesStore((state) => state.toggle);
   if (!open || !item) return null;
-
-  const favoriteKey = `${type}:${item.id ?? item.symbol ?? item.title}`;
-  const isFavorite = favorites.includes(favoriteKey);
-  const labels = { market: '시장 지수', crypto: '암호화폐', stock: '미국 주식', news: '뉴스', community: '커뮤니티' };
-  const body = {
-    market: <><p className="text-gray-300 mb-4">{item.name}의 최신 시장 지수입니다.</p><Row label="현재 지수" value={item.value} /><Row label="등락" value={item.change} /></>,
-    crypto: <><p className="text-gray-300 mb-4">{item.name}({item.symbol})의 가격 정보입니다.</p><Row label="현재 가격" value={item.price} /><Row label="변동률" value={item.change} /></>,
-    stock: <><p className="text-gray-300 mb-4">{item.name}({item.symbol})의 종목 정보입니다.</p><Row label="현재가" value={item.price} /><Row label="변동률" value={item.change} /><p className="text-gray-400 mt-3">{item.description}</p></>,
-    news: <><p className="text-gray-300 mb-4">{item.summary}</p><Row label="카테고리" value={item.category} /><Row label="시간" value={item.time} /></>,
-    community: <><p className="text-gray-300 mb-4">{item.author}님의 글입니다.</p><Row label="조회" value={item.views} /><Row label="좋아요" value={item.likes} /><Row label="댓글" value={item.comments} /></>,
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center px-4 sm:px-6">
-      <div className="bg-gray-950 rounded-lg w-full max-w-3xl p-6 border border-gray-700 shadow-2xl text-white">
-        <div className="flex gap-4 items-start justify-between mb-6"><div><p className="text-xs uppercase text-blue-400 mb-2">{labels[type] || '상세 정보'}</p><h2 className="text-2xl font-bold">{item.title || item.name || item.symbol}</h2></div><div className="flex gap-3">{(type === 'crypto' || type === 'stock') && <button type="button" onClick={() => toggle(favoriteKey)} className={`px-4 py-2 rounded-lg ${isFavorite ? 'bg-yellow-500 text-gray-900' : 'bg-gray-800'}`}>{isFavorite ? '즐겨찾기 해제' : '즐겨찾기'}</button>}<button type="button" aria-label="닫기" onClick={onClose} className="text-gray-400 hover:text-white text-xl">×</button></div></div>
-        <div className="space-y-3">{body[type] || <p className="text-gray-300">상세 정보가 없습니다.</p>}</div>
-      </div>
-    </div>
-  );
-}
-
-function Row({ label, value }) {
-  return <div className="flex justify-between gap-4 text-gray-300"><span>{label}</span><span className="text-white font-semibold">{value}</span></div>;
+  const key = `${type}:${item.id ?? item.symbol ?? item.title}`;
+  const selected = favorites.includes(key);
+  const rows = type === 'market' ? [['\uD604\uC7AC \uC9C0\uC218', item.value], ['\uB4F1\uB77D', item.change]] : type === 'crypto' || type === 'stock' ? [['\uD604\uC7AC\uAC00', item.price], ['\uBCC0\uB3D9\uB960', item.change]] : type === 'news' ? [['\uCE74\uD14C\uACE0\uB9AC', item.category], ['\uC2DC\uAC04', item.time]] : [['\uC870\uD68C', item.views], ['\uC88B\uC544\uC694', item.likes], ['\uB313\uAE00', item.comments]];
+  return <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 px-4"><div className="w-full max-w-xl rounded-lg border border-slate-200 bg-white p-6 shadow-xl"><div className="flex items-start justify-between gap-4"><div><p className="text-xs font-bold text-blue-600">{t[type] || t.detail}</p><h2 className="mt-2 text-xl font-bold text-slate-950">{item.title || item.name || item.symbol}</h2></div><button type="button" aria-label={t.close} onClick={onClose} className="text-xl text-slate-400 hover:text-slate-800">\u00d7</button></div>{item.summary && <p className="mt-4 text-sm leading-6 text-slate-600">{item.summary}</p>}{item.description && <p className="mt-4 text-sm text-slate-600">{item.description}</p>}<div className="mt-5 border-t border-slate-200">{rows.map(([label, value]) => <Row key={label} label={label} value={value} />)}</div>{(type === 'crypto' || type === 'stock') && <button type="button" onClick={() => toggle(key)} className={`mt-5 w-full rounded-md px-4 py-3 text-sm font-bold ${selected ? 'border border-slate-300 bg-white text-slate-700' : 'bg-blue-600 text-white hover:bg-blue-700'}`}>{selected ? t.remove : t.favorite}</button>}</div></div>;
 }

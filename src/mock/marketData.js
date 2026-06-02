@@ -1,8 +1,8 @@
 export const marketIndices = [
   { id: 1, name: 'S&P 500', value: '5,289.42', change: '+2.45%', isPositive: true, icon: 'SP' },
-  { id: 2, name: '나스닥', value: '16,543.88', change: '+1.89%', isPositive: true, icon: 'ND' },
-  { id: 3, name: '다우존스', value: '38,902.14', change: '-0.52%', isPositive: false, icon: 'DJ' },
-  { id: 4, name: '코스피', value: '2,748.29', change: '+1.23%', isPositive: true, icon: 'KS' },
+  { id: 2, name: '\uB098\uC2A4\uB2E5', value: '16,543.88', change: '+1.89%', isPositive: true, icon: 'ND' },
+  { id: 3, name: '\uB2E4\uC6B0\uC874\uC2A4', value: '38,902.14', change: '-0.52%', isPositive: false, icon: 'DJ' },
+  { id: 4, name: '\uCF54\uC2A4\uD53C', value: '2,748.29', change: '+1.23%', isPositive: true, icon: 'KS' },
 ];
 
 export const cryptoPrices = [
@@ -12,24 +12,21 @@ export const cryptoPrices = [
 ];
 
 export const usStocks = [
-  { id: 1, symbol: 'AAPL', name: 'Apple', price: '$189.45', change: '+2.15%', isPositive: true, description: '기술 기업 대표주' },
-  { id: 2, symbol: 'GOOGL', name: 'Google', price: '$142.80', change: '+1.92%', isPositive: true, description: '검색 및 광고 플랫폼' },
-  { id: 3, symbol: 'MSFT', name: 'Microsoft', price: '$423.56', change: '-0.75%', isPositive: false, description: 'AI 기술 선도 기업' },
-  { id: 4, symbol: 'TSLA', name: 'Tesla', price: '$242.18', change: '+4.38%', isPositive: true, description: '전기자동차 제조사' },
+  { id: 1, symbol: 'AAPL', name: 'Apple', price: '$189.45', change: '+2.15%', isPositive: true, description: '\uAE30\uC220 \uAE30\uC5C5 \uB300\uD45C\uC8FC' },
+  { id: 2, symbol: 'GOOGL', name: 'Google', price: '$142.80', change: '+1.92%', isPositive: true, description: '\uAC80\uC0C9 \uBC0F \uAD11\uACE0 \uD50C\uB7AB\uD3FC' },
+  { id: 3, symbol: 'MSFT', name: 'Microsoft', price: '$423.56', change: '-0.75%', isPositive: false, description: 'AI \uAE30\uC220 \uC120\uB3C4 \uAE30\uC5C5' },
+  { id: 4, symbol: 'TSLA', name: 'Tesla', price: '$242.18', change: '+4.38%', isPositive: true, description: '\uC804\uAE30\uC790\uB3D9\uCC28 \uC81C\uC870\uC0AC' },
 ];
 
 export const newsList = [
-  { id: 1, title: 'Fed, 기준금리 유지 결정... 경기 둔화 우려', summary: '연방준비제도가 기준금리를 현 수준에서 유지하기로 결정했습니다.', category: '경제', time: '2시간 전', importance: 'high' },
-  { id: 2, title: 'Apple, Q2 실적 기대 이상... 주가 상승', summary: 'Apple의 분기 실적이 시장 예상을 초과했습니다.', category: '기업', time: '4시간 전', importance: 'high' },
-  { id: 3, title: '비트코인, 70,000달러 돌파 시도', summary: '암호화폐 시장이 강세를 보이고 있습니다.', category: '암호화폐', time: '6시간 전', importance: 'medium' },
-  { id: 4, title: '삼성전자, 신형 반도체 공정 개발 완료', summary: '삼성전자가 최신 반도체 공정을 성공적으로 개발했습니다.', category: '기업', time: '8시간 전', importance: 'medium' },
-  { id: 5, title: '미국 실업률 3.5% 기록... 고용 시장 견조', summary: '최근 발표된 실업률 통계가 예상치를 하회했습니다.', category: '경제', time: '10시간 전', importance: 'low' },
+  { id: 1, title: 'Fed, \uAE30\uC900\uAE08\uB9AC \uC720\uC9C0 \uACB0\uC815... \uACBD\uAE30 \uB454\uD654 \uC6B0\uB824', summary: '\uC5F0\uBC29\uC900\uBE44\uC81C\uB3C4\uAC00 \uAE30\uC900\uAE08\uB9AC\uB97C \uD604 \uC218\uC900\uC5D0\uC11C \uC720\uC9C0\uD558\uAE30\uB85C \uACB0\uC815\uD588\uC2B5\uB2C8\uB2E4.', category: '\uACBD\uC81C', time: '2\uC2DC\uAC04 \uC804', importance: 'high' },
+  { id: 2, title: 'Apple, Q2 \uC2E4\uC801 \uAE30\uB300 \uC774\uC0C1... \uC8FC\uAC00 \uC0C1\uC2B9', summary: 'Apple\uC758 \uBD84\uAE30 \uC2E4\uC801\uC774 \uC2DC\uC7A5 \uC608\uC0C1\uC744 \uCD08\uACFC\uD588\uC2B5\uB2C8\uB2E4.', category: '\uAE30\uC5C5', time: '4\uC2DC\uAC04 \uC804', importance: 'high' },
+  { id: 3, title: '\uBE44\uD2B8\uCF54\uC778, 70,000\uB2EC\uB7EC \uB3CC\uD30C \uC2DC\uB3C4', summary: '\uC554\uD638\uD654\uD3D0 \uC2DC\uC7A5\uC774 \uAC15\uC138\uB97C \uBCF4\uC774\uACE0 \uC788\uC2B5\uB2C8\uB2E4.', category: '\uC554\uD638\uD654\uD3D0', time: '6\uC2DC\uAC04 \uC804', importance: 'medium' },
+  { id: 4, title: '\uC0BC\uC131\uC804\uC790, \uC2E0\uD615 \uBC18\uB3C4\uCCB4 \uACF5\uC815 \uAC1C\uBC1C \uC644\uB8CC', summary: '\uC0BC\uC131\uC804\uC790\uAC00 \uCD5C\uC2E0 \uBC18\uB3C4\uCCB4 \uACF5\uC815\uC744 \uC131\uACF5\uC801\uC73C\uB85C \uAC1C\uBC1C\uD588\uC2B5\uB2C8\uB2E4.', category: '\uAE30\uC5C5', time: '8\uC2DC\uAC04 \uC804', importance: 'medium' },
 ];
 
 export const communityPosts = [
-  { id: 1, author: '투자초심', title: '초보자를 위한 주식 투자 시작 가이드', views: '12.5K', likes: '2.3K', comments: 156, category: '초보자', score: 98 },
-  { id: 2, author: '코인마스터', title: '주목할 암호화폐 5개 분석', views: '8.9K', likes: '1.8K', comments: 124, category: '암호화폐', score: 87 },
-  { id: 3, author: '배당금사냥꾼', title: '배당률 높은 미국 주식 포트폴리오 구성', views: '6.2K', likes: '1.2K', comments: 89, category: '투자전략', score: 76 },
-  { id: 4, author: '가치애널리스트', title: 'ETF vs 개별주식, 어떤 것을 선택해야 할까?', views: '5.8K', likes: '1.1K', comments: 95, category: '투자전략', score: 72 },
-  { id: 5, author: '차트고수', title: '기술적 분석으로 수익 내는 방법', views: '9.3K', likes: '2.1K', comments: 178, category: '트레이딩', score: 92 },
+  { id: 1, author: '\uD22C\uC790\uCD08\uC2EC', title: '\uCD08\uBCF4\uC790\uB97C \uC704\uD55C \uC8FC\uC2DD \uD22C\uC790 \uC2DC\uC791 \uAC00\uC774\uB4DC', views: '12.5K', likes: '2.3K', comments: 156, category: '\uCD08\uBCF4\uC790', score: 98 },
+  { id: 2, author: '\uCF54\uC778\uB9C8\uC2A4\uD130', title: '\uC8FC\uBAA9\uD560 \uC554\uD638\uD654\uD3D0 5\uAC1C \uBD84\uC11D', views: '8.9K', likes: '1.8K', comments: 124, category: '\uC554\uD638\uD654\uD3D0', score: 87 },
+  { id: 3, author: '\uBC30\uB2F9\uAE08\uC0AC\uB0E5\uAFBC', title: '\uBC30\uB2F9\uB960 \uB192\uC740 \uBBF8\uAD6D \uC8FC\uC2DD \uD3EC\uD2B8\uD3F4\uB9AC\uC624 \uAD6C\uC131', views: '6.2K', likes: '1.2K', comments: 89, category: '\uD22C\uC790\uC804\uB7B5', score: 76 },
 ];
