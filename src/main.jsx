@@ -11,7 +11,7 @@ import { SearchProvider } from './context/SearchContext';
 const queryClient = new QueryClient();
 
 async function initApp() {
-  if (import.meta.env.DEV) {
+  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCKS === 'true') {
     try {
       const { worker } = await import('./mocks/browser');
       await worker.start({

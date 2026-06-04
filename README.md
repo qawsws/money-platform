@@ -40,3 +40,26 @@ JWT_SECRET=replace-with-a-long-random-secret
 ```
 
 When `DATABASE_URL` is empty, the server uses local SQLite. `render.yaml` declares a Render Web Service and PostgreSQL database for deployment.
+
+## Data sources
+
+The API server tries public live data first and falls back to local sample data when an external provider is unavailable.
+
+- Crypto: CoinGecko public markets API
+- US stocks and market indices: Stooq quote CSV
+- News: GDELT DOC API
+- Community: local sample data
+
+## View the local DB without installing a program
+
+List recent users without showing password hashes:
+
+```bash
+node --input-type=module -e "import { DatabaseSync } from 'node:sqlite'; const db = new DatabaseSync('data/money-platform.sqlite'); console.table(db.prepare('SELECT id, username, name, email, phone, birth_date AS birthDate, created_at AS createdAt FROM users ORDER BY id DESC LIMIT 20').all()); db.close();"
+```
+
+Count users:
+
+```bash
+node --input-type=module -e "import { DatabaseSync } from 'node:sqlite'; const db = new DatabaseSync('data/money-platform.sqlite'); console.table(db.prepare('SELECT COUNT(*) AS users FROM users').all()); db.close();"
+```

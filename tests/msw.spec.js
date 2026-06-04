@@ -18,7 +18,7 @@ test.beforeEach(async ({ page }) => {
   await page.goto('/');
 });
 
-test('MSW returns mocked market data', async ({ page }) => {
+test('API returns market data', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Bitcoin' })).toBeVisible();
   const data = await page.evaluate(async () => (await fetch('/api/crypto')).json());
   expect(Array.isArray(data)).toBe(true);
