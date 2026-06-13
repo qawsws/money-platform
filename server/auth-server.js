@@ -2,9 +2,9 @@ import { createServer } from 'node:http';
 import { createReadStream, existsSync, statSync } from 'node:fs';
 import { extname, resolve } from 'node:path';
 import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
-import { closeDb, createUser, findUserByEmail, findUserByUsername, initDb } from './db.js';
+import { closeDb, createUser, findUserByEmail, findUserByUsername, getCommunityPosts, incrementCommunityPostMetric, initDb } from './db.js';
 import { issueToken, verifyToken } from './token.js';
-import { getCommunityPostsLive, getCryptoPricesLive, getMarketIndicesLive, getNewsLive, getUsStocksLive } from './market-data.js';
+import { getCryptoPricesLive, getMarketIndicesLive, getNewsLive, getUsStocksLive } from './market-data.js';
 
 const port = Number(process.env.PORT || process.env.AUTH_PORT || 3001);
 const host = process.env.HOST || '0.0.0.0';
@@ -56,9 +56,9 @@ export const server = createServer(async (request, response) => {
     if (request.method === 'GET' && pathname === '/api/crypto') return json(response, 200, await getCryptoPricesLive());
     if (request.method === 'GET' && pathname === '/api/stocks/us') return json(response, 200, await getUsStocksLive());
     if (request.method === 'GET' && pathname === '/api/news') return json(response, 200, await getNewsLive());
-    if (request.method === 'GET' && pathname === '/api/community') return json(response, 200, getCommunityPostsLive());
-    if (request.method === 'POST' && pathname === '/api/community/like') { const { id } = await body(request); const post = getCommunityPostsLive().find((item) => item.id === id); if (post) post.likes = String((parseInt(post.likes, 10) || 0) + 1); return json(response, post ? 200 : 404, { success: Boolean(post), post }); }
-    if (request.method === 'POST' && pathname === '/api/community/view') { const { id } = await body(request); const post = getCommunityPostsLive().find((item) => item.id === id); if (post) post.views = String((parseInt(post.views, 10) || 0) + 1); return json(response, post ? 200 : 404, { success: Boolean(post), post }); }
+    if (request.method === 'GET' && pathname === '/api/community') return json(response, 200, await getCommunityPosts());
+    if (request.method === 'POST' && pathname === '/api/community/like') { const { id } = await body(request); const post = await incrementCommunityPostMetric(id, 'likes'); return json(response, post ? 200 : 404, { success: Boolean(post), post }); }
+    if (request.method === 'POST' && pathname === '/api/community/view') { const { id } = await body(request); const post = await incrementCommunityPostMetric(id, 'views'); return json(response, post ? 200 : 404, { success: Boolean(post), post }); }
     if (pathname.startsWith('/api/')) return json(response, 404, { message: 'Not found' });
     return serveFile(response, resolve(dist, `.${pathname}`));
   } catch (error) { console.error(error); return json(response, 500, { message: '\uC11C\uBC84 \uCC98\uB9AC \uC911 \uC624\uB958\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4.' }); }

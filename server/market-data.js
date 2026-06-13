@@ -1,4 +1,4 @@
-import { communityPosts, cryptoPrices, marketIndices, newsList, usStocks } from '../src/mock/marketData.js';
+import { cryptoPrices, marketIndices, newsList, usStocks } from '../src/mock/marketData.js';
 
 const timeout = 5000;
 
@@ -100,8 +100,4 @@ export async function getNewsLive() {
   } catch {
     return newsList;
   }
-}
-
-export function getCommunityPostsLive() {
-  return communityPosts;
 }

@@ -63,3 +63,9 @@ Count users:
 ```bash
 node --input-type=module -e "import { DatabaseSync } from 'node:sqlite'; const db = new DatabaseSync('data/money-platform.sqlite'); console.table(db.prepare('SELECT COUNT(*) AS users FROM users').all()); db.close();"
 ```
+
+List community posts:
+
+```bash
+node --input-type=module -e "import { DatabaseSync } from 'node:sqlite'; const db = new DatabaseSync('data/money-platform.sqlite'); console.table(db.prepare('SELECT id, title, likes, views FROM community_posts ORDER BY id LIMIT 20').all()); db.close();"
+```
