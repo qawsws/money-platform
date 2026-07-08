@@ -1,6 +1,6 @@
 # MoneyPlatform
 
-React + Vite investment dashboard with a Node API server. Market data currently uses server-side sample data. Authentication supports SQLite locally and PostgreSQL in production.
+React + Vite investment dashboard with a Node API server. Market data uses public live APIs with local fallback data. Authentication, community posts, favorites, and portfolio holdings support SQLite locally and PostgreSQL in production.
 
 ## Local development
 
@@ -48,7 +48,7 @@ The API server tries public live data first and falls back to local sample data 
 - Crypto: CoinGecko public markets API
 - US stocks and market indices: Stooq quote CSV
 - News: GDELT DOC API
-- Community: local sample data
+- Community: database-backed local posts
 
 ## View the local DB without installing a program
 
@@ -68,4 +68,16 @@ List community posts:
 
 ```bash
 node --input-type=module -e "import { DatabaseSync } from 'node:sqlite'; const db = new DatabaseSync('data/money-platform.sqlite'); console.table(db.prepare('SELECT id, title, likes, views FROM community_posts ORDER BY id LIMIT 20').all()); db.close();"
+```
+
+List saved favorites:
+
+```bash
+node --input-type=module -e "import { DatabaseSync } from 'node:sqlite'; const db = new DatabaseSync('data/money-platform.sqlite'); console.table(db.prepare('SELECT users.username, favorite_assets.item_key AS itemKey, favorite_assets.created_at AS createdAt FROM favorite_assets JOIN users ON users.id = favorite_assets.user_id ORDER BY favorite_assets.created_at DESC LIMIT 20').all()); db.close();"
+```
+
+List portfolio holdings:
+
+```bash
+node --input-type=module -e "import { DatabaseSync } from 'node:sqlite'; const db = new DatabaseSync('data/money-platform.sqlite'); console.table(db.prepare('SELECT users.username, portfolio_holdings.symbol, portfolio_holdings.name, portfolio_holdings.quantity, portfolio_holdings.average_price AS averagePrice FROM portfolio_holdings JOIN users ON users.id = portfolio_holdings.user_id ORDER BY portfolio_holdings.updated_at DESC LIMIT 20').all()); db.close();"
 ```
