@@ -2,7 +2,7 @@ import { createServer } from 'node:http';
 import { createReadStream, existsSync, statSync } from 'node:fs';
 import { extname, resolve } from 'node:path';
 import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
-import { closeDb, createUser, findUserByEmail, findUserByUsername, getCommunityPosts, getFavoriteKeys, incrementCommunityPostMetric, initDb, toggleFavoriteKey } from './db.js';
+import { closeDb, createUser, deletePortfolioHolding, findUserByEmail, findUserByUsername, getCommunityPosts, getFavoriteKeys, getPortfolioHoldings, incrementCommunityPostMetric, initDb, savePortfolioHolding, toggleFavoriteKey } from './db.js';
 import { issueToken, verifyToken } from './token.js';
 import { getCryptoPricesLive, getMarketIndicesLive, getNewsLive, getUsStocksLive } from './market-data.js';
 
@@ -63,6 +63,27 @@ async function favoriteToggle(request, response) {
   return favorites ? json(response, 200, { success: true, favorites }) : json(response, 400, { message: '\uC990\uACA8\uCC3E\uAE30 \uB300\uC0C1\uC774 \uC62C\uBC14\uB974\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4.' });
 }
 
+async function portfolio(request, response) {
+  const user = await requireUser(request, response);
+  if (!user) return;
+  return json(response, 200, { success: true, holdings: await getPortfolioHoldings(user.username) });
+}
+
+async function portfolioSave(request, response) {
+  const user = await requireUser(request, response);
+  if (!user) return;
+  const holdings = await savePortfolioHolding(user.username, await body(request));
+  return holdings ? json(response, 200, { success: true, holdings }) : json(response, 400, { message: '\uD3EC\uD2B8\uD3F4\uB9AC\uC624 \uC790\uC0B0 \uC815\uBCF4\uAC00 \uC62C\uBC14\uB974\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4.' });
+}
+
+async function portfolioDelete(request, response) {
+  const user = await requireUser(request, response);
+  if (!user) return;
+  const { itemKey } = await body(request);
+  const holdings = await deletePortfolioHolding(user.username, itemKey);
+  return holdings ? json(response, 200, { success: true, holdings }) : json(response, 400, { message: '\uD3EC\uD2B8\uD3F4\uB9AC\uC624 \uC790\uC0B0\uC744 \uCC3E\uC744 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4.' });
+}
+
 function serveFile(response, path) {
   const file = existsSync(path) && statSync(path).isFile() ? path : resolve(dist, 'index.html');
   if (!existsSync(file)) return json(response, 404, { message: 'Not found' });
@@ -78,6 +99,9 @@ export const server = createServer(async (request, response) => {
     if (request.method === 'GET' && pathname === '/api/auth/me') return await me(request, response);
     if (request.method === 'GET' && pathname === '/api/favorites') return await favorites(request, response);
     if (request.method === 'POST' && pathname === '/api/favorites/toggle') return await favoriteToggle(request, response);
+    if (request.method === 'GET' && pathname === '/api/portfolio') return await portfolio(request, response);
+    if (request.method === 'POST' && pathname === '/api/portfolio') return await portfolioSave(request, response);
+    if (request.method === 'DELETE' && pathname === '/api/portfolio') return await portfolioDelete(request, response);
     if (request.method === 'GET' && pathname === '/api/market/indices') return json(response, 200, await getMarketIndicesLive());
     if (request.method === 'GET' && pathname === '/api/crypto') return json(response, 200, await getCryptoPricesLive());
     if (request.method === 'GET' && pathname === '/api/stocks/us') return json(response, 200, await getUsStocksLive());

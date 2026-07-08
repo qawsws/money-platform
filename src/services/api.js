@@ -52,3 +52,19 @@ export const postFavoriteToggle = (token, id) => request('/api/favorites/toggle'
   headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
   body: JSON.stringify({ id }),
 });
+
+export const getPortfolio = (token) => request('/api/portfolio', {
+  headers: { Authorization: `Bearer ${token}` },
+});
+
+export const savePortfolioHolding = (token, holding) => request('/api/portfolio', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+  body: JSON.stringify(holding),
+});
+
+export const deletePortfolioHolding = (token, itemKey) => request('/api/portfolio', {
+  method: 'DELETE',
+  headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+  body: JSON.stringify({ itemKey }),
+});

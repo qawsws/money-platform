@@ -82,6 +82,21 @@ export async function initDb() {
         UNIQUE(user_id, item_key)
       )
     `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS portfolio_holdings (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        item_key TEXT NOT NULL,
+        asset_type TEXT NOT NULL,
+        symbol TEXT NOT NULL,
+        name TEXT NOT NULL,
+        quantity NUMERIC NOT NULL,
+        average_price NUMERIC NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        UNIQUE(user_id, item_key)
+      )
+    `);
     await seedCommunityPosts();
     return;
   }
@@ -120,6 +135,22 @@ export async function initDb() {
       user_id INTEGER NOT NULL,
       item_key TEXT NOT NULL,
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(user_id, item_key),
+      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+  `);
+  sqlite.exec(`
+    CREATE TABLE IF NOT EXISTS portfolio_holdings (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      item_key TEXT NOT NULL,
+      asset_type TEXT NOT NULL,
+      symbol TEXT NOT NULL,
+      name TEXT NOT NULL,
+      quantity REAL NOT NULL,
+      average_price REAL NOT NULL,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
       UNIQUE(user_id, item_key),
       FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
     )
@@ -212,6 +243,60 @@ export async function toggleFavoriteKey(username, itemKey) {
   if (existing) sqlite.prepare('DELETE FROM favorite_assets WHERE user_id = ? AND item_key = ?').run(user.id, itemKey);
   else sqlite.prepare('INSERT INTO favorite_assets (user_id, item_key) VALUES (?, ?)').run(user.id, itemKey);
   return getFavoriteKeys(username);
+}
+
+const mapHolding = (holding) => holding && ({
+  id: holding.id,
+  itemKey: holding.item_key ?? holding.itemKey,
+  assetType: holding.asset_type ?? holding.assetType,
+  symbol: holding.symbol,
+  name: holding.name,
+  quantity: Number(holding.quantity),
+  averagePrice: Number(holding.average_price ?? holding.averagePrice),
+});
+
+export async function getPortfolioHoldings(username) {
+  const user = await findUserByUsername(username);
+  if (!user) return null;
+  const query = 'SELECT id, item_key, asset_type, symbol, name, quantity, average_price FROM portfolio_holdings WHERE user_id = $1 ORDER BY updated_at DESC, id DESC';
+  if (pool) return (await pool.query(query, [user.id])).rows.map(mapHolding);
+  return sqlite.prepare(query.replace('$1', '?')).all(user.id).map(mapHolding);
+}
+
+export async function savePortfolioHolding(username, holding) {
+  const user = await findUserByUsername(username);
+  const quantity = Number(holding.quantity);
+  const averagePrice = Number(holding.averagePrice);
+  if (!user || !holding.itemKey || !holding.assetType || !holding.symbol || !holding.name || quantity <= 0 || averagePrice < 0) return null;
+
+  if (pool) {
+    await pool.query(`
+      INSERT INTO portfolio_holdings (user_id, item_key, asset_type, symbol, name, quantity, average_price, updated_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
+      ON CONFLICT (user_id, item_key)
+      DO UPDATE SET quantity = EXCLUDED.quantity, average_price = EXCLUDED.average_price, symbol = EXCLUDED.symbol, name = EXCLUDED.name, asset_type = EXCLUDED.asset_type, updated_at = NOW()
+    `, [user.id, holding.itemKey, holding.assetType, holding.symbol, holding.name, quantity, averagePrice]);
+    return getPortfolioHoldings(username);
+  }
+
+  sqlite.prepare(`
+    INSERT INTO portfolio_holdings (user_id, item_key, asset_type, symbol, name, quantity, average_price, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    ON CONFLICT(user_id, item_key)
+    DO UPDATE SET quantity = excluded.quantity, average_price = excluded.average_price, symbol = excluded.symbol, name = excluded.name, asset_type = excluded.asset_type, updated_at = CURRENT_TIMESTAMP
+  `).run(user.id, holding.itemKey, holding.assetType, holding.symbol, holding.name, quantity, averagePrice);
+  return getPortfolioHoldings(username);
+}
+
+export async function deletePortfolioHolding(username, itemKey) {
+  const user = await findUserByUsername(username);
+  if (!user || !itemKey) return null;
+  if (pool) {
+    await pool.query('DELETE FROM portfolio_holdings WHERE user_id = $1 AND item_key = $2', [user.id, itemKey]);
+    return getPortfolioHoldings(username);
+  }
+  sqlite.prepare('DELETE FROM portfolio_holdings WHERE user_id = ? AND item_key = ?').run(user.id, itemKey);
+  return getPortfolioHoldings(username);
 }
 
 export async function closeDb() {
