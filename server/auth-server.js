@@ -2,7 +2,7 @@ import { createServer } from 'node:http';
 import { createReadStream, existsSync, statSync } from 'node:fs';
 import { extname, resolve } from 'node:path';
 import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
-import { closeDb, createUser, findUserByEmail, findUserByUsername, getCommunityPosts, incrementCommunityPostMetric, initDb } from './db.js';
+import { closeDb, createUser, findUserByEmail, findUserByUsername, getCommunityPosts, getFavoriteKeys, incrementCommunityPostMetric, initDb, toggleFavoriteKey } from './db.js';
 import { issueToken, verifyToken } from './token.js';
 import { getCryptoPricesLive, getMarketIndicesLive, getNewsLive, getUsStocksLive } from './market-data.js';
 
@@ -39,6 +39,30 @@ async function me(request, response) {
   return user ? json(response, 200, { success: true, user: publicUser(user) }) : json(response, 401, { message: '\uB85C\uADF8\uC778\uC774 \uD544\uC694\uD569\uB2C8\uB2E4.' });
 }
 
+async function requireUser(request, response) {
+  const claims = verifyToken(request.headers.authorization?.replace(/^Bearer /, ''));
+  const user = claims && await findUserByUsername(claims.username);
+  if (!user) {
+    json(response, 401, { message: '\uB85C\uADF8\uC778\uC774 \uD544\uC694\uD569\uB2C8\uB2E4.' });
+    return null;
+  }
+  return user;
+}
+
+async function favorites(request, response) {
+  const user = await requireUser(request, response);
+  if (!user) return;
+  return json(response, 200, { success: true, favorites: await getFavoriteKeys(user.username) });
+}
+
+async function favoriteToggle(request, response) {
+  const user = await requireUser(request, response);
+  if (!user) return;
+  const { id } = await body(request);
+  const favorites = await toggleFavoriteKey(user.username, id);
+  return favorites ? json(response, 200, { success: true, favorites }) : json(response, 400, { message: '\uC990\uACA8\uCC3E\uAE30 \uB300\uC0C1\uC774 \uC62C\uBC14\uB974\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4.' });
+}
+
 function serveFile(response, path) {
   const file = existsSync(path) && statSync(path).isFile() ? path : resolve(dist, 'index.html');
   if (!existsSync(file)) return json(response, 404, { message: 'Not found' });
@@ -52,6 +76,8 @@ export const server = createServer(async (request, response) => {
     if (request.method === 'POST' && pathname === '/api/auth/signup') return await signup(request, response);
     if (request.method === 'POST' && pathname === '/api/auth/login') return await login(request, response);
     if (request.method === 'GET' && pathname === '/api/auth/me') return await me(request, response);
+    if (request.method === 'GET' && pathname === '/api/favorites') return await favorites(request, response);
+    if (request.method === 'POST' && pathname === '/api/favorites/toggle') return await favoriteToggle(request, response);
     if (request.method === 'GET' && pathname === '/api/market/indices') return json(response, 200, await getMarketIndicesLive());
     if (request.method === 'GET' && pathname === '/api/crypto') return json(response, 200, await getCryptoPricesLive());
     if (request.method === 'GET' && pathname === '/api/stocks/us') return json(response, 200, await getUsStocksLive());

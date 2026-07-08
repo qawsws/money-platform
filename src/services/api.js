@@ -42,3 +42,13 @@ export const postSignup = (profile) => request('/api/auth/signup', {
 export const getCurrentUser = (token) => request('/api/auth/me', {
   headers: { Authorization: `Bearer ${token}` },
 });
+
+export const getFavorites = (token) => request('/api/favorites', {
+  headers: { Authorization: `Bearer ${token}` },
+});
+
+export const postFavoriteToggle = (token, id) => request('/api/favorites/toggle', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+  body: JSON.stringify({ id }),
+});

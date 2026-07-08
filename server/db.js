@@ -73,6 +73,15 @@ export async function initDb() {
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS favorite_assets (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        item_key TEXT NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        UNIQUE(user_id, item_key)
+      )
+    `);
     await seedCommunityPosts();
     return;
   }
@@ -103,6 +112,16 @@ export async function initDb() {
       category TEXT NOT NULL,
       score INTEGER NOT NULL DEFAULT 0,
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  sqlite.exec(`
+    CREATE TABLE IF NOT EXISTS favorite_assets (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      item_key TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(user_id, item_key),
+      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
     )
   `);
   await seedCommunityPosts();
@@ -166,6 +185,33 @@ export async function incrementCommunityPostMetric(id, metric) {
   const result = sqlite.prepare(`UPDATE community_posts SET ${metric} = ${metric} + 1 WHERE id = ?`).run(id);
   if (result.changes === 0) return null;
   return mapPost(sqlite.prepare('SELECT id, author, title, views, likes, comments, category, score FROM community_posts WHERE id = ?').get(id));
+}
+
+export async function getFavoriteKeys(username) {
+  const user = await findUserByUsername(username);
+  if (!user) return null;
+  if (pool) {
+    const result = await pool.query('SELECT item_key FROM favorite_assets WHERE user_id = $1 ORDER BY created_at ASC', [user.id]);
+    return result.rows.map((row) => row.item_key);
+  }
+  return sqlite.prepare('SELECT item_key FROM favorite_assets WHERE user_id = ? ORDER BY created_at ASC').all(user.id).map((row) => row.item_key);
+}
+
+export async function toggleFavoriteKey(username, itemKey) {
+  const user = await findUserByUsername(username);
+  if (!user || !itemKey) return null;
+
+  if (pool) {
+    const existing = await pool.query('SELECT id FROM favorite_assets WHERE user_id = $1 AND item_key = $2', [user.id, itemKey]);
+    if (existing.rows[0]) await pool.query('DELETE FROM favorite_assets WHERE user_id = $1 AND item_key = $2', [user.id, itemKey]);
+    else await pool.query('INSERT INTO favorite_assets (user_id, item_key) VALUES ($1, $2)', [user.id, itemKey]);
+    return getFavoriteKeys(username);
+  }
+
+  const existing = sqlite.prepare('SELECT id FROM favorite_assets WHERE user_id = ? AND item_key = ?').get(user.id, itemKey);
+  if (existing) sqlite.prepare('DELETE FROM favorite_assets WHERE user_id = ? AND item_key = ?').run(user.id, itemKey);
+  else sqlite.prepare('INSERT INTO favorite_assets (user_id, item_key) VALUES (?, ?)').run(user.id, itemKey);
+  return getFavoriteKeys(username);
 }
 
 export async function closeDb() {

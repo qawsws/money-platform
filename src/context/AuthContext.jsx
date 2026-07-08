@@ -17,7 +17,7 @@ export function AuthProvider({ children }) {
   const setFavoritesUser = useFavoritesStore((state) => state.setUser);
 
   useEffect(() => {
-    setFavoritesUser(user?.username || null);
+    setFavoritesUser(user?.username || null, localStorage.getItem('mp_token') || '');
   }, [user, setFavoritesUser]);
 
   useEffect(() => {

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { getFavorites, postFavoriteToggle } from '../services/api';
 
 const KEY = 'mp_favorites';
 
@@ -17,7 +18,7 @@ function writeStorage(data) {
   try {
     localStorage.setItem(KEY, JSON.stringify(data));
   } catch {
-    // 즐겨찾기는 저장 공간이 차단된 환경에서도 메모리 상태로 동작합니다.
+    // Keep the in-memory state when storage is unavailable.
   }
 }
 
@@ -25,17 +26,38 @@ const userKey = (username) => username ? `user:${username}` : 'guest';
 
 export const useFavoritesStore = create((set, get) => ({
   activeUser: 'guest',
+  token: '',
   favorites: readStorage().guest || [],
-  setUser: (username) => {
+  setUser: async (username, token = '') => {
     const activeUser = userKey(username);
-    set({ activeUser, favorites: readStorage()[activeUser] || [] });
+    const cached = readStorage()[activeUser] || [];
+    set({ activeUser, token, favorites: cached });
+    if (!username || !token) return;
+    try {
+      const res = await getFavorites(token);
+      set({ favorites: res.favorites || [] });
+    } catch {
+      set({ favorites: cached });
+    }
   },
-  toggle: (id) => {
-    const { activeUser, favorites } = get();
+  toggle: async (id) => {
+    const { activeUser, favorites, token } = get();
     const next = favorites.includes(id) ? favorites.filter((item) => item !== id) : [...favorites, id];
+    set({ favorites: next });
+
+    if (token) {
+      try {
+        const res = await postFavoriteToggle(token, id);
+        set({ favorites: res.favorites || next });
+        return;
+      } catch {
+        set({ favorites });
+        return;
+      }
+    }
+
     const data = readStorage();
     data[activeUser] = next;
     writeStorage(data);
-    set({ favorites: next });
   },
 }));
