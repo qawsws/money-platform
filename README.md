@@ -22,6 +22,7 @@ Open `http://localhost:5173`.
 ```bash
 npm run lint
 npm run build
+npm run verify
 npm run test:e2e
 ```
 
@@ -37,9 +38,25 @@ The Node server serves `dist`, investment API routes, and authentication routes.
 ```bash
 DATABASE_URL=postgresql://...
 JWT_SECRET=replace-with-a-long-random-secret
+DATABASE_SSL=true
 ```
 
 When `DATABASE_URL` is empty, the server uses local SQLite. `render.yaml` declares a Render Web Service and PostgreSQL database for deployment.
+
+## Deployment checklist
+
+1. Commit all local changes.
+2. Push the repository to GitHub.
+3. Create the Render service from `render.yaml`.
+4. Confirm these environment variables in Render:
+
+- `DATABASE_URL`: provided by the Render PostgreSQL database
+- `DATABASE_SSL`: `true`
+- `JWT_SECRET`: generated secret value
+- `NODE_VERSION`: `24.16.0`
+
+5. Open `/api/auth/health` on the deployed URL and confirm `{ "ok": true }`.
+6. Test signup, login, favorites, portfolio holdings, and market data on the deployed URL.
 
 ## Data sources
 

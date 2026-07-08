@@ -27,7 +27,7 @@ async function initApp() {
   createRoot(document.getElementById('root')).render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
+        <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
           <AuthProvider>
             <SearchProvider>
               <App />
