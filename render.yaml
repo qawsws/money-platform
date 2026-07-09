@@ -14,6 +14,8 @@ services:
         fromDatabase:
           name: money-platform-db
           property: connectionString
+      - key: DATABASE_SSL
+        value: "true"
 
 databases:
   - name: money-platform-db
