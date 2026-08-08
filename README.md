@@ -36,7 +36,7 @@ npm start
 The Node server serves `dist`, investment API routes, and authentication routes. Set:
 
 ```bash
-DATABASE_URL=postgresql://...
+DATABASE_URL=
 JWT_SECRET=replace-with-a-long-random-secret
 DATABASE_SSL=true
 ```

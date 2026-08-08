@@ -27,7 +27,7 @@ export default defineConfig({
       reuseExistingServer: true,
     },
     {
-      command: 'npm run dev:web -- --host 127.0.0.1',
+      command: 'node node_modules/vite/bin/vite.js --host 127.0.0.1',
       url: 'http://localhost:5173',
       reuseExistingServer: true,
     },

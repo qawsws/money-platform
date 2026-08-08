@@ -18,9 +18,8 @@ async function initApp() {
         serviceWorker: { url: '/mockServiceWorker.js', options: { type: 'classic' } },
         onUnhandledRequest: 'bypass',
       });
-      console.log('[MSW] worker started');
-    } catch (error) {
-      console.error('[MSW] failed to start', error);
+    } catch {
+      // Mock worker is optional in development.
     }
   }
 

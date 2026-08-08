@@ -37,6 +37,17 @@ export function AuthProvider({ children }) {
     return res.user;
   };
 
+  const replaceSession = (res) => remember(res);
+
+  async function refreshUser() {
+    const token = localStorage.getItem('mp_token');
+    if (!token) return null;
+    const res = await getCurrentUser(token);
+    setUser(res.user);
+    localStorage.setItem('mp_user', JSON.stringify(res.user));
+    return res.user;
+  }
+
   async function login(username, password) {
     const res = await postLogin({ username, password });
     if (!res?.success) throw new Error('\uB85C\uADF8\uC778\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4.');
@@ -46,7 +57,7 @@ export function AuthProvider({ children }) {
   async function signup(profile) {
     const res = await postSignup(profile);
     if (!res?.success) throw new Error('\uD68C\uC6D0\uAC00\uC785\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4.');
-    return remember(res);
+    return res.user;
   }
 
   function logout() {
@@ -55,7 +66,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('mp_token');
   }
 
-  return <AuthContext.Provider value={{ user, login, signup, logout }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, login, signup, logout, refreshUser, replaceSession }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

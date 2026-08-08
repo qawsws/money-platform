@@ -1,9 +1,31 @@
 @import "tailwindcss";
 
 :root {
+  --color-background: #f5f7fa;
+  --color-background-soft: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f9fafb;
+  --color-border: #e5e7eb;
+  --color-border-strong: #d7dde8;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #64748b;
+  --color-text-tertiary: #94a3b8;
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-soft: #eff6ff;
+  --color-positive: #ef4444;
+  --color-positive-soft: #fef2f2;
+  --color-negative: #2563eb;
+  --color-negative-soft: #eff6ff;
+  --color-warning: #f59e0b;
+  --color-success: #10b981;
+  --shadow-card: 0 14px 34px rgba(15, 23, 42, 0.06), 0 2px 8px rgba(15, 23, 42, 0.04);
+  --shadow-card-hover: 0 18px 44px rgba(15, 23, 42, 0.09), 0 4px 12px rgba(15, 23, 42, 0.05);
+  --radius-card: 20px;
+
   font-family: Inter, Pretendard, "Noto Sans KR", Arial, sans-serif;
-  color: #0f172a;
-  background: #f8fafc;
+  color: var(--color-text-primary);
+  background: var(--color-background);
 }
 
 html {
@@ -13,7 +35,10 @@ html {
 body {
   margin: 0;
   min-width: 320px;
-  background: #f8fafc;
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 button,

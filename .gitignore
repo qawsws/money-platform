@@ -10,13 +10,19 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+.tmp/
+test-results/
 *.local
+.env
+.env.*
+!.env.example
 data/*.sqlite
 data/*.sqlite-*
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json
 .idea
 .DS_Store
 *.suo
@@ -24,3 +30,5 @@ data/*.sqlite-*
 *.njsproj
 *.sln
 *.sw?
+playwright-report/
+coverage/

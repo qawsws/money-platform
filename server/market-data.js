@@ -1,6 +1,17 @@
-import { cryptoPrices, marketIndices, newsList, usStocks } from '../src/mock/marketData.js';
+import { cryptoPrices, koreanStocks, marketIndices, newsList, usStocks } from '../src/mock/marketData.js';
 
-const timeout = 5000;
+const timeout = Number(process.env.MARKET_TIMEOUT_MS || 12_000);
+const cacheMs = Number(process.env.MARKET_CACHE_MS || 60_000);
+const cache = new Map();
+
+async function cached(key, loader) {
+  const now = Date.now();
+  const hit = cache.get(key);
+  if (hit && now - hit.time < cacheMs) return hit.data;
+  const data = await loader();
+  cache.set(key, { time: now, data });
+  return data;
+}
 
 async function fetchJson(url) {
   const response = await fetch(url, { signal: AbortSignal.timeout(timeout) });
@@ -14,90 +25,154 @@ async function fetchText(url) {
   return response.text();
 }
 
-function csvRows(text) {
-  const [head, ...rows] = text.trim().split(/\r?\n/).map((line) => line.split(','));
-  return rows.map((row) => Object.fromEntries(head.map((key, index) => [key, row[index]])));
+const reason = (error) => error?.cause?.code || error?.message || error?.name || 'unknown';
+const live = (items, provider) => items.map((item) => ({ ...item, dataSource: 'live', provider }));
+const fallback = (items, provider, error) => items.map((item) => ({ ...item, dataSource: 'fallback', provider, fallbackReason: reason(error) }));
+const decodeXml = (value = '') => value.replace(/<!\[CDATA\[(.*?)\]\]>/gs, '$1').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+const stripTags = (value = '') => decodeXml(value).replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+
+async function yahooChart(symbol) {
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=1mo&interval=1d`;
+  const data = await fetchJson(url);
+  const result = data?.chart?.result?.[0];
+  const meta = result?.meta;
+  if (!meta?.regularMarketPrice) throw new Error('empty quote');
+  const current = Number(meta.regularMarketPrice);
+  const previous = Number(meta.chartPreviousClose || meta.previousClose || current);
+  const percent = previous ? ((current - previous) / previous) * 100 : 0;
+  const prices = (result?.indicators?.quote?.[0]?.close || []).filter((value) => Number.isFinite(Number(value))).map(Number);
+  const history = prices.slice(-30);
+  return { value: current, change: `${percent >= 0 ? '+' : ''}${percent.toFixed(2)}%`, isPositive: percent >= 0, priceHistory: history.length > 1 ? history : [previous, current] };
 }
 
-function pct(value, fallback) {
-  const text = String(value || '').trim();
-  if (!text || text === 'N/D') return fallback;
-  return text.endsWith('%') ? text : `${text}%`;
-}
-
-async function stooq(symbols) {
-  const url = `https://stooq.com/q/l/?s=${symbols.join('+')}&f=sd2t2lcpn&h&e=csv`;
-  return csvRows(await fetchText(url));
+async function yahooQuotes(items, symbols, currency = '$') {
+  const quotes = await Promise.all(symbols.map((symbol) => yahooChart(symbol)));
+  return items.map((item, index) => {
+    const quote = quotes[index];
+    return {
+      ...item,
+      price: `${currency}${quote.value.toLocaleString(undefined, { maximumFractionDigits: 2 })}`,
+      change: quote.change,
+      isPositive: quote.isPositive,
+      priceHistory: quote.priceHistory,
+    };
+  });
 }
 
 export async function getMarketIndicesLive() {
+  return cached('market-indices', async () => {
   try {
-    const rows = await stooq(['^spx', '^ndq', '^dji', '^ks11']);
-    return marketIndices.map((item, index) => {
-      const row = rows[index] || {};
-      const value = row.Last && row.Last !== 'N/D' ? Number(row.Last).toLocaleString() : item.value;
-      const change = pct(row.Percent, item.change);
-      return { ...item, value, change, isPositive: !String(change).startsWith('-') };
-    });
-  } catch {
-    return marketIndices;
+    const quotes = await Promise.all(['^GSPC', '^IXIC', '^DJI', '^KS11'].map((symbol) => yahooChart(symbol)));
+    return live(marketIndices.map((item, index) => {
+      const quote = quotes[index];
+      return { ...item, value: quote.value.toLocaleString(undefined, { maximumFractionDigits: 2 }), change: quote.change, isPositive: quote.isPositive };
+    }), 'Yahoo Finance');
+  } catch (error) {
+    return fallback(marketIndices, 'Yahoo Finance', error);
   }
+  });
 }
 
 export async function getCryptoPricesLive() {
+  return cached('crypto-prices', async () => {
   try {
-    const data = await fetchJson('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,ripple&order=market_cap_desc&per_page=3&page=1&sparkline=false&price_change_percentage=24h');
-    return data.map((coin, index) => {
+    const ids = cryptoPrices.map((coin) => coin.coingeckoId || coin.id).filter(Boolean);
+    const data = await fetchJson(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${ids.join(',')}&order=market_cap_desc&per_page=${ids.length}&page=1&sparkline=true&price_change_percentage=24h`);
+    return live(data.map((coin) => {
       const change = Number(coin.price_change_percentage_24h || 0);
+      const fallback = cryptoPrices.find((item) => item.symbol.toLowerCase() === coin.symbol.toLowerCase()) || {};
       return {
-        ...cryptoPrices[index],
-        id: cryptoPrices[index]?.id || coin.id,
+        ...fallback,
+        id: fallback.id || coin.id,
         name: coin.name,
         symbol: coin.symbol.toUpperCase(),
         price: `$${Number(coin.current_price).toLocaleString()}`,
         change: `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`,
         isPositive: change >= 0,
         image: coin.symbol.toUpperCase(),
+        priceHistory: coin.sparkline_in_7d?.price?.slice(-30) || [],
       };
-    });
-  } catch {
-    return cryptoPrices;
+    }), 'CoinGecko');
+  } catch (error) {
+    return fallback(cryptoPrices, 'CoinGecko', error);
   }
+  });
 }
 
 export async function getUsStocksLive() {
+  return cached('us-stocks', async () => {
   try {
-    const rows = await stooq(['aapl.us', 'googl.us', 'msft.us', 'tsla.us']);
-    return usStocks.map((item, index) => {
-      const row = rows[index] || {};
-      const change = pct(row.Percent, item.change);
-      return {
-        ...item,
-        price: row.Last && row.Last !== 'N/D' ? `$${Number(row.Last).toLocaleString()}` : item.price,
-        change,
-        isPositive: !String(change).startsWith('-'),
-      };
-    });
-  } catch {
-    return usStocks;
+    return live(await yahooQuotes(usStocks, usStocks.map((item) => item.symbol), '$'), 'Yahoo Finance');
+  } catch (error) {
+    return fallback(usStocks, 'Yahoo Finance', error);
   }
+  });
+}
+
+export async function getKoreanStocksLive() {
+  return cached('korean-stocks', async () => {
+  try {
+    return live(await yahooQuotes(koreanStocks, koreanStocks.map((item) => `${item.symbol}.KS`), '\u20A9'), 'Yahoo Finance');
+  } catch (error) {
+    return fallback(koreanStocks, 'Yahoo Finance', error);
+  }
+  });
 }
 
 export async function getNewsLive() {
+  return cached('news', async () => {
   try {
-    const data = await fetchJson('https://api.gdeltproject.org/api/v2/doc/doc?query=stock%20market%20OR%20federal%20reserve%20OR%20bitcoin&mode=ArtList&format=json&maxrecords=8&sort=HybridRel');
-    const articles = Array.isArray(data.articles) ? data.articles.slice(0, 5) : [];
-    if (articles.length === 0) return newsList;
-    return articles.map((article, index) => ({
-      id: index + 1,
-      title: article.title || newsList[index]?.title,
-      summary: article.seendate ? `${article.domain || 'news'} · ${article.seendate}` : (article.url || ''),
-      category: '글로벌',
-      time: '실시간',
-      importance: index < 2 ? 'high' : 'medium',
-      url: article.url,
-    }));
-  } catch {
-    return newsList;
+    const feeds = [
+      { query: '\uD55C\uAD6D \uC99D\uC2DC OR \uCF54\uC2A4\uD53C OR \uC0BC\uC131\uC804\uC790 OR SK\uD558\uC774\uB2C9\uC2A4', category: '\uAD6D\uB0B4\uC99D\uC2DC' },
+      { query: '\uBBF8\uAD6D\uC99D\uC2DC OR \uB098\uC2A4\uB2E5 OR \uC5F0\uC900 OR \uBE44\uD2B8\uCF54\uC778', category: '\uD574\uC678\uC99D\uC2DC' },
+      { query: '\uD22C\uC790 OR \uAE08\uB9AC OR \uD658\uC728 OR \uCC44\uAD8C', category: '\uACBD\uC81C' },
+    ];
+    const xmls = await Promise.all(feeds.map((feed) => fetchText(`https://news.google.com/rss/search?q=${encodeURIComponent(feed.query)}&hl=ko&gl=KR&ceid=KR:ko`).then((xml) => ({ ...feed, xml }))));
+    const items = xmls.flatMap((feed) => [...feed.xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].slice(0, 6).map((match) => ({ item: match[1], category: feed.category })));
+    if (items.length === 0) return fallback(newsList, 'Google News RSS', new Error('empty response'));
+    const seen = new Set();
+    return live(items.map(({ item, category }, index) => {
+      const rawTitle = decodeXml(item.match(/<title>([\s\S]*?)<\/title>/)?.[1] || newsList[index]?.title || '');
+      const title = rawTitle.replace(/\s+-\s+[^-]+$/, '').trim();
+      const link = decodeXml(item.match(/<link>([\s\S]*?)<\/link>/)?.[1] || '');
+      const source = decodeXml(item.match(/<source[^>]*>([\s\S]*?)<\/source>/)?.[1] || '');
+      const date = decodeXml(item.match(/<pubDate>([\s\S]*?)<\/pubDate>/)?.[1] || '');
+      const summary = stripTags(item.match(/<description>([\s\S]*?)<\/description>/)?.[1] || '') || [source, date].filter(Boolean).join(' \u00b7 ');
+      return {
+        id: index + 1,
+        title,
+        summary,
+        category,
+        time: '\uC2E4\uC2DC\uAC04',
+        importance: index < 3 ? 'high' : 'medium',
+        url: link,
+      };
+    }).filter((article) => {
+      const key = article.title.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    }).slice(0, 16), 'Google News RSS');
+  } catch (error) {
+    return fallback(newsList, 'Google News RSS', error);
   }
+  });
+}
+
+async function check(name, provider, load) {
+  try {
+    await load();
+    return { name, provider, ok: true };
+  } catch (error) {
+    return { name, provider, ok: false, reason: reason(error) };
+  }
+}
+
+export async function getMarketDataStatus() {
+  const statuses = await Promise.all([
+    check('crypto', 'CoinGecko', () => fetchJson('https://api.coingecko.com/api/v3/ping')),
+    check('stocks', 'Yahoo Finance', () => fetchJson('https://query1.finance.yahoo.com/v8/finance/chart/AAPL?range=1d&interval=1d')),
+    check('news', 'Google News RSS', () => fetchText(`https://news.google.com/rss/search?q=${encodeURIComponent('\uD55C\uAD6D \uC99D\uC2DC')}&hl=ko&gl=KR&ceid=KR:ko`)),
+  ]);
+  return { checkedAt: new Date().toISOString(), statuses };
 }

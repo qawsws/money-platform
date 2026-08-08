@@ -16,6 +16,30 @@ services:
           property: connectionString
       - key: DATABASE_SSL
         value: "true"
+      - key: AI_ENABLED
+        value: "false"
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4.1-mini
+      - key: AI_TIMEOUT_MS
+        value: "20000"
+      - key: AI_CACHE_TTL_MS
+        value: "600000"
+      - key: AI_CACHE_MAX_ENTRIES
+        value: "200"
+      - key: AI_RATE_LIMIT_WINDOW_MS
+        value: "60000"
+      - key: AI_RATE_LIMIT_MAX
+        value: "8"
+      - key: AI_MAX_OPENAI_CALLS_PER_DAY
+        value: "5"
+      - key: AI_MAX_OPENAI_CALLS_PER_USER_PER_DAY
+        value: "2"
+      - key: AI_MAX_OUTPUT_TOKENS
+        value: "500"
+      - key: AI_CACHE_TTL_SECONDS
+        value: "21600"
 
 databases:
   - name: money-platform-db
