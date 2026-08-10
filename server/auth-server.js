@@ -1,4 +1,4 @@
-﻿import './env.js';
+import './env.js';
 import { createServer } from 'node:http';
 import { createReadStream, existsSync, statSync } from 'node:fs';
 import { extname, resolve } from 'node:path';
@@ -14,10 +14,48 @@ const host = process.env.HOST || '0.0.0.0';
 const dist = resolve('dist');
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png' };
 const json = (response, status, body) => { response.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' }); response.end(JSON.stringify(body)); };
+class HttpError extends Error {
+  constructor(status, message) {
+    super(message);
+    this.status = status;
+    this.publicMessage = message;
+  }
+}
+const bodyLimitBytes = Number(process.env.BODY_LIMIT_BYTES || 128_000);
+const authLimitWindowMs = Number(process.env.AUTH_RATE_LIMIT_WINDOW_MS || 60_000);
+const authLimitMax = Number(process.env.AUTH_RATE_LIMIT_MAX || 12);
+const authAttempts = new Map();
 const publicUser = (user) => { const result = { ...user }; delete result.password_hash; return result; };
 const hashPassword = (password) => { const salt = randomBytes(16).toString('hex'); return `${salt}:${scryptSync(password, salt, 64).toString('hex')}`; };
 const matches = (password, stored) => { const [salt, hash] = stored.split(':'); const expected = Buffer.from(hash, 'hex'); const actual = scryptSync(password, salt, 64); return expected.length === actual.length && timingSafeEqual(expected, actual); };
-const body = async (request) => { const chunks = []; for await (const chunk of request) chunks.push(chunk); return JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}'); };
+const body = async (request, maxBytes = bodyLimitBytes) => {
+  const chunks = [];
+  let size = 0;
+  for await (const chunk of request) {
+    size += chunk.length;
+    if (size > maxBytes) throw new HttpError(413, 'Request body is too large.');
+    chunks.push(chunk);
+  }
+  try {
+    return JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}');
+  } catch {
+    throw new HttpError(400, 'Invalid request body.');
+  }
+};
+const clientKey = (request) => String(request.headers['x-forwarded-for'] || '').split(',')[0].trim() || request.socket.remoteAddress || 'anonymous';
+function allowAuthAttempt(request, scope) {
+  const now = Date.now();
+  const key = `${scope}:${clientKey(request)}`;
+  const bucket = authAttempts.get(key) || [];
+  const recent = bucket.filter((time) => now - time < authLimitWindowMs);
+  if (recent.length >= authLimitMax) {
+    authAttempts.set(key, recent);
+    return false;
+  }
+  recent.push(now);
+  authAttempts.set(key, recent);
+  return true;
+}
 const aiBody = async (request, maxBytes = 64_000) => {
   const chunks = [];
   let size = 0;
@@ -30,6 +68,7 @@ const aiBody = async (request, maxBytes = 64_000) => {
 };
 
 async function signup(request, response) {
+  if (!allowAuthAttempt(request, 'signup')) return json(response, 429, { message: 'Too many requests. Please try again later.' });
   const profile = await body(request);
   const { username, password, name, email, phone, birthDate = '', consent } = profile;
   if (!username || !password || !name || !email || !phone || !consent) return json(response, 400, { message: '\uD544\uC218 \uD56D\uBAA9\uC744 \uBAA8\uB450 \uC785\uB825\uD574 \uC8FC\uC138\uC694.' });
@@ -42,6 +81,7 @@ async function signup(request, response) {
 }
 
 async function login(request, response) {
+  if (!allowAuthAttempt(request, 'login')) return json(response, 429, { message: 'Too many requests. Please try again later.' });
   const { username, password } = await body(request); const user = username && await findUserByUsername(username);
   if (!user || !password || !matches(password, user.password_hash)) return json(response, 401, { message: '\uC544\uC774\uB514 \uB610\uB294 \uBE44\uBC00\uBC88\uD638\uAC00 \uC62C\uBC14\uB974\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4.' });
   const clean = publicUser(user); return json(response, 200, { success: true, user: clean, token: issueToken(clean) });
@@ -587,6 +627,7 @@ export const server = createServer(async (request, response) => {
     if (pathname.startsWith('/api/')) return json(response, 404, { message: 'Not found' });
     return serveFile(response, resolve(dist, `.${pathname}`));
   } catch (error) {
+    if (error instanceof HttpError) return json(response, error.status, { message: error.publicMessage });
     console.error('Server request failed', { name: error?.name, code: error?.code });
     return json(response, 500, { message: '\uC11C\uBC84 \uCC98\uB9AC \uC911 \uC624\uB958\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4.' });
   }

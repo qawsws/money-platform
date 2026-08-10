@@ -38,6 +38,8 @@ const countValue = (value) => {
   return text.endsWith('K') ? Math.round(number * 1000) : Math.round(number);
 };
 
+const communityPlaceholder = 'Sample community post for investors to discuss market ideas.';
+
 const formatCount = (value) => {
   const number = Number(value || 0);
   if (number >= 1000) return `${Number((number / 1000).toFixed(1))}K`;
@@ -360,16 +362,16 @@ async function ensureCommunityContentColumn() {
       WHERE table_name = 'community_posts' AND column_name = 'content'
     `);
     if (result.rowCount === 0) await pool.query("ALTER TABLE community_posts ADD COLUMN content TEXT NOT NULL DEFAULT ''");
-    await pool.query("UPDATE community_posts SET content = title || E'\\n\\n?ъ옄?먮뱾???④퍡 ?섍껄???섎닃 ???덈룄濡?以鍮꾪븳 而ㅻ??덊떚 ?덉떆 湲?낅땲??' WHERE content = ''");
+    await pool.query("UPDATE community_posts SET content = title || $1 WHERE content = ''", [`\n\n${communityPlaceholder}`]);
     return;
   }
 
   const columns = sqlite.prepare("PRAGMA table_info('community_posts')").all();
   if (!columns.some((column) => column.name === 'content')) sqlite.exec("ALTER TABLE community_posts ADD COLUMN content TEXT NOT NULL DEFAULT ''");
-  sqlite.prepare("UPDATE community_posts SET content = title || char(10) || char(10) || '?ъ옄?먮뱾???④퍡 ?섍껄???섎닃 ???덈룄濡?以鍮꾪븳 而ㅻ??덊떚 ?덉떆 湲?낅땲??' WHERE content = ''").run();
+  sqlite.prepare("UPDATE community_posts SET content = title || char(10) || char(10) || ? WHERE content = ''").run(communityPlaceholder);
 }
 
-const defaultContent = (post) => `${post.title}\n\n?ъ옄?먮뱾???④퍡 ?섍껄???섎닃 ???덈룄濡?以鍮꾪븳 而ㅻ??덊떚 ?덉떆 湲?낅땲?? ?ㅼ젣 ?쒕퉬?ㅼ뿉?쒕뒗 ?ъ슜?먭? ?묒꽦??蹂몃Ц?????곸뿭????λ맗?덈떎.`;
+const defaultContent = (post) => `${post.title}\n\n${communityPlaceholder} User-written content is stored here in the live service.`;
 
 async function ensureCommunityHiddenColumn() {
   if (pool) {
@@ -489,7 +491,7 @@ export async function createCommunityPost(username, post) {
   const user = await findUserByUsername(username);
   const title = String(post.title || '').trim();
   const content = String(post.content || '').trim();
-  const category = String(post.category || '?먯쑀').trim();
+  const category = String(post.category || '????').trim();
   if (!user || title.length < 2 || content.length < 5) return null;
 
   if (pool) {

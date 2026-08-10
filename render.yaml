@@ -2,12 +2,15 @@ services:
   - type: web
     name: money-platform
     runtime: node
+    plan: free
     buildCommand: npm ci && npm run build
     startCommand: npm start
     healthCheckPath: /api/auth/health
     envVars:
       - key: NODE_VERSION
         value: 24.16.0
+      - key: NODE_ENV
+        value: production
       - key: JWT_SECRET
         generateValue: true
       - key: DATABASE_URL
@@ -43,5 +46,6 @@ services:
 
 databases:
   - name: money-platform-db
+    plan: free
     databaseName: money_platform
     user: money_platform
