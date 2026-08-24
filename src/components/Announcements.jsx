@@ -16,19 +16,19 @@ export default function Announcements() {
   return (
     <section className="border-b border-slate-200 bg-white">
       <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
-        <div className="rounded-md border border-blue-100 bg-blue-50">
+        <div className="rounded-md border border-emerald-100 bg-emerald-50">
           {notices.map((notice) => (
             <button
               key={notice.id}
               type="button"
               onClick={() => setSelected(notice)}
-              className="flex w-full min-w-0 items-center gap-2 border-b border-blue-100 px-4 py-3 text-left transition last:border-b-0 hover:bg-blue-100/60 focus:outline-none focus:ring-4 focus:ring-blue-100"
+              className="flex w-full min-w-0 items-center gap-2 border-b border-emerald-100 px-4 py-3 text-left transition last:border-b-0 hover:bg-emerald-100/60 focus:outline-none focus:ring-4 focus:ring-emerald-100"
             >
-              <span className={`shrink-0 rounded-full px-2 py-1 text-xs font-bold ${notice.priority === 'important' ? 'bg-blue-600 text-white' : 'bg-white text-blue-700'}`}>
+              <span className={`shrink-0 rounded-full px-2 py-1 text-xs font-bold ${notice.priority === 'important' ? 'bg-[var(--color-primary)] text-white' : 'bg-white text-emerald-700'}`}>
                 {notice.priority === 'important' ? '중요' : '공지'}
               </span>
               <span className="min-w-0 flex-1 truncate font-bold text-slate-950">{notice.title}</span>
-              <span className="shrink-0 text-xs font-bold text-blue-700">보기</span>
+              <span className="shrink-0 text-xs font-bold text-emerald-700">보기</span>
             </button>
           ))}
         </div>
@@ -39,7 +39,7 @@ export default function Announcements() {
           <article className="w-full max-w-2xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl">
             <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-5 py-4">
               <div className="min-w-0">
-                <span className={`inline-flex rounded-full px-2 py-1 text-xs font-bold ${selected.priority === 'important' ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-700'}`}>
+                <span className={`inline-flex rounded-full px-2 py-1 text-xs font-bold ${selected.priority === 'important' ? 'bg-[var(--color-primary)] text-white' : 'bg-emerald-50 text-emerald-700'}`}>
                   {selected.priority === 'important' ? '중요' : '공지'}
                 </span>
                 <h2 id="announcement-title" className="mt-3 break-words text-xl font-black text-slate-950">{selected.title}</h2>

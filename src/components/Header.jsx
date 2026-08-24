@@ -36,7 +36,7 @@ const menuItems = [
 ];
 
 const navClass = ({ isActive }) => [
-  'rounded-full px-3 py-2 text-sm transition-colors',
+  'rounded-md px-3 py-2 text-sm font-semibold transition-colors',
   isActive
     ? 'bg-[var(--color-primary-soft)] font-semibold text-[var(--color-primary)]'
     : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-muted)] hover:text-[var(--color-text-primary)]',
@@ -47,7 +47,7 @@ const avatarText = (username = '') => username.trim().charAt(0).toUpperCase() ||
 function Logo({ onClick }) {
   return (
     <Link to="/" onClick={onClick} className="flex shrink-0 items-center gap-2.5">
-      <span className="grid size-9 place-items-center rounded-2xl bg-[var(--color-primary)] text-sm font-black text-white shadow-sm">
+      <span className="grid size-9 place-items-center rounded-lg bg-[var(--color-primary)] text-sm font-black text-white shadow-sm">
         M
       </span>
       <span className="text-lg font-extrabold tracking-tight text-[var(--color-text-primary)]">
@@ -75,7 +75,7 @@ function ChevronIcon({ open }) {
 
 function SearchBox({ input, setInput, submitSearch, className = '' }) {
   return (
-    <div className={`flex h-11 min-w-0 items-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-3 shadow-sm transition focus-within:border-[var(--color-primary)] focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-100 ${className}`}>
+    <div className={`flex h-10 min-w-0 items-center rounded-lg border border-[var(--color-border)] bg-white px-3 shadow-sm transition focus-within:border-[var(--color-primary)] focus-within:ring-2 focus-within:ring-emerald-100 ${className}`}>
       <SearchIcon />
       <input
         value={input}
@@ -211,15 +211,15 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-white/90 shadow-sm backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-white/95 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 sm:px-6 lg:px-8">
         <Logo onClick={() => setMobileOpen(false)} />
 
         <nav aria-label="Primary" className="hidden items-center gap-1 lg:flex">
           {menuItems.map((item) => <NavLink key={item.to} to={item.to} className={navClass}>{item.label}</NavLink>)}
         </nav>
 
-        <SearchBox input={input} setInput={setInput} submitSearch={submitSearch} className="ml-auto hidden max-w-sm flex-1 md:flex xl:max-w-md" />
+        <SearchBox input={input} setInput={setInput} submitSearch={submitSearch} className="ml-auto hidden max-w-sm flex-1 md:flex xl:max-w-lg" />
 
         <div className="ml-auto hidden shrink-0 items-center gap-2 md:flex">
           {user ? (

@@ -9,7 +9,7 @@ export default function SignupModal({ open, onClose, onSignup }) {
   if (!open) return null;
   const update = (field) => (event) => setForm((value) => ({ ...value, [field]: event.target.type === 'checkbox' ? event.target.checked : event.target.value }));
   const submit = async (event) => { event.preventDefault(); setLoading(true); setError(null); try { if (form.password !== form.passwordConfirm) throw new Error(t.mismatch); const profile = { ...form }; delete profile.passwordConfirm; await onSignup(profile); setForm(initial); onClose(); } catch (err) { setError(err.message); } finally { setLoading(false); } };
-  const field = 'mt-1.5 h-11 w-full rounded-xl border border-[var(--color-border)] bg-white px-3 text-sm text-[var(--color-text-primary)] outline-none transition placeholder:text-[var(--color-text-muted)] focus:border-[var(--color-primary)] focus:ring-4 focus:ring-blue-100 disabled:bg-slate-50';
+  const field = 'mt-1.5 h-11 w-full rounded-xl border border-[var(--color-border)] bg-white px-3 text-sm text-[var(--color-text-primary)] outline-none transition placeholder:text-[var(--color-text-muted)] focus:border-[var(--color-primary)] focus:ring-4 focus:ring-emerald-100 disabled:bg-slate-50';
   const label = 'text-sm font-medium text-[var(--color-text-secondary)]';
 
   return createPortal(
@@ -69,7 +69,7 @@ export default function SignupModal({ open, onClose, onSignup }) {
             <button type="button" onClick={onClose} className="h-11 rounded-xl border border-[var(--color-border)] bg-white px-4 text-sm font-semibold text-[var(--color-text-secondary)] transition hover:border-slate-300 hover:bg-slate-50">
               {t.cancel}
             </button>
-            <button type="submit" disabled={loading} className="h-11 rounded-xl bg-[var(--color-primary)] px-4 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
+            <button type="submit" disabled={loading} className="h-11 rounded-xl bg-[var(--color-primary)] px-4 text-sm font-semibold text-white transition hover:bg-[var(--color-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50">
               {loading ? t.loading : t.submit}
             </button>
           </div>

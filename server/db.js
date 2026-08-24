@@ -1,4 +1,4 @@
-import { mkdirSync } from 'node:fs';
+﻿import { mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DatabaseSync } from 'node:sqlite';
@@ -491,7 +491,7 @@ export async function createCommunityPost(username, post) {
   const user = await findUserByUsername(username);
   const title = String(post.title || '').trim();
   const content = String(post.content || '').trim();
-  const category = String(post.category || '????').trim();
+  const category = String(post.category || '자유').trim();
   if (!user || title.length < 2 || content.length < 5) return null;
 
   if (pool) {
@@ -1136,3 +1136,4 @@ export async function closeDb() {
   if (pool) await pool.end();
   if (sqlite) sqlite.close();
 }
+

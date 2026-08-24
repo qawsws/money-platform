@@ -1,9 +1,9 @@
 export default function PageHeader({ eyebrow, title, description }) {
   return (
-    <div className="mb-6">
-      {eyebrow && <p className="text-sm font-bold text-[var(--color-primary)]">{eyebrow}</p>}
-      <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-[var(--color-text-primary)]">{title}</h1>
-      <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--color-text-secondary)]">{description}</p>
-    </div>
+    <header className="mb-6 rounded-2xl border border-[var(--color-border)] bg-white px-5 py-5 shadow-sm">
+      {eyebrow && <p className="text-xs font-black uppercase text-[var(--color-primary)]">{eyebrow}</p>}
+      <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-text-primary)] sm:text-4xl">{title}</h1>
+      {description && <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-[var(--color-text-secondary)]">{description}</p>}
+    </header>
   );
 }

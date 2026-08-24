@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import DetailModal from '../components/DetailModal';
 import Card from '../components/ui/Card';
@@ -25,9 +25,7 @@ export default function DetailPage() {
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <Card hover={false} className="p-6 text-center sm:p-8">
           <p className="text-lg font-extrabold text-[var(--color-text-primary)]">{error}</p>
-          <button type="button" onClick={() => navigate(-1)} className="mt-5 inline-flex min-h-11 items-center justify-center rounded-2xl bg-[var(--color-primary)] px-5 text-sm font-bold text-white transition hover:bg-blue-700">
-            목록으로 돌아가기
-          </button>
+          <button type="button" onClick={() => navigate(-1)} className="mt-5 inline-flex min-h-11 items-center justify-center rounded-2xl bg-[var(--color-primary)] px-5 text-sm font-bold text-white transition hover:bg-[var(--color-primary-hover)]">{'목록으로 돌아가기'}</button>
         </Card>
       </main>
     );
@@ -50,3 +48,5 @@ export default function DetailPage() {
   }
   return <DetailModal open type={type} item={item} standalone={!location.state?.background} onClose={() => navigate(-1)} />;
 }
+
+

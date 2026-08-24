@@ -1,17 +1,9 @@
-import { lazy, Suspense } from 'react';
+﻿import { lazy, Suspense } from 'react';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import ScrollToTop from './components/ScrollToTop';
-import SectionDivider from './components/SectionDivider';
 
 const Header = lazy(() => import('./components/Header'));
-const Announcements = lazy(() => import('./components/Announcements'));
 const HomeSummary = lazy(() => import('./components/HomeSummary'));
-const MarketIndex = lazy(() => import('./components/MarketIndex'));
-const CoinPrice = lazy(() => import('./components/CoinPrice'));
-const StockCard = lazy(() => import('./components/StockCard'));
-const KoreanStockCard = lazy(() => import('./components/KoreanStockCard'));
-const NewsList = lazy(() => import('./components/NewsList'));
-const CommunityPosts = lazy(() => import('./components/CommunityPosts'));
 const Footer = lazy(() => import('./components/Footer'));
 const MarketPage = lazy(() => import('./pages/MarketPage'));
 const CryptoPage = lazy(() => import('./pages/CryptoPage'));
@@ -30,10 +22,10 @@ const NotFound = () => (
   <section className="mx-auto grid min-h-[55vh] max-w-7xl place-items-center px-4 py-16 text-center sm:px-6 lg:px-8">
     <div className="min-w-0 max-w-full">
       <p className="text-sm font-black uppercase text-[var(--color-primary)]">404</p>
-      <h1 className="mt-3 break-words text-3xl font-black tracking-tight text-[var(--color-text-primary)]">페이지를 찾을 수 없습니다.</h1>
-      <p className="mt-3 break-words text-sm leading-6 text-[var(--color-text-secondary)]">요청한 경로가 변경되었거나 존재하지 않습니다.</p>
-      <a href="/" className="mt-6 inline-flex min-h-11 items-center justify-center rounded-2xl bg-[var(--color-primary)] px-5 text-sm font-bold text-white transition hover:bg-[var(--color-primary-hover)]">
-        홈으로 이동
+      <h1 className="mt-3 break-words text-3xl font-black tracking-tight text-[var(--color-text-primary)]">{'\uD398\uC774\uC9C0\uB97C \uCC3E\uC744 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4.'}</h1>
+      <p className="mt-3 break-words text-sm leading-6 text-[var(--color-text-secondary)]">{'\uC694\uCCAD\uD55C \uACBD\uB85C\uAC00 \uBCC0\uACBD\uB418\uC5C8\uAC70\uB098 \uC874\uC7AC\uD558\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4.'}</p>
+      <a href="/" className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-[var(--color-primary)] px-5 text-sm font-bold text-white transition hover:bg-[var(--color-primary-hover)]">
+        {'\uD648\uC73C\uB85C \uC774\uB3D9'}
       </a>
     </div>
   </section>
@@ -54,7 +46,7 @@ function App() {
       <Suspense fallback={<Loading />}><Header /></Suspense>
       <main className="flex-1">
         <Routes location={background || location}>
-          <Route path="/" element={<Suspense fallback={<Loading />}><HomeSummary /><Announcements /><MarketIndex limit={4} showMore onOpenDetail={(item) => openDetail('market', item)} /><SectionDivider /><CoinPrice limit={3} showMore onOpenDetail={(item) => openDetail('crypto', item)} /><SectionDivider /><StockCard limit={4} showMore onOpenDetail={(item) => openDetail('stock', item)} /><SectionDivider /><KoreanStockCard limit={4} showMore onOpenDetail={(item) => openDetail('korean-stock', item)} /><SectionDivider /><section className="py-7"><div className="mx-auto grid max-w-7xl gap-6 px-4 sm:px-6 lg:grid-cols-[minmax(0,1.7fr)_minmax(320px,1fr)] lg:px-8"><NewsList contained={false} limit={4} showMore onOpenDetail={(item) => openDetail('news', item)} /><CommunityPosts contained={false} limit={3} showMore onOpenDetail={(item) => openDetail('community', item)} /></div></section></Suspense>} />
+          <Route path="/" element={<Suspense fallback={<Loading />}><HomeSummary onOpenDetail={openDetail} /></Suspense>} />
           <Route path="/market" element={<Suspense fallback={<Loading />}><MarketPage /></Suspense>} />
           <Route path="/crypto" element={<Suspense fallback={<Loading />}><CryptoPage /></Suspense>} />
           <Route path="/stocks/:market" element={<Suspense fallback={<Loading />}><StocksPage /></Suspense>} />
@@ -76,3 +68,7 @@ function App() {
 }
 
 export default App;
+
+
+
+
