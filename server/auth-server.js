@@ -252,6 +252,23 @@ async function requireAdmin(request, response) {
   return user;
 }
 
+async function adminBootstrap(request, response) {
+  const user = await requireUser(request, response);
+  if (!user) return;
+  const dashboard = await getAdminDashboard();
+  if (dashboard.users.some((item) => item.isAdmin)) {
+    return json(response, 409, { message: '\uC774\uBBF8 \uAD00\uB9AC\uC790 \uACC4\uC815\uC774 \uC788\uC2B5\uB2C8\uB2E4.' });
+  }
+  const { username } = await body(request);
+  if (username && username !== user.username) {
+    return json(response, 403, { message: '\uB85C\uADF8\uC778\uD55C \uACC4\uC815\uB9CC \uCD5C\uCD08 \uAD00\uB9AC\uC790\uB85C \uB4F1\uB85D\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4.' });
+  }
+  const cleanUser = publicUser(await setUserAdmin(user.id, true));
+  return cleanUser
+    ? json(response, 200, { success: true, message: '\uAD00\uB9AC\uC790 \uACC4\uC815 \uC124\uC815\uC774 \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4.', user: cleanUser, token: issueToken(cleanUser) })
+    : json(response, 404, { message: '\uC0AC\uC6A9\uC790\uB97C \uCC3E\uC744 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4.' });
+}
+
 async function favorites(request, response) {
   const user = await requireUser(request, response);
   if (!user) return;
@@ -578,6 +595,7 @@ export const server = createServer(async (request, response) => {
     if (request.method === 'PATCH' && pathname === '/api/me/profile') return await profileUpdate(request, response);
     if (request.method === 'PATCH' && pathname === '/api/me/password') return await passwordUpdate(request, response);
     if (request.method === 'DELETE' && pathname === '/api/me') return await accountDelete(request, response);
+    if (request.method === 'POST' && pathname === '/api/admin/bootstrap') return await adminBootstrap(request, response);
     if (request.method === 'GET' && pathname === '/api/admin/dashboard') return await adminDashboard(request, response);
     if (request.method === 'PATCH' && pathname === '/api/admin/users/role') return await adminUserRoleUpdate(request, response);
     if (request.method === 'PATCH' && pathname === '/api/admin/users/note') return await adminUserNoteSave(request, response);
