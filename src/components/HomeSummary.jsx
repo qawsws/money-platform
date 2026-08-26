@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { getAnnouncements, getCommunityPosts, getCryptoPrices, getKoreanStocks, getMarketIndices, getNews, getPortfolio, getUsStocks } from '../services/api';
 
 const t = {
-  greeting: '\uC548\uB155\uD558\uC138\uC694.',
+  greeting: '\uC2DC\uC7A5 \uD750\uB984\uC744 \uD55C\uB208\uC5D0 \uD655\uC778\uD558\uC138\uC694',
   dashboard: '\uC624\uB298\uC758 \uC2DC\uC7A5',
   subtitle: '\uC8FC\uC694 \uC9C0\uC218, \uBBF8\uAD6D \uC8FC\uC2DD, \uD55C\uAD6D \uC8FC\uC2DD, \uC554\uD638\uD654\uD3D0, \uC2DC\uC7A5 \uB274\uC2A4\uB97C \uD55C \uD654\uBA74\uC5D0\uC11C \uD655\uC778\uD558\uC138\uC694.',
   totalAssets: '\uD655\uC778 \uC790\uC0B0',
