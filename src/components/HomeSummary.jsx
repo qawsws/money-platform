@@ -1,12 +1,12 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getAnnouncements, getCommunityPosts, getCryptoPrices, getKoreanStocks, getMarketIndices, getNews, getPortfolio, getUsStocks } from '../services/api';
 
 const t = {
-  greeting: '\uC548\uB155\uD558\uC138\uC694',
-  dashboard: '\uC2DC\uC7A5 \uB300\uC2DC\uBCF4\uB4DC',
+  greeting: '\uC548\uB155\uD558\uC138\uC694.',
+  dashboard: '\uC624\uB298\uC758 \uC2DC\uC7A5',
   subtitle: '\uC8FC\uC694 \uC9C0\uC218, \uBBF8\uAD6D \uC8FC\uC2DD, \uD55C\uAD6D \uC8FC\uC2DD, \uC554\uD638\uD654\uD3D0, \uC2DC\uC7A5 \uB274\uC2A4\uB97C \uD55C \uD654\uBA74\uC5D0\uC11C \uD655\uC778\uD558\uC138\uC694.',
   totalAssets: '\uD655\uC778 \uC790\uC0B0',
   breadth: '\uC2DC\uC7A5 \uB4F1\uB77D',
@@ -121,7 +121,7 @@ function DashboardSkeleton() {
 
 function Sidebar({ counts }) {
   const items = [
-    { label: '\uB300\uC2DC\uBCF4\uB4DC', icon: 'D', to: '/' },
+    { label: '\uD648', icon: 'H', to: '/' },
     { label: '\uC2DC\uC7A5', icon: 'M', to: '/market' },
     { label: '\uD3EC\uD2B8\uD3F4\uB9AC\uC624', icon: 'P', to: '/portfolio' },
     { label: '\uB274\uC2A4', icon: 'N', to: '/news' },
@@ -131,7 +131,7 @@ function Sidebar({ counts }) {
     <aside className="hidden rounded-3xl border border-[var(--color-border)] bg-[var(--color-background-soft)] p-4 lg:block">
       <div className="flex items-center gap-3 px-2 py-2">
         <span className="grid size-10 place-items-center rounded-2xl bg-[var(--color-primary)] text-sm font-black text-white">MP</span>
-        <div><p className="text-sm font-black text-[var(--color-text-primary)]">MoneyPlatform</p><p className="text-xs font-semibold text-[var(--color-text-secondary)]">{'\uD22C\uC790 \uB300\uC2DC\uBCF4\uB4DC'}</p></div>
+        <div><p className="text-sm font-black text-[var(--color-text-primary)]">MoneyPlatform</p><p className="text-xs font-semibold text-[var(--color-text-secondary)]">{'\uD22C\uC790 \uC815\uBCF4 \uD50C\uB7AB\uD3FC'}</p></div>
       </div>
       <nav className="mt-8 space-y-1" aria-label="Dashboard sections">
         {items.map((item, index) => (
@@ -534,7 +534,7 @@ export default function HomeSummary({ onOpenDetail }) {
             <div className="flex flex-col gap-3 rounded-2xl border border-[var(--color-border)] bg-white px-5 py-5 shadow-sm md:flex-row md:items-center md:justify-between">
               <div className="min-w-0">
                 <p className="text-xs font-black uppercase text-[var(--color-primary)]">{t.dashboard}</p>
-                <h1 className="mt-1 text-2xl font-black tracking-tight text-[var(--color-text-primary)] sm:text-3xl">{t.greeting}, MoneyPlatform</h1>
+                <h1 className="mt-1 text-2xl font-black tracking-tight text-[var(--color-text-primary)] sm:text-3xl">{t.greeting}</h1>
                 <p className="mt-1 text-sm font-semibold text-[var(--color-text-secondary)]">{error ? String(error?.message || error) : t.subtitle}</p>
               </div>
               <div className="flex shrink-0 items-center gap-2">
