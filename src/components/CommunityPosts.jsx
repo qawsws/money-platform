@@ -9,8 +9,8 @@ import QuoteSectionHeader from './ui/QuoteSectionHeader';
 import ResultToolbar from './ui/ResultToolbar';
 
 const t = {
-  title: '인기 커뮤니티',
-  description: '투자자들이 지금 이야기하는 주제입니다.',
+  title: '커뮤니티',
+  description: '투자자들이 시장 의견과 정보를 나누는 공간입니다.',
   pageTitle: '커뮤니티',
   pageDescription: '투자자들과 시장 의견과 정보를 나누는 공간입니다.',
   views: '조회',
@@ -63,7 +63,6 @@ function numericValue(value) {
 
 function UserAvatar({ name, className = '' }) {
   const initial = String(name || '?').trim().charAt(0).toUpperCase() || '?';
-
   return (
     <span className={`grid size-9 shrink-0 place-items-center rounded-full bg-[var(--color-primary-soft)] text-xs font-black text-[var(--color-primary)] ${className}`}>
       {initial}
@@ -75,11 +74,12 @@ function FieldLabel({ htmlFor, children }) {
   return <label htmlFor={htmlFor} className="mb-2 block text-sm font-bold text-[var(--color-text-primary)]">{children}</label>;
 }
 
-function StatusPanel({ message, onRetry }) {
+function StatusPanel({ message, onRetry, action }) {
   return (
     <Card hover={false} className="flex min-h-48 flex-col items-center justify-center p-6 text-center">
       <span className="grid size-10 place-items-center rounded-full bg-[var(--color-primary-soft)] text-sm font-black text-[var(--color-primary)]">C</span>
       <p className="mt-3 text-sm font-bold text-[var(--color-text-secondary)]">{message}</p>
+      {action}
       {onRetry && <button type="button" onClick={onRetry} className="mt-4 rounded-full bg-[var(--color-primary-soft)] px-4 py-2 text-sm font-bold text-[var(--color-primary)] hover:bg-emerald-100">{t.retry}</button>}
     </Card>
   );
@@ -155,7 +155,7 @@ function CommunityItem({ post, index, liked, disabled, onOpen, onLike, compact =
           onClick={(event) => { event.stopPropagation(); onLike(post.id); }}
           className={`pointer-events-auto inline-flex min-h-9 h-fit shrink-0 items-center gap-1 rounded-full border px-3 text-xs font-bold transition disabled:opacity-80 ${liked ? 'border-rose-500 bg-rose-500 text-white' : 'border-rose-200 bg-rose-50 text-rose-600 hover:border-rose-300 hover:bg-rose-100'}`}
         >
-          {liked ? '♥' : '♡'} {post.likes}
+          {liked ? '♥ 취소' : '♡ 좋아요'} {post.likes}
         </button>
       </div>
     </article>
@@ -183,6 +183,7 @@ function FeaturedPost({ post, onOpen }) {
     </Card>
   );
 }
+
 function CategoryTabs({ active, counts, onChange }) {
   return (
     <div className="sticky top-20 z-10 flex gap-2 overflow-x-auto rounded-3xl border border-[var(--color-border)] bg-white/95 p-2 shadow-sm backdrop-blur" role="tablist" aria-label="커뮤니티 분류">
@@ -234,9 +235,9 @@ function PopularPanel({ posts, likedPosts, disabled, onOpen, onLike }) {
         <span className="rounded-full bg-rose-50 px-3 py-1 text-xs font-black text-rose-600">Top 5</span>
       </div>
       <div className="mt-4 divide-y divide-[var(--color-border)]">
-        {popular.map((post, index) => (
+        {popular.length > 0 ? popular.map((post, index) => (
           <CommunityItem key={post.id} post={post} index={index} liked={likedPosts.includes(post.id)} disabled={disabled} onOpen={onOpen} onLike={onLike} compact />
-        ))}
+        )) : <p className="rounded-2xl bg-[var(--color-surface-muted)] p-4 text-sm font-bold text-[var(--color-text-secondary)]">아직 인기 글이 없습니다.</p>}
       </div>
     </Card>
   );
@@ -362,14 +363,20 @@ export default function CommunityPosts({ onOpenDetail, limit = null, showCompose
   const featured = [...posts].sort((a, b) => numericValue(b.likes) - numericValue(a.likes))[0];
   const disabledLike = like.isPending || unlike.isPending;
 
+  const openComposerButton = showComposer && (
+    <button type="button" onClick={() => setIsComposerOpen((value) => !value)} className="rounded-full bg-[var(--color-primary)] px-4 py-2 text-xs font-black text-white transition hover:bg-[var(--color-primary-hover)]">
+      {isComposerOpen ? '글쓰기 닫기' : '글쓰기'}
+    </button>
+  );
+
   const content = (
     <>
       {isPage ? <PageHeader eyebrow="커뮤니티" title={t.pageTitle} description={t.pageDescription} /> : <QuoteSectionHeader title={t.title} description={t.description} action={showMore && <Link to="/community" className="text-sm font-bold text-[var(--color-primary)] hover:text-[var(--color-primary-hover)]">{t.more}</Link>} />}
       {isPage && <ResultToolbar count={posts.length} label="게시글" />}
       {isLoading && <CommunitySkeleton />}
       {error && <StatusPanel message={t.error} onRetry={refetch} />}
-      {!isLoading && !error && posts.length === 0 && <StatusPanel message={t.empty} />}
-      {!isLoading && !error && posts.length > 0 && (
+      {!isLoading && !error && posts.length === 0 && !isPage && <StatusPanel message={t.empty} />}
+      {!isLoading && !error && (posts.length > 0 || isPage) && (
         isPage ? (
           <div className="space-y-5">
             <FeaturedPost post={featured} onOpen={openPost} />
@@ -384,17 +391,23 @@ export default function CommunityPosts({ onOpenDetail, limit = null, showCompose
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
                       <span className="rounded-full bg-[var(--color-background-soft)] px-3 py-1 text-xs font-black text-[var(--color-text-secondary)]">{visiblePosts.length}개</span>
-                      {showComposer && (
-                        <button type="button" onClick={() => setIsComposerOpen((value) => !value)} className="rounded-full bg-[var(--color-primary)] px-4 py-2 text-xs font-black text-white transition hover:bg-[var(--color-primary-hover)]">
-                          {isComposerOpen ? '글쓰기 닫기' : '글쓰기'}
-                        </button>
-                      )}
+                      {openComposerButton}
                     </div>
                   </div>
                   <div className="divide-y divide-[var(--color-border)]">
-                    {visiblePosts.map((post, index) => (
+                    {visiblePosts.length > 0 ? visiblePosts.map((post, index) => (
                       <CommunityItem key={post.id} post={post} index={index} liked={likedPosts.includes(post.id)} disabled={disabledLike} onOpen={openPost} onLike={likePost} />
-                    ))}
+                    )) : (
+                      <div className="flex min-h-44 flex-col items-center justify-center px-4 py-10 text-center">
+                        <span className="grid size-10 place-items-center rounded-full bg-[var(--color-primary-soft)] text-sm font-black text-[var(--color-primary)]">C</span>
+                        <p className="mt-3 text-sm font-bold text-[var(--color-text-secondary)]">{t.empty}</p>
+                        {showComposer && (
+                          <button type="button" onClick={() => setIsComposerOpen(true)} className="mt-4 rounded-full bg-[var(--color-primary)] px-5 py-2 text-sm font-black text-white transition hover:bg-[var(--color-primary-hover)]">
+                            첫 글쓰기
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </Card>
                 {showComposer && isComposerOpen && <Composer user={user} form={form} update={update} create={create} canSubmit={canSubmit} onCancel={() => setIsComposerOpen(false)} />}
@@ -430,8 +443,3 @@ export default function CommunityPosts({ onOpenDetail, limit = null, showCompose
     </section>
   );
 }
-
-
-
-
-
