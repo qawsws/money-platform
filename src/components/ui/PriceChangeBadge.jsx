@@ -4,7 +4,7 @@ export default function PriceChangeBadge({ change, isPositive, className = '' })
   const value = parseChange(change);
   const neutral = !Number.isFinite(value) || value === 0;
   const positive = !neutral && (typeof isPositive === 'boolean' ? isPositive : value > 0);
-  const label = neutral ? '\uBCF4\uD569' : positive ? '\uC0C1\uC2B9' : '\uD558\uB77D';
+  const label = neutral ? '보합' : positive ? '상승' : '하락';
   const display = change == null || Number.isNaN(value) ? '-' : String(change);
   const tone = neutral
     ? 'bg-slate-100 text-slate-500'

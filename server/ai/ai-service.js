@@ -19,8 +19,8 @@ const portfolioPromptVersion = 'portfolio-v1';
 const portfolioSchemaVersion = 'portfolio-analysis-v1';
 const investmentPromptVersion = 'investment-insights-v1';
 const investmentSchemaVersion = 'investment-insights-v1';
-const portfolioDisclaimer = '\u0041\u0049 \ubd84\uc11d\uc740 \ud604\uc7ac \ud3ec\ud2b8\ud3f4\ub9ac\uc624 \ub370\uc774\ud130\ub97c \uc815\ub9ac\ud55c \ucc38\uace0 \uc815\ubcf4\uc785\ub2c8\ub2e4. \ud22c\uc790 \uc790\ubb38\uc774\ub098 \uc218\uc775 \ubcf4\uc7a5\uc744 \uc758\ubbf8\ud558\uc9c0 \uc54a\uc73c\uba70, \uc2e4\uc81c \ud22c\uc790 \ud310\ub2e8\uc740 \uc0ac\uc6a9\uc790\uac00 \uc9c1\uc811 \ud574\uc57c \ud569\ub2c8\ub2e4.';
-const investmentDisclaimer = '\ud22c\uc790 \ucc38\uace0 \uc815\ubcf4\uc774\uba70 \ud22c\uc790 \uad8c\uc720\uac00 \uc544\ub2d9\ub2c8\ub2e4.';
+const portfolioDisclaimer = 'AI 분석은 현재 포트폴리오 데이터를 정리한 참고 정보입니다. 투자 자문이나 수익 보장을 의미하지 않으며, 실제 투자 판단은 사용자가 직접 해야 합니다.';
+const investmentDisclaimer = '투자 참고 정보이며 투자 권유가 아닙니다.';
 const inFlight = new Map();
 
 export function assertAiAvailable() {

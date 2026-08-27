@@ -5,36 +5,36 @@ import { useAuth } from '../context/AuthContext';
 import { getAnnouncements, getCommunityPosts, getCryptoPrices, getKoreanStocks, getMarketIndices, getNews, getPortfolio, getUsStocks } from '../services/api';
 
 const t = {
-  greeting: '\uC2DC\uC7A5 \uD750\uB984\uC744 \uD55C\uB208\uC5D0 \uD655\uC778\uD558\uC138\uC694',
-  dashboard: '\uC624\uB298\uC758 \uC2DC\uC7A5',
-  subtitle: '\uC8FC\uC694 \uC9C0\uC218, \uBBF8\uAD6D \uC8FC\uC2DD, \uD55C\uAD6D \uC8FC\uC2DD, \uC554\uD638\uD654\uD3D0, \uC2DC\uC7A5 \uB274\uC2A4\uB97C \uD55C \uD654\uBA74\uC5D0\uC11C \uD655\uC778\uD558\uC138\uC694.',
-  totalAssets: '\uD655\uC778 \uC790\uC0B0',
-  breadth: '\uC2DC\uC7A5 \uB4F1\uB77D',
-  performance: '\uC2DC\uC7A5\uBCC4 \uB4F1\uB77D \uBD84\uD3EC',
-  allocation: '\uC790\uC0B0\uAD70 \uBE44\uC911',
-  watchlist: '\uBCC0\uB3D9\uB960 \uB7AD\uD0B9',
-  watchlistHint: '\uC624\uB298 \uB4F1\uB77D\uD3ED\uC774 \uD070 \uC790\uC0B0 \uC21C',
-  heroHint: '\uC2DC\uC7A5\uBCC4 \uC8FC\uC694 \uC790\uC0B0',
-  news: '\uC8FC\uC694 \uB274\uC2A4',
-  ai: 'AI \uD22C\uC790 \uC778\uC0AC\uC774\uD2B8',
-  aiText: '\uBCF4\uC720 \uC790\uC0B0\uACFC \uAD00\uB828 \uB274\uC2A4, \uC2DC\uC7A5 \uB370\uC774\uD130\uB97C \uC5F0\uACB0\uD574 \uD655\uC778\uD560 \uC810\uC744 \uC815\uB9AC\uD569\uB2C8\uB2E4.',
-  portfolio: '\uD3EC\uD2B8\uD3F4\uB9AC\uC624\uC5D0\uC11C \uBCF4\uAE30',
-  refresh: '\uC0C8\uB85C\uACE0\uCE68',
-  refreshing: '\uC5C5\uB370\uC774\uD2B8 \uC911',
-  updatedNow: '\uD604\uC7AC \uB370\uC774\uD130 \uAE30\uC900',
-  empty: '\uD45C\uC2DC\uD560 \uC2DC\uC7A5 \uB370\uC774\uD130\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.',
-  error: '\uC2DC\uC7A5 \uC815\uBCF4\uB97C \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',
-  retry: '\uB2E4\uC2DC \uC2DC\uB3C4',
-  noData: '\uB370\uC774\uD130 \uC5C6\uC74C',
-  viewAll: '\uB354\uBCF4\uAE30',
-  community: '\uCEE4\uBBA4\uB2C8\uD2F0',
-  notices: '\uACF5\uC9C0',
-  noticeHint: '\uC911\uC694\uD55C \uACF5\uC9C0\uB97C \uC81C\uBAA9\uC73C\uB85C \uBA3C\uC800 \uD655\uC778\uD558\uC138\uC694',
-  noticeEmpty: '\uD604\uC7AC \uB4F1\uB85D\uB41C \uACF5\uC9C0\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.',
-  viewNotice: '\uB0B4\uC6A9 \uBCF4\uAE30',
-  close: '\uB2EB\uAE30',
-  loginPortfolioTitle: '\uB0B4 \uC790\uC0B0 \uBE44\uC911\uC740 \uB85C\uADF8\uC778 \uD6C4 \uD655\uC778\uD560 \uC218 \uC788\uC5B4\uC694',
-  loginPortfolioText: '\uD3EC\uD2B8\uD3F4\uB9AC\uC624\uC5D0 \uBCF4\uC720 \uC790\uC0B0\uC744 \uCD94\uAC00\uD558\uBA74 \uC790\uC0B0\uAD70\uBCC4 \uBE44\uC911\uC744 \uBCFC \uC218 \uC788\uC2B5\uB2C8\uB2E4.',
+  greeting: '시장 흐름을 한눈에 확인하세요',
+  dashboard: '오늘의 시장',
+  subtitle: '주요 지수, 미국 주식, 한국 주식, 암호화폐, 시장 뉴스를 한 화면에서 확인하세요.',
+  totalAssets: '확인 자산',
+  breadth: '시장 등락',
+  performance: '시장별 등락 분포',
+  allocation: '자산군 비중',
+  watchlist: '변동률 랭킹',
+  watchlistHint: '오늘 등락폭이 큰 자산 순',
+  heroHint: '시장별 주요 자산',
+  news: '주요 뉴스',
+  ai: 'AI 투자 인사이트',
+  aiText: '보유 자산과 관련 뉴스, 시장 데이터를 연결해 확인할 점을 정리합니다.',
+  portfolio: '포트폴리오에서 보기',
+  refresh: '새로고침',
+  refreshing: '업데이트 중',
+  updatedNow: '현재 데이터 기준',
+  empty: '표시할 시장 데이터가 없습니다.',
+  error: '시장 정보를 불러오지 못했습니다.',
+  retry: '다시 시도',
+  noData: '데이터 없음',
+  viewAll: '더보기',
+  community: '커뮤니티',
+  notices: '공지',
+  noticeHint: '중요한 공지를 제목으로 먼저 확인하세요',
+  noticeEmpty: '현재 등록된 공지가 없습니다.',
+  viewNotice: '내용 보기',
+  close: '닫기',
+  loginPortfolioTitle: '내 자산 비중은 로그인 후 확인할 수 있어요',
+  loginPortfolioText: '포트폴리오에 보유 자산을 추가하면 자산군별 비중을 볼 수 있습니다.',
 };
 
 const USD_TO_KRW_RATE = 1380;
@@ -79,7 +79,7 @@ const selectMarketRepresentativeAssets = ({ usItems, krItems, cryptoItems }) => 
 
 const formatUpdatedAt = (timestamp) => {
   if (!timestamp) return t.updatedNow;
-  return `${new Intl.DateTimeFormat('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(timestamp))} \uAE30\uC900`;
+  return `${new Intl.DateTimeFormat('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(timestamp))} 기준`;
 };
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
@@ -121,17 +121,17 @@ function DashboardSkeleton() {
 
 function Sidebar({ counts }) {
   const items = [
-    { label: '\uD648', icon: 'H', to: '/' },
-    { label: '\uC2DC\uC7A5', icon: 'M', to: '/market' },
-    { label: '\uD3EC\uD2B8\uD3F4\uB9AC\uC624', icon: 'P', to: '/portfolio' },
-    { label: '\uB274\uC2A4', icon: 'N', to: '/news' },
-    { label: '\uCEE4\uBBA4\uB2C8\uD2F0', icon: 'C', to: '/community' },
+    { label: '홈', icon: 'H', to: '/' },
+    { label: '시장', icon: 'M', to: '/market' },
+    { label: '포트폴리오', icon: 'P', to: '/portfolio' },
+    { label: '뉴스', icon: 'N', to: '/news' },
+    { label: '커뮤니티', icon: 'C', to: '/community' },
   ];
   return (
     <aside className="hidden rounded-3xl border border-[var(--color-border)] bg-[var(--color-background-soft)] p-4 lg:block">
       <div className="flex items-center gap-3 px-2 py-2">
         <span className="grid size-10 place-items-center rounded-2xl bg-[var(--color-primary)] text-sm font-black text-white">MP</span>
-        <div><p className="text-sm font-black text-[var(--color-text-primary)]">MoneyPlatform</p><p className="text-xs font-semibold text-[var(--color-text-secondary)]">{'\uD22C\uC790 \uC815\uBCF4 \uD50C\uB7AB\uD3FC'}</p></div>
+        <div><p className="text-sm font-black text-[var(--color-text-primary)]">MoneyPlatform</p><p className="text-xs font-semibold text-[var(--color-text-secondary)]">{'투자 정보 플랫폼'}</p></div>
       </div>
       <nav className="mt-8 space-y-1" aria-label="Dashboard sections">
         {items.map((item, index) => (
@@ -142,11 +142,11 @@ function Sidebar({ counts }) {
         ))}
       </nav>
       <div className="mt-8 rounded-2xl bg-white p-4 shadow-sm">
-        <p className="text-xs font-bold text-[var(--color-text-secondary)]">{'\uD655\uC778 \uC790\uC0B0'}</p>
+        <p className="text-xs font-bold text-[var(--color-text-secondary)]">{'확인 자산'}</p>
         <p className="mt-2 text-3xl font-black tabular-nums text-[var(--color-text-primary)]">{counts.total}</p>
         <div className="mt-4 grid grid-cols-2 gap-2 text-xs font-bold">
-          <span className="rounded-xl bg-[var(--color-positive-soft)] px-2 py-2 text-[var(--color-positive)]">{'\uC0C1\uC2B9'} {counts.positive}</span>
-          <span className="rounded-xl bg-[var(--color-negative-soft)] px-2 py-2 text-[var(--color-negative)]">{'\uD558\uB77D'} {counts.negative}</span>
+          <span className="rounded-xl bg-[var(--color-positive-soft)] px-2 py-2 text-[var(--color-positive)]">{'상승'} {counts.positive}</span>
+          <span className="rounded-xl bg-[var(--color-negative-soft)] px-2 py-2 text-[var(--color-negative)]">{'하락'} {counts.negative}</span>
         </div>
       </div>
     </aside>
@@ -192,7 +192,7 @@ function NoticePanel({ items, selected, onSelect, onClose }) {
             className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-2xl bg-white px-3 py-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-card-hover)] focus:outline-none focus:ring-2 focus:ring-amber-300"
           >
             <span className={`shrink-0 rounded-full px-2 py-1 text-xs font-black ${notice.priority === 'important' ? 'bg-amber-500 text-white' : 'bg-amber-100 text-amber-800'}`}>
-              {notice.priority === 'important' ? '\uC911\uC694' : '\uACF5\uC9C0'}
+              {notice.priority === 'important' ? '중요' : '공지'}
             </span>
             <span className="min-w-0 truncate text-sm font-black text-[var(--color-text-primary)]">{notice.title}</span>
             <span className="shrink-0 text-xs font-black text-amber-700">{t.viewNotice}</span>
@@ -206,7 +206,7 @@ function NoticePanel({ items, selected, onSelect, onClose }) {
             <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-5 py-4">
               <div className="min-w-0">
                 <span className={`inline-flex rounded-full px-2 py-1 text-xs font-black ${selected.priority === 'important' ? 'bg-amber-500 text-white' : 'bg-amber-50 text-amber-800'}`}>
-                  {selected.priority === 'important' ? '\uC911\uC694' : '\uACF5\uC9C0'}
+                  {selected.priority === 'important' ? '중요' : '공지'}
                 </span>
                 <h2 id="home-notice-title" className="mt-3 break-words text-xl font-black text-[var(--color-text-primary)]">{selected.title}</h2>
               </div>
@@ -233,7 +233,7 @@ function AssetHeroCard({ item, onOpen }) {
         <span className="rounded-full bg-[var(--color-background-soft)] px-2 py-1 text-xs font-black text-[var(--color-text-secondary)]">{item.group}</span>
       </div>
       <div className="mt-5 flex items-end justify-between gap-4">
-        <div><p className="text-xs font-bold text-[var(--color-text-secondary)]">{'\uD604\uC7AC\uAC00'}</p><p className="mt-1 text-2xl font-black tabular-nums text-[var(--color-text-primary)]">{item.price}</p></div>
+        <div><p className="text-xs font-bold text-[var(--color-text-secondary)]">{'현재가'}</p><p className="mt-1 text-2xl font-black tabular-nums text-[var(--color-text-primary)]">{item.price}</p></div>
         <MiniSpark positive={item.positive} />
       </div>
     </button>
@@ -247,12 +247,12 @@ function SummaryCard({ total, positive, negative, topGainers, topLosers }) {
       <p className="text-sm font-black text-[var(--color-text-secondary)]">{t.breadth}</p>
       <div className="mt-3 flex items-end justify-between gap-4">
         <div><p className="text-4xl font-black tabular-nums text-[var(--color-text-primary)]">{total}</p><p className="mt-1 text-xs font-bold text-[var(--color-text-secondary)]">{t.totalAssets}</p></div>
-        <div className="text-right"><p className="text-sm font-black text-[var(--color-positive)]">{'\uC0C1\uC2B9'} {positive}</p><p className="mt-1 text-sm font-black text-[var(--color-negative)]">{'\uD558\uB77D'} {negative}</p></div>
+        <div className="text-right"><p className="text-sm font-black text-[var(--color-positive)]">{'상승'} {positive}</p><p className="mt-1 text-sm font-black text-[var(--color-negative)]">{'하락'} {negative}</p></div>
       </div>
       <div className="mt-5 h-3 overflow-hidden rounded-full bg-[var(--color-negative-soft)]"><div className="h-full bg-[var(--color-positive)]" style={{ width: positiveWidth + '%' }} /></div>
       <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-        <RankList title={'\uC0C1\uC2B9 TOP 5'} items={topGainers} positive />
-        <RankList title={'\uD558\uB77D TOP 5'} items={topLosers} />
+        <RankList title={'상승 TOP 5'} items={topGainers} positive />
+        <RankList title={'하락 TOP 5'} items={topLosers} />
       </div>
     </section>
   );
@@ -296,26 +296,26 @@ function ChartPanel({ groups }) {
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm font-black text-[var(--color-text-secondary)]">{t.performance}</p>
-          <h2 className="mt-2 text-2xl font-black text-[var(--color-text-primary)]">{'\uC2DC\uC7A5\uAD70\uBCC4 \uC0C1\uC2B9/\uD558\uB77D \uBE44\uAD50'}</h2>
-          <p className="mt-2 text-sm font-semibold leading-6 text-[var(--color-text-secondary)]">{'\uC9C0\uC218\u00B7\uC8FC\uC2DD\uC740 \uC804\uC77C \uC885\uAC00 \uB300\uBE44, \uC554\uD638\uD654\uD3D0\uB294 24\uC2DC\uAC04 \uBCC0\uB3D9\uB960 \uAE30\uC900\uC785\uB2C8\uB2E4.'}</p>
+          <h2 className="mt-2 text-2xl font-black text-[var(--color-text-primary)]">{'시장군별 상승/하락 비교'}</h2>
+          <p className="mt-2 text-sm font-semibold leading-6 text-[var(--color-text-secondary)]">{'지수·주식은 전일 종가 대비, 암호화폐는 24시간 변동률 기준입니다.'}</p>
         </div>
-        <div className="hidden rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-[var(--color-text-secondary)] sm:block">{'\uCD1D'} {total}{'\uAC1C'}</div>
+        <div className="hidden rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-[var(--color-text-secondary)] sm:block">{'총'} {total}{'개'}</div>
       </div>
       <div className="mt-5 space-y-4">
         {rows.map((row) => (
           <div key={row.label} className="rounded-2xl bg-[var(--color-background-soft)] p-4">
             <div className="flex items-center justify-between gap-3">
               <p className="text-sm font-black text-[var(--color-text-primary)]">{row.label}</p>
-              <p className="text-xs font-black text-[var(--color-text-secondary)]">{'\uD558\uB77D'} {row.negative}{'\uAC1C'} / {'\uC0C1\uC2B9'} {row.positive}{'\uAC1C'}</p>
+              <p className="text-xs font-black text-[var(--color-text-secondary)]">{'하락'} {row.negative}{'개'} / {'상승'} {row.positive}{'개'}</p>
             </div>
             <div className="mt-3 grid grid-cols-2 gap-2">
               <div>
                 <div className="h-3 overflow-hidden rounded-full bg-white"><div className="ml-auto h-full rounded-full bg-[var(--color-negative)]" style={{ width: row.negativeWidth + '%' }} /></div>
-                <div className="mt-1 flex justify-between text-[11px] font-bold text-[var(--color-negative)]"><span>{'\uD558\uB77D'}</span><span>{row.negativeWidth.toFixed(0)}%</span></div>
+                <div className="mt-1 flex justify-between text-[11px] font-bold text-[var(--color-negative)]"><span>{'하락'}</span><span>{row.negativeWidth.toFixed(0)}%</span></div>
               </div>
               <div>
                 <div className="h-3 overflow-hidden rounded-full bg-white"><div className="h-full rounded-full bg-[var(--color-positive)]" style={{ width: row.positiveWidth + '%' }} /></div>
-                <div className="mt-1 flex justify-between text-[11px] font-bold text-[var(--color-positive)]"><span>{'\uC0C1\uC2B9'}</span><span>{row.positiveWidth.toFixed(0)}%</span></div>
+                <div className="mt-1 flex justify-between text-[11px] font-bold text-[var(--color-positive)]"><span>{'상승'}</span><span>{row.positiveWidth.toFixed(0)}%</span></div>
               </div>
             </div>
           </div>
@@ -359,23 +359,23 @@ function Allocation({ groups, totalValue, holdingCount, loading }) {
   return (
     <section className="rounded-2xl border border-[var(--color-border)] bg-white p-4 shadow-sm">
       <div className="flex items-center justify-between gap-3">
-        <div><p className="text-xs font-black uppercase text-emerald-700">Portfolio</p><h2 className="mt-1 text-base font-black text-[var(--color-text-primary)]">{'\uB0B4 \uC790\uC0B0\uAD70 \uBE44\uC911'}</h2></div>
-        <span className="rounded-full bg-[var(--color-background-soft)] px-2.5 py-1 text-xs font-black text-[var(--color-text-secondary)]">{holdingCount}{'\uAC1C'}</span>
+        <div><p className="text-xs font-black uppercase text-emerald-700">Portfolio</p><h2 className="mt-1 text-base font-black text-[var(--color-text-primary)]">{'내 자산군 비중'}</h2></div>
+        <span className="rounded-full bg-[var(--color-background-soft)] px-2.5 py-1 text-xs font-black text-[var(--color-text-secondary)]">{holdingCount}{'개'}</span>
       </div>
       {loading ? (
         <div className="mt-5 space-y-3"><div className="h-32 animate-pulse rounded-2xl bg-slate-100" /><div className="h-12 animate-pulse rounded-2xl bg-slate-100" /></div>
       ) : groups.length === 0 ? (
         <div className="mt-5 rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-background-soft)] p-4">
-          <p className="text-sm font-black text-[var(--color-text-primary)]">{'\uB4F1\uB85D\uB41C \uBCF4\uC720 \uC790\uC0B0\uC774 \uC5C6\uC5B4\uC694'}</p>
-          <p className="mt-2 text-xs font-semibold leading-5 text-[var(--color-text-secondary)]">{'\uD3EC\uD2B8\uD3F4\uB9AC\uC624\uC5D0 \uC790\uC0B0\uC744 \uCD94\uAC00\uD558\uBA74 \uD3C9\uAC00\uAE08\uC561 \uAE30\uC900 \uBE44\uC911\uC774 \uD45C\uC2DC\uB429\uB2C8\uB2E4.'}</p>
-          <Link to="/portfolio" className="mt-4 inline-flex h-10 w-full items-center justify-center rounded-full bg-emerald-700 px-4 text-sm font-black text-white hover:bg-emerald-800">{'\uC790\uC0B0 \uCD94\uAC00\uD558\uAE30'}</Link>
+          <p className="text-sm font-black text-[var(--color-text-primary)]">{'등록된 보유 자산이 없어요'}</p>
+          <p className="mt-2 text-xs font-semibold leading-5 text-[var(--color-text-secondary)]">{'포트폴리오에 자산을 추가하면 평가금액 기준 비중이 표시됩니다.'}</p>
+          <Link to="/portfolio" className="mt-4 inline-flex h-10 w-full items-center justify-center rounded-full bg-emerald-700 px-4 text-sm font-black text-white hover:bg-emerald-800">{'자산 추가하기'}</Link>
         </div>
       ) : (
         <>
           <div className="mt-5 grid grid-cols-[120px_minmax(0,1fr)] items-center gap-4">
             <div className="grid size-28 place-items-center rounded-full shadow-inner" style={{ background: 'conic-gradient(' + (gradient || '#e5e7eb 0% 100%') + ')' }}>
               <div className="grid size-20 place-items-center rounded-full bg-white text-center shadow-sm">
-                <div><p className="text-[11px] font-bold text-[var(--color-text-secondary)]">{'\uD3C9\uAC00\uAE08\uC561'}</p><p className="text-lg font-black text-[var(--color-text-primary)]">100%</p></div>
+                <div><p className="text-[11px] font-bold text-[var(--color-text-secondary)]">{'평가금액'}</p><p className="text-lg font-black text-[var(--color-text-primary)]">100%</p></div>
               </div>
             </div>
             <div className="space-y-2">
@@ -385,13 +385,13 @@ function Allocation({ groups, totalValue, holdingCount, loading }) {
                   <div key={group.label}>
                     <div className="mb-1 flex items-center justify-between text-xs font-black"><span className="flex items-center gap-2 text-[var(--color-text-secondary)]"><span className="size-2.5 rounded-full" style={{ backgroundColor: group.hex }} />{group.label}</span><span className="text-[var(--color-text-primary)]">{percent}%</span></div>
                     <div className="h-2 overflow-hidden rounded-full bg-[var(--color-background-soft)]"><div className="h-full rounded-full" style={{ width: percent + '%', backgroundColor: group.hex }} /></div>
-                    <p className="mt-1 text-[11px] font-bold text-[var(--color-text-tertiary)]">{group.count}{'\uAC1C'} / {group.formatted}</p>
+                    <p className="mt-1 text-[11px] font-bold text-[var(--color-text-tertiary)]">{group.count}{'개'} / {group.formatted}</p>
                   </div>
                 );
               })}
             </div>
           </div>
-          <Link to="/portfolio" className="mt-5 inline-flex h-10 w-full items-center justify-center rounded-full bg-emerald-700 px-4 text-sm font-black text-white hover:bg-emerald-800">{'\uD3EC\uD2B8\uD3F4\uB9AC\uC624\uC5D0\uC11C \uC790\uC138\uD788 \uBCF4\uAE30'}</Link>
+          <Link to="/portfolio" className="mt-5 inline-flex h-10 w-full items-center justify-center rounded-full bg-emerald-700 px-4 text-sm font-black text-white hover:bg-emerald-800">{'포트폴리오에서 자세히 보기'}</Link>
         </>
       )}
     </section>
@@ -407,7 +407,7 @@ function NewsPanel({ items, onOpen }) {
       <div className="mt-2 divide-y divide-[var(--color-border)]">
         {items.length === 0 ? <p className="py-8 text-sm font-bold text-[var(--color-text-secondary)]">{t.noData}</p> : items.map((item) => (
           <button key={item.id} type="button" onClick={() => onOpen(item)} className="block w-full rounded-xl px-2 py-3 text-left hover:bg-amber-50/70">
-            <p className="text-xs font-black text-amber-700">{item.category || '\uB274\uC2A4'} {item.time ? `/ ${item.time}` : ''}</p>
+            <p className="text-xs font-black text-amber-700">{item.category || '뉴스'} {item.time ? `/ ${item.time}` : ''}</p>
             <p className="mt-1 line-clamp-2 text-sm font-black leading-6 text-[var(--color-text-primary)]">{item.title}</p>
           </button>
         ))}
@@ -420,14 +420,14 @@ function PortfolioLoginPrompt() {
   return (
     <section className="rounded-2xl border border-[var(--color-border)] bg-white p-5 shadow-sm">
       <p className="text-xs font-black uppercase text-emerald-700">Portfolio</p>
-      <h2 className="mt-2 text-lg font-black leading-7 text-[var(--color-text-primary)]">{'\uB0B4 \uC790\uC0B0 \uBE44\uC911\uC740 \uB85C\uADF8\uC778 \uD6C4 \uD655\uC778\uD560 \uC218 \uC788\uC5B4\uC694'}</h2>
-      <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">{'\uBCF4\uC720 \uC790\uC0B0\uC744 \uB4F1\uB85D\uD558\uBA74 \uD3C9\uAC00\uAE08\uC561 \uAE30\uC900\uC73C\uB85C \uD55C\uAD6D \uC8FC\uC2DD, \uBBF8\uAD6D \uC8FC\uC2DD, \uC554\uD638\uD654\uD3D0 \uBE44\uC911\uC744 \uBCFC \uC218 \uC788\uC2B5\uB2C8\uB2E4.'}</p>
+      <h2 className="mt-2 text-lg font-black leading-7 text-[var(--color-text-primary)]">{'내 자산 비중은 로그인 후 확인할 수 있어요'}</h2>
+      <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">{'보유 자산을 등록하면 평가금액 기준으로 한국 주식, 미국 주식, 암호화폐 비중을 볼 수 있습니다.'}</p>
       <div className="mt-5 space-y-2">
-        {['\uD3C9\uAC00\uAE08\uC561 \uAE30\uC900 \uBE44\uC911', '\uC790\uC0B0\uAD70\uBCC4 \uBCF4\uC720 \uAC1C\uC218', '\uC218\uC775/\uC190\uC2E4 \uD655\uC778'].map((item) => <p key={item} className="rounded-2xl bg-[var(--color-background-soft)] px-3 py-2 text-xs font-black text-[var(--color-text-secondary)]">{item}</p>)}
+        {['평가금액 기준 비중', '자산군별 보유 개수', '수익/손실 확인'].map((item) => <p key={item} className="rounded-2xl bg-[var(--color-background-soft)] px-3 py-2 text-xs font-black text-[var(--color-text-secondary)]">{item}</p>)}
       </div>
       <div className="mt-5 grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
-        <Link to="/portfolio" className="inline-flex h-10 items-center justify-center rounded-full bg-emerald-700 px-4 text-sm font-black text-white hover:bg-emerald-800">{'\uD3EC\uD2B8\uD3F4\uB9AC\uC624 \uBCF4\uAE30'}</Link>
-        <Link to="/favorites" className="inline-flex h-10 items-center justify-center rounded-full border border-[var(--color-border)] px-4 text-sm font-black text-[var(--color-text-primary)] hover:bg-[var(--color-background-soft)]">{'\uAD00\uC2EC\uC790\uC0B0 \uBCF4\uAE30'}</Link>
+        <Link to="/portfolio" className="inline-flex h-10 items-center justify-center rounded-full bg-emerald-700 px-4 text-sm font-black text-white hover:bg-emerald-800">{'포트폴리오 보기'}</Link>
+        <Link to="/favorites" className="inline-flex h-10 items-center justify-center rounded-full border border-[var(--color-border)] px-4 text-sm font-black text-[var(--color-text-primary)] hover:bg-[var(--color-background-soft)]">{'관심자산 보기'}</Link>
       </div>
     </section>
   );
@@ -443,9 +443,9 @@ function CommunityPanel({ items }) {
       <div className="mt-2 divide-y divide-[var(--color-border)]">
         {items.length === 0 ? <p className="py-8 text-sm font-bold text-[var(--color-text-secondary)]">{t.noData}</p> : items.map((item) => (
           <Link key={item.id} to="/community" className="block rounded-xl px-2 py-3 hover:bg-emerald-50/70">
-            <p className="text-xs font-black text-emerald-700">{item.category || '\uC790\uC720'} / {item.authorName || item.author || '\uC775\uBA85'}</p>
+            <p className="text-xs font-black text-emerald-700">{item.category || '자유'} / {item.authorName || item.author || '익명'}</p>
             <p className="mt-1 line-clamp-2 text-sm font-black leading-6 text-[var(--color-text-primary)]">{item.title}</p>
-            <p className="mt-1 text-xs font-bold text-[var(--color-text-secondary)]">{'\uC870\uD68C'} {item.views || 0} / {'\uB313\uAE00'} {item.comments || item.commentCount || 0}</p>
+            <p className="mt-1 text-xs font-bold text-[var(--color-text-secondary)]">{'조회'} {item.views || 0} / {'댓글'} {item.comments || item.commentCount || 0}</p>
           </Link>
         ))}
       </div>
@@ -457,7 +457,7 @@ function AiPanel() {
   return (
     <section className="rounded-3xl bg-[var(--color-text-primary)] p-5 text-white shadow-sm">
       <p className="text-xs font-black uppercase text-emerald-200">{t.ai}</p>
-      <h2 className="mt-2 text-xl font-black">{'\uD22C\uC790 \uC810\uAC80'}</h2>
+      <h2 className="mt-2 text-xl font-black">{'투자 점검'}</h2>
       <p className="mt-2 text-sm leading-6 text-slate-300">{t.aiText}</p>
       <Link to="/portfolio" className="mt-5 inline-flex h-10 items-center justify-center rounded-full bg-white px-4 text-sm font-black text-[var(--color-text-primary)]">{t.portfolio}</Link>
     </section>
@@ -481,10 +481,10 @@ export default function HomeSummary({ onOpenDetail }) {
   const error = queries.find((query) => query.error)?.error;
   const updatedAt = Math.max(...queries.map((query) => query.dataUpdatedAt || 0));
 
-  const indices = (market.data || []).map((item) => compactAsset(item, '\uC9C0\uC218', 'market'));
-  const cryptoItems = (crypto.data || []).map((item) => compactAsset(item, '\uC554\uD638\uD654\uD3D0', 'crypto'));
-  const usItems = (stocks.data || []).map((item) => compactAsset(item, '\uBBF8\uAD6D \uC8FC\uC2DD', 'stock'));
-  const krItems = (koreanStocks.data || []).map((item) => compactAsset(item, '\uD55C\uAD6D \uC8FC\uC2DD', 'korean-stock'));
+  const indices = (market.data || []).map((item) => compactAsset(item, '지수', 'market'));
+  const cryptoItems = (crypto.data || []).map((item) => compactAsset(item, '암호화폐', 'crypto'));
+  const usItems = (stocks.data || []).map((item) => compactAsset(item, '미국 주식', 'stock'));
+  const krItems = (koreanStocks.data || []).map((item) => compactAsset(item, '한국 주식', 'korean-stock'));
   const quoteAssets = [...cryptoItems, ...usItems, ...krItems];
   const assets = [...indices, ...quoteAssets].filter((item) => Number.isFinite(item.changeValue));
   const positive = assets.filter((item) => item.positive).length;
@@ -496,17 +496,17 @@ export default function HomeSummary({ onOpenDetail }) {
   const watchItems = [...usItems, ...cryptoItems, ...krItems].sort((a, b) => Math.abs(b.changeValue) - Math.abs(a.changeValue)).slice(0, 5);
   const noticeItems = (announcements.data || []).slice(0, 3);
   const breadthGroups = [
-    { label: '\uC9C0\uC218', items: indices },
-    { label: '\uBBF8\uAD6D \uC8FC\uC2DD', items: usItems },
-    { label: '\uD55C\uAD6D \uC8FC\uC2DD', items: krItems },
-    { label: '\uC554\uD638\uD654\uD3D0', items: cryptoItems },
+    { label: '지수', items: indices },
+    { label: '미국 주식', items: usItems },
+    { label: '한국 주식', items: krItems },
+    { label: '암호화폐', items: cryptoItems },
   ].filter((group) => group.items.length > 0);
   const assetByKey = new Map(quoteAssets.map((item) => [`${item.type}:${item.id}`, item]));
   const portfolioHoldings = portfolio.data?.holdings || [];
   const portfolioTotals = portfolioHoldings.reduce((acc, holding) => {
     const current = assetByKey.get(holding.itemKey);
     const type = holding.assetType || String(holding.itemKey || '').split(':')[0];
-    const label = type === 'korean-stock' ? '\uD55C\uAD6D \uC8FC\uC2DD' : type === 'stock' ? '\uBBF8\uAD6D \uC8FC\uC2DD' : '\uC554\uD638\uD654\uD3D0';
+    const label = type === 'korean-stock' ? '한국 주식' : type === 'stock' ? '미국 주식' : '암호화폐';
     const currentPrice = parsePrice(current?.price);
     const fallbackPrice = Number(holding.averagePrice) || 0;
     const price = currentPrice || fallbackPrice;
@@ -515,8 +515,8 @@ export default function HomeSummary({ onOpenDetail }) {
     acc.set(label, { ...previous, value: previous.value + value, count: previous.count + 1 });
     return acc;
   }, new Map());
-  const portfolioColors = { '\uD55C\uAD6D \uC8FC\uC2DD': '#10b981', '\uBBF8\uAD6D \uC8FC\uC2DD': '#8b5cf6', '\uC554\uD638\uD654\uD3D0': '#f59e0b' };
-  const portfolioGroups = [...portfolioTotals.values()].filter((group) => group.value > 0).map((group) => ({ ...group, hex: portfolioColors[group.label] || '#64748b', formatted: `\u20A9${Math.round(group.value).toLocaleString('ko-KR')}` }));
+  const portfolioColors = { '한국 주식': '#10b981', '미국 주식': '#8b5cf6', '암호화폐': '#f59e0b' };
+  const portfolioGroups = [...portfolioTotals.values()].filter((group) => group.value > 0).map((group) => ({ ...group, hex: portfolioColors[group.label] || '#64748b', formatted: `₩${Math.round(group.value).toLocaleString('ko-KR')}` }));
   const portfolioTotalValue = portfolioGroups.reduce((sum, group) => sum + group.value, 0);
 
   const refetchAll = () => queries.forEach((query) => query.refetch());
@@ -553,14 +553,14 @@ export default function HomeSummary({ onOpenDetail }) {
               <div className="rounded-3xl border border-dashed border-[var(--color-border)] bg-white p-8 text-center text-sm font-bold text-[var(--color-text-secondary)]">{t.empty}</div>
             ) : (
               <>
-                <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-background-soft)] p-3"><div className="mb-3 flex items-center justify-between gap-3 px-1"><p className="text-sm font-black text-[var(--color-text-primary)]">{'\uC2DC\uC7A5\uBCC4 \uC8FC\uC694 \uC790\uC0B0'}</p><span className="rounded-full bg-white px-3 py-1 text-xs font-black text-[var(--color-text-secondary)] shadow-sm">{t.heroHint}</span></div><div className="flex gap-3 overflow-x-auto pb-1">{heroAssets.map((item) => <AssetHeroCard key={`${item.type}-${item.symbol}`} item={item} onOpen={openAsset} />)}</div></div>
+                <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-background-soft)] p-3"><div className="mb-3 flex items-center justify-between gap-3 px-1"><p className="text-sm font-black text-[var(--color-text-primary)]">{'시장별 주요 자산'}</p><span className="rounded-full bg-white px-3 py-1 text-xs font-black text-[var(--color-text-secondary)] shadow-sm">{t.heroHint}</span></div><div className="flex gap-3 overflow-x-auto pb-1">{heroAssets.map((item) => <AssetHeroCard key={`${item.type}-${item.symbol}`} item={item} onOpen={openAsset} />)}</div></div>
                 <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_340px]">
                   <div className="space-y-4">
                     <div className="grid gap-4 lg:grid-cols-[320px_minmax(0,1fr)]"><SummaryCard total={assets.length} positive={positive} negative={negative} topGainers={topGainers} topLosers={topLosers} /><ChartPanel groups={breadthGroups} /></div>
-                    <div className="grid gap-4 lg:grid-cols-2"><Watchlist title={'\uBBF8\uAD6D \uC8FC\uC2DD'} items={usItems.slice(0, 5)} onOpen={openAsset} to="/stocks/us" /><Watchlist title={'\uD55C\uAD6D \uC8FC\uC2DD'} items={krItems.slice(0, 5)} onOpen={openAsset} to="/stocks/kr" /></div>
+                    <div className="grid gap-4 lg:grid-cols-2"><Watchlist title={'미국 주식'} items={usItems.slice(0, 5)} onOpen={openAsset} to="/stocks/us" /><Watchlist title={'한국 주식'} items={krItems.slice(0, 5)} onOpen={openAsset} to="/stocks/kr" /></div>
                     <div className="grid gap-4 lg:grid-cols-2"><NewsPanel items={(news.data || []).slice(0, 4)} onOpen={openNews} /><CommunityPanel items={(community.data || []).slice(0, 4)} /></div>
                   </div>
-                  <aside className="space-y-4"><Watchlist title={t.watchlist} description={t.watchlistHint} items={watchItems} onOpen={openAsset} />{user ? <Allocation groups={portfolioGroups} totalValue={portfolioTotalValue} holdingCount={portfolioHoldings.length} loading={portfolio.isLoading} /> : <PortfolioLoginPrompt />}<Watchlist title={'\uC554\uD638\uD654\uD3D0'} items={cryptoItems.slice(0, 5)} onOpen={openAsset} to="/crypto" /><AiPanel /></aside>
+                  <aside className="space-y-4"><Watchlist title={t.watchlist} description={t.watchlistHint} items={watchItems} onOpen={openAsset} />{user ? <Allocation groups={portfolioGroups} totalValue={portfolioTotalValue} holdingCount={portfolioHoldings.length} loading={portfolio.isLoading} /> : <PortfolioLoginPrompt />}<Watchlist title={'암호화폐'} items={cryptoItems.slice(0, 5)} onOpen={openAsset} to="/crypto" /><AiPanel /></aside>
                 </div>
               </>
             )}

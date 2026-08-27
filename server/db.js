@@ -1,4 +1,4 @@
-﻿import { mkdirSync } from 'node:fs';
+import { mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DatabaseSync } from 'node:sqlite';
@@ -38,7 +38,11 @@ const countValue = (value) => {
   return text.endsWith('K') ? Math.round(number * 1000) : Math.round(number);
 };
 
-const communityPlaceholder = 'Sample community post for investors to discuss market ideas.';
+const legacyCommunitySeeds = [
+  { author: '투자초심', title: '초보자를 위한 주식 투자 시작 가이드' },
+  { author: '코인마스터', title: '주목할 암호화폐 5개 분석' },
+  { author: '배당금사냥꾼', title: '배당률 높은 미국 주식 포트폴리오 구성' },
+];
 
 const formatCount = (value) => {
   const number = Number(value || 0);
@@ -206,6 +210,7 @@ export async function initDb() {
     await ensureCommunityHiddenColumn();
     await ensureUserAdminColumn();
     await seedCommunityPosts();
+    await cleanupLegacyCommunityPosts();
     return;
   }
 
@@ -337,6 +342,7 @@ export async function initDb() {
   await ensureCommunityHiddenColumn();
   await ensureUserAdminColumn();
   await seedCommunityPosts();
+  await cleanupLegacyCommunityPosts();
 }
 
 async function ensureUserAdminColumn() {
@@ -362,16 +368,16 @@ async function ensureCommunityContentColumn() {
       WHERE table_name = 'community_posts' AND column_name = 'content'
     `);
     if (result.rowCount === 0) await pool.query("ALTER TABLE community_posts ADD COLUMN content TEXT NOT NULL DEFAULT ''");
-    await pool.query("UPDATE community_posts SET content = title || $1 WHERE content = ''", [`\n\n${communityPlaceholder}`]);
+    await pool.query("UPDATE community_posts SET content = title WHERE content = ''");
     return;
   }
 
   const columns = sqlite.prepare("PRAGMA table_info('community_posts')").all();
   if (!columns.some((column) => column.name === 'content')) sqlite.exec("ALTER TABLE community_posts ADD COLUMN content TEXT NOT NULL DEFAULT ''");
-  sqlite.prepare("UPDATE community_posts SET content = title || char(10) || char(10) || ? WHERE content = ''").run(communityPlaceholder);
+  sqlite.prepare("UPDATE community_posts SET content = title WHERE content = ''").run();
 }
 
-const defaultContent = (post) => `${post.title}\n\n${communityPlaceholder} User-written content is stored here in the live service.`;
+const defaultContent = (post) => post.content || post.title;
 
 async function ensureCommunityHiddenColumn() {
   if (pool) {
@@ -389,6 +395,8 @@ async function ensureCommunityHiddenColumn() {
 }
 
 async function seedCommunityPosts() {
+  if (communityPosts.length === 0) return;
+
   if (pool) {
     const { rows } = await pool.query('SELECT COUNT(*)::int AS count FROM community_posts');
     if (rows[0]?.count > 0) return;
@@ -406,6 +414,21 @@ async function seedCommunityPosts() {
   const insert = sqlite.prepare('INSERT INTO community_posts (author, title, content, views, likes, comments, category, score) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
   for (const post of communityPosts) {
     insert.run(post.author, post.title, defaultContent(post), countValue(post.views), countValue(post.likes), post.comments, post.category, post.score);
+  }
+}
+
+
+async function cleanupLegacyCommunityPosts() {
+  if (pool) {
+    for (const post of legacyCommunitySeeds) {
+      await pool.query('DELETE FROM community_posts WHERE author = $1 AND title = $2', [post.author, post.title]);
+    }
+    return;
+  }
+
+  const deletePost = sqlite.prepare('DELETE FROM community_posts WHERE author = ? AND title = ?');
+  for (const post of legacyCommunitySeeds) {
+    deletePost.run(post.author, post.title);
   }
 }
 

@@ -2,27 +2,27 @@ import { Link } from 'react-router-dom';
 
 const groups = [
   {
-    title: '\uC11C\uBE44\uC2A4',
+    title: '서비스',
     links: [
-      { label: '\uC2DC\uC7A5', to: '/market' },
-      { label: '\uCF54\uC778', to: '/crypto' },
-      { label: '\uBBF8\uAD6D\uC8FC\uC2DD', to: '/stocks/us' },
-      { label: '\uD55C\uAD6D\uC8FC\uC2DD', to: '/stocks/kr' },
+      { label: '시장', to: '/market' },
+      { label: '코인', to: '/crypto' },
+      { label: '미국주식', to: '/stocks/us' },
+      { label: '한국주식', to: '/stocks/kr' },
     ],
   },
   {
-    title: '\uCF58\uD150\uCE20',
+    title: '콘텐츠',
     links: [
-      { label: '\uB274\uC2A4', to: '/news' },
-      { label: '\uCEE4\uBBA4\uB2C8\uD2F0', to: '/community' },
+      { label: '뉴스', to: '/news' },
+      { label: '커뮤니티', to: '/community' },
     ],
   },
   {
-    title: '\uC0AC\uC6A9\uC790',
+    title: '사용자',
     links: [
-      { label: '\uB9C8\uC774\uD398\uC774\uC9C0', to: '/mypage' },
-      { label: '\uD3EC\uD2B8\uD3F4\uB9AC\uC624', to: '/portfolio' },
-      { label: '\uC990\uACA8\uCC3E\uAE30', to: '/favorites' },
+      { label: '마이페이지', to: '/mypage' },
+      { label: '포트폴리오', to: '/portfolio' },
+      { label: '즐겨찾기', to: '/favorites' },
     ],
   },
 ];
@@ -48,10 +48,10 @@ export default function Footer() {
           <div className="max-w-md">
             <FooterLogo />
             <p className="mt-4 text-sm leading-6 text-[var(--color-text-secondary)]">
-              {'\uC2DC\uC7A5 \uC815\uBCF4, \uB274\uC2A4, \uCEE4\uBBA4\uB2C8\uD2F0\uB97C \uD55C\uACF3\uC5D0\uC11C \uD655\uC778\uD560 \uC218 \uC788\uB294 \uD22C\uC790 \uC815\uBCF4 \uD50C\uB7AB\uD3FC\uC785\uB2C8\uB2E4.'}
+              {'시장 정보, 뉴스, 커뮤니티를 한곳에서 확인할 수 있는 투자 정보 플랫폼입니다.'}
             </p>
             <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
-              {'\uD559\uC2B5\uACFC \uC815\uBCF4 \uD655\uC778\uC744 \uC704\uD55C \uC11C\uBE44\uC2A4\uB85C, \uD22C\uC790 \uD310\uB2E8\uC740 \uC774\uC6A9\uC790 \uBCF8\uC778\uC758 \uCC45\uC784\uC785\uB2C8\uB2E4.'}
+              {'학습과 정보 확인을 위한 서비스로, 투자 판단은 이용자 본인의 책임입니다.'}
             </p>
           </div>
 
@@ -74,8 +74,8 @@ export default function Footer() {
         </div>
 
         <div className="mt-8 flex flex-col gap-3 border-t border-[var(--color-border)] pt-5 text-xs leading-5 text-[var(--color-text-secondary)] md:flex-row md:items-center md:justify-between">
-          <p>{'\u00A9 2026 MoneyPlatform. All rights reserved.'}</p>
-          <p>{'\uBCF8 \uC11C\uBE44\uC2A4\uC758 \uC815\uBCF4\uB294 \uD22C\uC790 \uCC38\uACE0\uC6A9\uC774\uBA70 \uD22C\uC790 \uACB0\uACFC\uC5D0 \uB300\uD55C \uCC45\uC784\uC740 \uC774\uC6A9\uC790 \uBCF8\uC778\uC5D0\uAC8C \uC788\uC2B5\uB2C8\uB2E4.'}</p>
+          <p>{'© 2026 MoneyPlatform. All rights reserved.'}</p>
+          <p>{'본 서비스의 정보는 투자 참고용이며 투자 결과에 대한 책임은 이용자 본인에게 있습니다.'}</p>
         </div>
       </div>
     </footer>

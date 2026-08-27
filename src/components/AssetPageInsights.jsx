@@ -1,4 +1,4 @@
-﻿import Card from './ui/Card';
+import Card from './ui/Card';
 
 const numberFormat = new Intl.NumberFormat('ko-KR', { maximumFractionDigits: 2 });
 

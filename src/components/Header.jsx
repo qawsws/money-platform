@@ -6,24 +6,24 @@ import LoginModal from './LoginModal';
 import SignupModal from './SignupModal';
 
 const t = {
-  search: '\uAC80\uC0C9',
-  placeholder: '\uC885\uBAA9 \uB610\uB294 \uB274\uC2A4 \uAC80\uC0C9',
-  portfolio: '\uD3EC\uD2B8\uD3F4\uB9AC\uC624',
-  favorites: '\uC990\uACA8\uCC3E\uAE30',
-  mypage: '\uB9C8\uC774\uD398\uC774\uC9C0',
-  admin: '\uAD00\uB9AC\uC790',
-  login: '\uB85C\uADF8\uC778',
-  logout: '\uB85C\uADF8\uC544\uC6C3',
-  signup: '\uD68C\uC6D0\uAC00\uC785',
-  market: '\uC2DC\uC7A5',
-  crypto: '\uCF54\uC778',
-  stocks: '\uBBF8\uAD6D\uC8FC\uC2DD',
-  koreanStocks: '\uD55C\uAD6D\uC8FC\uC2DD',
-  news: '\uB274\uC2A4',
-  community: '\uCEE4\uBBA4\uB2C8\uD2F0',
-  openMenu: '\uBA54\uB274 \uC5F4\uAE30',
-  closeMenu: '\uBA54\uB274 \uB2EB\uAE30',
-  userMenu: '\uC0AC\uC6A9\uC790 \uBA54\uB274',
+  search: '검색',
+  placeholder: '종목 또는 뉴스 검색',
+  portfolio: '포트폴리오',
+  favorites: '즐겨찾기',
+  mypage: '마이페이지',
+  admin: '관리자',
+  login: '로그인',
+  logout: '로그아웃',
+  signup: '회원가입',
+  market: '시장',
+  crypto: '코인',
+  stocks: '미국주식',
+  koreanStocks: '한국주식',
+  news: '뉴스',
+  community: '커뮤니티',
+  openMenu: '메뉴 열기',
+  closeMenu: '메뉴 닫기',
+  userMenu: '사용자 메뉴',
 };
 
 const menuItems = [
@@ -192,7 +192,7 @@ export default function Header() {
   const handleSignup = async (profile) => {
     const createdUser = await signup(profile);
     setLoginInitialUsername(createdUser?.username || profile.username || '');
-    setLoginNotice('\uD68C\uC6D0\uAC00\uC785\uC774 \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4. \uBE44\uBC00\uBC88\uD638\uB97C \uC785\uB825\uD574 \uB85C\uADF8\uC778\uD574 \uC8FC\uC138\uC694.');
+    setLoginNotice('회원가입이 완료되었습니다. 비밀번호를 입력해 로그인해 주세요.');
     setShowLogin(true);
     return createdUser;
   };

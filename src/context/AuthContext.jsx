@@ -50,13 +50,13 @@ export function AuthProvider({ children }) {
 
   async function login(username, password) {
     const res = await postLogin({ username, password });
-    if (!res?.success) throw new Error('\uB85C\uADF8\uC778\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4.');
+    if (!res?.success) throw new Error('로그인에 실패했습니다.');
     return remember(res);
   }
 
   async function signup(profile) {
     const res = await postSignup(profile);
-    if (!res?.success) throw new Error('\uD68C\uC6D0\uAC00\uC785\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4.');
+    if (!res?.success) throw new Error('회원가입에 실패했습니다.');
     return res.user;
   }
 

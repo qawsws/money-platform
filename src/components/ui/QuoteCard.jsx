@@ -22,7 +22,7 @@ export default function QuoteCard({
         <button
           type="button"
           onClick={onOpen}
-          aria-label={`${title} \uC0C1\uC138 \uBCF4\uAE30`}
+          aria-label={`${title} 상세 보기`}
           className="absolute inset-0 z-0 rounded-[var(--radius-card)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
         />
       )}
@@ -47,7 +47,7 @@ export default function QuoteCard({
         </div>
 
         <div className="mt-auto flex items-end justify-between gap-3 pt-5">
-          <p className="line-clamp-2 min-w-0 text-sm leading-5 text-[var(--color-text-secondary)]">{description || '\uD604\uC7AC \uB370\uC774\uD130 \uAE30\uC900'}</p>
+          <p className="line-clamp-2 min-w-0 text-sm leading-5 text-[var(--color-text-secondary)]">{description || '현재 데이터 기준'}</p>
           {favoriteAction && <div className="pointer-events-auto shrink-0">{favoriteAction}</div>}
         </div>
       </div>

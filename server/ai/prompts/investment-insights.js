@@ -21,7 +21,7 @@ Expected JSON shape:
   "portfolioObservation": "portfolio composition observation",
   "newsObservation": "related news observation",
   "riskChecks": ["items the user should check"],
-  "disclaimer": "\uD22C\uC790 \uCC38\uACE0 \uC815\uBCF4\uC774\uBA70 \uD22C\uC790 \uAD8C\uC720\uAC00 \uC544\uB2D9\uB2C8\uB2E4."
+  "disclaimer": "투자 참고 정보이며 투자 권유가 아닙니다."
 }
 
 Rules:

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 
-const t = { title: '\uB85C\uADF8\uC778', username: '\uC544\uC774\uB514', password: '\uBE44\uBC00\uBC88\uD638', cancel: '\uCDE8\uC18C', submit: '\uB85C\uADF8\uC778', loading: '\uB85C\uADF8\uC778 \uC911...', fallback: '\uB85C\uADF8\uC778\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4.' };
+const t = { title: '로그인', username: '아이디', password: '비밀번호', cancel: '취소', submit: '로그인', loading: '로그인 중...', fallback: '로그인에 실패했습니다.' };
 
 export default function LoginModal({ open, onClose, onLogin, initialUsername = '', notice = '' }) {
   const [username, setUsername] = useState(initialUsername);

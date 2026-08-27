@@ -190,11 +190,11 @@ npm run test:e2e
 실제 값은 `.env` 또는 Render Environment에만 설정합니다.
 
 ```env
-DATABASE_URL=
+DATABASE_URL=postgresql://user:password@host:port/database
 DATABASE_SSL=true
-JWT_SECRET=replace-with-a-long-random-secret
+JWT_SECRET=change-me-long-random-secret
 AI_ENABLED=false
-OPENAI_API_KEY=
+OPENAI_API_KEY=optional-openai-key-placeholder
 OPENAI_MODEL=gpt-4.1-mini
 ```
 

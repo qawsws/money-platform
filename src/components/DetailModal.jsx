@@ -8,55 +8,55 @@ import Card from './ui/Card';
 import PriceChangeBadge from './ui/PriceChangeBadge';
 
 const t = {
-  market: '\uC2DC\uC7A5 \uC9C0\uC218',
-  crypto: '\uC554\uD638\uD654\uD3D0',
-  stock: '\uBBF8\uAD6D \uC8FC\uC2DD',
-  'korean-stock': '\uD55C\uAD6D \uC8FC\uC2DD',
-  news: '\uB274\uC2A4',
-  community: '\uCEE4\uBBA4\uB2C8\uD2F0',
-  detail: '\uC0C1\uC138 \uC815\uBCF4',
-  favorite: '\uC990\uACA8\uCC3E\uAE30',
-  remove: '\uC990\uACA8\uCC3E\uAE30 \uD574\uC81C',
-  close: '\uB2EB\uAE30',
-  back: '\uBAA9\uB85D\uC73C\uB85C \uB3CC\uC544\uAC00\uAE30',
-  comments: '\uB313\uAE00',
-  comment: '\uB313\uAE00 \uC791\uC131',
-  emptyComments: '\uC544\uC9C1 \uB313\uAE00\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.',
-  login: '\uB85C\uADF8\uC778 \uD6C4 \uB313\uAE00\uC744 \uC791\uC131\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4.',
-  submit: '\uB4F1\uB85D',
-  delete: '\uC0AD\uC81C',
-  report: '\uC2E0\uACE0',
-  postReport: '\uAC8C\uC2DC\uAE00 \uC2E0\uACE0',
-  commentReport: '\uB313\uAE00 \uC2E0\uACE0',
-  reportReason: '\uC2E0\uACE0 \uC0AC\uC720',
-  postReportReason: '\uAC8C\uC2DC\uAE00 \uC2E0\uACE0 \uC0AC\uC720',
-  commentReportReason: '\uB313\uAE00 \uC2E0\uACE0 \uC0AC\uC720',
-  reportDone: '\uC2E0\uACE0\uAC00 \uC811\uC218\uB418\uC5C8\uC2B5\uB2C8\uB2E4.',
-  confirmComment: '\uC774 \uB313\uAE00\uC744 \uC0AD\uC81C\uD560\uAE4C\uC694?',
-  confirmPost: '\uC774 \uAE00\uC744 \uC0AD\uC81C\uD560\uAE4C\uC694?',
-  source: '\uC6D0\uBB38 \uBCF4\uAE30',
-  memo: '\uB0B4 \uBA54\uBAA8',
-  memoPlaceholder: '\uC774 \uC885\uBAA9\uC744 \uBCF4\uBA70 \uAE30\uC5B5\uD560 \uD22C\uC790 \uC544\uC774\uB514\uC5B4\uB97C \uC801\uC5B4\uBCF4\uC138\uC694.',
-  memoSaved: '\uBA54\uBAA8\uAC00 \uC800\uC7A5\uB418\uC5C8\uC2B5\uB2C8\uB2E4.',
-  saveNews: '\uB274\uC2A4 \uC800\uC7A5',
-  removeNews: '\uB274\uC2A4 \uC800\uC7A5 \uD574\uC81C',
-  chart: '\uAC00\uACA9 \uCC28\uD2B8',
-  metrics: '\uC8FC\uC694 \uC9C0\uD45C',
-  info: '\uAE30\uBCF8 \uC815\uBCF4',
-  aiSummary: 'AI \uC694\uC57D',
-  aiSummaryTitle: 'AI \uD575\uC2EC \uC694\uC57D',
-  aiLoading: 'AI \uBD84\uC11D \uC911...',
-  aiFailed: 'AI \uC694\uC57D\uC744 \uC0DD\uC131\uD558\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.',
-  aiDisabled: 'AI \uAE30\uB2A5\uC774 \uD604\uC7AC \uBE44\uD65C\uC131\uD654\uB418\uC5B4 \uC788\uC2B5\uB2C8\uB2E4.',
-  aiDailyLimit: '\uC624\uB298 \uC0AC\uC6A9\uD560 \uC218 \uC788\uB294 AI \uC0AC\uC6A9 \uD69F\uC218\uB97C \uBAA8\uB450 \uC0AC\uC6A9\uD588\uC2B5\uB2C8\uB2E4.',
-  aiRetry: '\uB2E4\uC2DC \uC2DC\uB3C4',
-  positives: '\uAE0D\uC815 \uC694\uC778',
-  negatives: '\uBD80\uC815 \uC694\uC778',
-  relatedAssets: '\uAD00\uB828 \uC790\uC0B0',
-  caution: '\uCD94\uAC00 \uD655\uC778 \uC0AC\uD56D',
-  noChart: '\uD45C\uC2DC\uD560 \uCC28\uD2B8 \uB370\uC774\uD130\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.',
-  like: '\uC88B\uC544\uC694',
-  liked: '\uC88B\uC544\uC694 \uC644\uB8CC',
+  market: '시장 지수',
+  crypto: '암호화폐',
+  stock: '미국 주식',
+  'korean-stock': '한국 주식',
+  news: '뉴스',
+  community: '커뮤니티',
+  detail: '상세 정보',
+  favorite: '즐겨찾기',
+  remove: '즐겨찾기 해제',
+  close: '닫기',
+  back: '목록으로 돌아가기',
+  comments: '댓글',
+  comment: '댓글 작성',
+  emptyComments: '아직 댓글이 없습니다.',
+  login: '로그인 후 댓글을 작성할 수 있습니다.',
+  submit: '등록',
+  delete: '삭제',
+  report: '신고',
+  postReport: '게시글 신고',
+  commentReport: '댓글 신고',
+  reportReason: '신고 사유',
+  postReportReason: '게시글 신고 사유',
+  commentReportReason: '댓글 신고 사유',
+  reportDone: '신고가 접수되었습니다.',
+  confirmComment: '이 댓글을 삭제할까요?',
+  confirmPost: '이 글을 삭제할까요?',
+  source: '원문 보기',
+  memo: '내 메모',
+  memoPlaceholder: '이 종목을 보며 기억할 투자 아이디어를 적어보세요.',
+  memoSaved: '메모가 저장되었습니다.',
+  saveNews: '뉴스 저장',
+  removeNews: '뉴스 저장 해제',
+  chart: '가격 차트',
+  metrics: '주요 지표',
+  info: '기본 정보',
+  aiSummary: 'AI 요약',
+  aiSummaryTitle: 'AI 핵심 요약',
+  aiLoading: 'AI 분석 중...',
+  aiFailed: 'AI 요약을 생성하지 못했습니다.',
+  aiDisabled: 'AI 기능이 현재 비활성화되어 있습니다.',
+  aiDailyLimit: '오늘 사용할 수 있는 AI 사용 횟수를 모두 사용했습니다.',
+  aiRetry: '다시 시도',
+  positives: '긍정 요인',
+  negatives: '부정 요인',
+  relatedAssets: '관련 자산',
+  caution: '추가 확인 사항',
+  noChart: '표시할 차트 데이터가 없습니다.',
+  like: '좋아요',
+  liked: '좋아요 완료',
 };
 
 const quoteTypes = ['market', 'crypto', 'stock', 'korean-stock'];
@@ -280,7 +280,7 @@ function Sparkline({ values = [], positive = true, type = 'stock' }) {
   const fillPath = `${path} L 100 54 L 0 54 Z`;
   const stroke = positive ? 'var(--color-positive)' : 'var(--color-negative)';
   const fill = positive ? 'rgba(239, 68, 68, 0.08)' : 'rgba(37, 99, 235, 0.08)';
-  const basis = type === 'crypto' ? '\uCD5C\uADFC \uAC00\uACA9 \uC774\uB825\uACFC 24\uC2DC\uAC04 \uBCC0\uB3D9\uB960 \uAE30\uC900\uC785\uB2C8\uB2E4.' : '\uCD5C\uADFC \uAC00\uACA9 \uC774\uB825\uACFC \uC804\uC77C \uC885\uAC00 \uB300\uBE44 \uB4F1\uB77D\uB960 \uAE30\uC900\uC785\uB2C8\uB2E4.';
+  const basis = type === 'crypto' ? '최근 가격 이력과 24시간 변동률 기준입니다.' : '최근 가격 이력과 전일 종가 대비 등락률 기준입니다.';
 
   return (
     <Card hover={false} className="p-5 sm:p-6">
@@ -397,19 +397,19 @@ function CommunityDetailHeader({ item, user, onDelete, deleting, liked, likeCoun
             <UserAvatar name={displayName} />
             <div className="min-w-0">
               <p className="truncate text-sm font-extrabold text-[var(--color-text-primary)]">{displayName || '-'}</p>
-              <p className="mt-1 text-xs font-medium text-[var(--color-text-tertiary)]">{item.createdAt || item.time || '\uD604\uC7AC \uB370\uC774\uD130 \uAE30\uC900'}</p>
+              <p className="mt-1 text-xs font-medium text-[var(--color-text-tertiary)]">{item.createdAt || item.time || '현재 데이터 기준'}</p>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <MetaChip type="views" label={'\uC870\uD68C'} value={item.views} />
-            <MetaChip type="comments" label={'\uB313\uAE00'} value={item.comments} />
+            <MetaChip type="views" label={'조회'} value={item.views} />
+            <MetaChip type="comments" label={'댓글'} value={item.comments} />
             <button type="button" onClick={onLike} disabled={liking} aria-pressed={liked} className={'inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 text-xs font-black transition disabled:opacity-60 ' + likeClass}>
               <StatIcon type="likes" />
-              {liked ? '\uC88B\uC544\uC694 \uC644\uB8CC' : '\uC88B\uC544\uC694'} {likeCount}
+              {liked ? '좋아요 완료' : '좋아요'} {likeCount}
             </button>
             {user && !isOwner && (
               <button type="button" onClick={onToggleReport} className={'inline-flex min-h-9 items-center justify-center rounded-full border px-3 text-xs font-black transition ' + reportClass}>
-                {reportOpen ? '\uB2EB\uAE30' : '\uAC8C\uC2DC\uAE00 \uC2E0\uACE0'}
+                {reportOpen ? '닫기' : '게시글 신고'}
               </button>
             )}
             {isOwner && (
@@ -558,18 +558,18 @@ export default function DetailModal({ open, type, item, onClose, standalone = fa
   const chartValues = Array.isArray(item.priceHistory) && item.priceHistory.map(Number).filter(Number.isFinite).length > 1 ? item.priceHistory : fallbackPriceHistory(item);
   const hasChart = isQuote && chartValues.length > 1;
   const rows = type === 'market'
-    ? [['\uD604\uC7AC \uC9C0\uC218', item.value], ['\uC804\uC77C \uB300\uBE44 \uB4F1\uB77D\uB960', item.change, true]]
+    ? [['현재 지수', item.value], ['전일 대비 등락률', item.change, true]]
     : type === 'crypto' || type === 'stock' || type === 'korean-stock'
-      ? [['\uD604\uC7AC\uAC00', item.price], [type === 'crypto' ? '24\uC2DC\uAC04 \uBCC0\uB3D9\uB960' : '\uC804\uC77C \uB300\uBE44 \uB4F1\uB77D\uB960', item.change, true]]
+      ? [['현재가', item.price], [type === 'crypto' ? '24시간 변동률' : '전일 대비 등락률', item.change, true]]
       : type === 'news'
-        ? [['\uCE74\uD14C\uACE0\uB9AC', item.category], ['\uC2DC\uAC04', item.time]]
-        : [['\uC870\uD68C', item.views], ['\uC88B\uC544\uC694', item.likes], ['\uB313\uAE00', item.comments]];
+        ? [['카테고리', item.category], ['시간', item.time]]
+        : [['조회', item.views], ['좋아요', item.likes], ['댓글', item.comments]];
   const infoRows = [
-    type !== 'market' ? ['\uAD6C\uBD84', t[type] || t.detail] : null,
-    ['\uC2EC\uBCFC', item.symbol],
-    ['\uCF54\uB4DC', item.code],
-    type !== 'market' ? ['\uCE74\uD14C\uACE0\uB9AC', item.category] : null,
-    ['\uC2DC\uAC04', item.time],
+    type !== 'market' ? ['구분', t[type] || t.detail] : null,
+    ['심볼', item.symbol],
+    ['코드', item.code],
+    type !== 'market' ? ['카테고리', item.category] : null,
+    ['시간', item.time],
   ].filter((row) => row && row[1] != null && row[1] !== '');
 
   const panel = (
@@ -600,11 +600,11 @@ export default function DetailModal({ open, type, item, onClose, standalone = fa
               </Card>
             )}
 
-            <TextCard title={type === 'community' ? '\uAC8C\uC2DC\uAE00 \uBCF8\uBB38' : isQuote ? '\uC790\uC0B0 \uC815\uBCF4' : t.detail}>{item.summary || item.content || item.description}</TextCard>
+            <TextCard title={type === 'community' ? '게시글 본문' : isQuote ? '자산 정보' : t.detail}>{item.summary || item.content || item.description}</TextCard>
 
             {type === 'news' && item.url && (
               <Card hover={false} className="p-5 sm:p-6">
-                <h3 className="text-lg font-extrabold text-[var(--color-text-primary)]">{'\uB274\uC2A4 \uB9C1\uD06C'}</h3>
+                <h3 className="text-lg font-extrabold text-[var(--color-text-primary)]">{'뉴스 링크'}</h3>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <a href={item.url} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-2xl bg-[var(--color-primary)] px-4 text-sm font-bold text-white transition hover:bg-blue-700">
                     {t.source}
@@ -635,7 +635,7 @@ export default function DetailModal({ open, type, item, onClose, standalone = fa
                 </div>
                 <textarea value={memo ?? note.data?.note?.note ?? ''} onChange={(event) => setMemo(event.target.value)} placeholder={t.memoPlaceholder} rows={4} className="w-full rounded-2xl border border-[var(--color-border)] bg-white px-4 py-3 text-sm outline-none transition focus:border-[var(--color-primary)] focus:ring-4 focus:ring-blue-100" />
                 <div className="mt-3 flex justify-end">
-                  <button type="button" onClick={() => saveMemo.mutate()} disabled={saveMemo.isPending} className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-[var(--color-primary)] px-4 text-sm font-bold text-white transition hover:bg-blue-700 disabled:bg-slate-300">{saveMemo.isPending ? '\uC800\uC7A5 \uC911...' : '\uC800\uC7A5'}</button>
+                  <button type="button" onClick={() => saveMemo.mutate()} disabled={saveMemo.isPending} className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-[var(--color-primary)] px-4 text-sm font-bold text-white transition hover:bg-blue-700 disabled:bg-slate-300">{saveMemo.isPending ? '저장 중...' : '저장'}</button>
                 </div>
               </Card>
             )}
@@ -646,17 +646,17 @@ export default function DetailModal({ open, type, item, onClose, standalone = fa
                   <div className="border-b border-amber-100 bg-amber-50/70 p-5 sm:p-6">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <h3 className="text-base font-black text-amber-800">{'\uAC8C\uC2DC\uAE00 \uC2E0\uACE0'}</h3>
-                        <p className="mt-1 text-sm text-amber-700">{'\uAC8C\uC2DC\uAE00 \uC804\uCCB4\uC5D0 \uB300\uD55C \uC2E0\uACE0\uC785\uB2C8\uB2E4. \uD2B9\uC815 \uB313\uAE00\uC740 \uB313\uAE00 \uC606\uC758 \uB313\uAE00 \uC2E0\uACE0\uB97C \uC774\uC6A9\uD574\uC8FC\uC138\uC694.'}</p>
+                        <h3 className="text-base font-black text-amber-800">{'게시글 신고'}</h3>
+                        <p className="mt-1 text-sm text-amber-700">{'게시글 전체에 대한 신고입니다. 특정 댓글은 댓글 옆의 댓글 신고를 이용해주세요.'}</p>
                       </div>
                       <button type="button" onClick={() => setOpenPostReport(false)} className="rounded-full border border-amber-200 bg-white px-3 py-1 text-xs font-black text-amber-700">{t.close}</button>
                     </div>
-                    <label className="mt-4 block text-xs font-bold text-amber-800" htmlFor="post-report-reason">{'\uAC8C\uC2DC\uAE00 \uC2E0\uACE0 \uC0AC\uC720'}</label>
-                    <input id="post-report-reason" value={postReportReason} onChange={(event) => setPostReportReason(event.target.value)} className="mt-2 h-11 w-full rounded-2xl border border-amber-200 bg-white px-4 text-sm outline-none transition focus:border-amber-400 focus:ring-4 focus:ring-amber-100" placeholder={'\uC2A4\uD338, \uC695\uC124, \uD5C8\uC704 \uC815\uBCF4 \uB4F1'} />
+                    <label className="mt-4 block text-xs font-bold text-amber-800" htmlFor="post-report-reason">{'게시글 신고 사유'}</label>
+                    <input id="post-report-reason" value={postReportReason} onChange={(event) => setPostReportReason(event.target.value)} className="mt-2 h-11 w-full rounded-2xl border border-amber-200 bg-white px-4 text-sm outline-none transition focus:border-amber-400 focus:ring-4 focus:ring-amber-100" placeholder={'스팸, 욕설, 허위 정보 등'} />
                     <div className="mt-3 flex justify-end">
-                      <button type="button" onClick={() => reportContent.mutate({ targetType: 'post', targetId: item.id, reason: postReportReason })} disabled={reportContent.isPending || postReportReason.trim().length < 2} className="inline-flex min-h-10 items-center justify-center rounded-xl bg-amber-500 px-4 text-sm font-bold text-white transition hover:bg-amber-600 disabled:bg-slate-300">{reportContent.isPending ? '\uC2E0\uACE0 \uC911...' : '\uAC8C\uC2DC\uAE00 \uC2E0\uACE0 \uC811\uC218'}</button>
+                      <button type="button" onClick={() => reportContent.mutate({ targetType: 'post', targetId: item.id, reason: postReportReason })} disabled={reportContent.isPending || postReportReason.trim().length < 2} className="inline-flex min-h-10 items-center justify-center rounded-xl bg-amber-500 px-4 text-sm font-bold text-white transition hover:bg-amber-600 disabled:bg-slate-300">{reportContent.isPending ? '신고 중...' : '게시글 신고 접수'}</button>
                     </div>
-                    {reportContent.isSuccess && <p className="mt-2 text-xs font-semibold text-emerald-600">{'\uC2E0\uACE0\uAC00 \uC811\uC218\uB418\uC5C8\uC2B5\uB2C8\uB2E4.'}</p>}
+                    {reportContent.isSuccess && <p className="mt-2 text-xs font-semibold text-emerald-600">{'신고가 접수되었습니다.'}</p>}
                   </div>
                 )}
 
@@ -664,7 +664,7 @@ export default function DetailModal({ open, type, item, onClose, standalone = fa
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                       <h3 className="text-lg font-extrabold text-[var(--color-text-primary)]">{t.comments}</h3>
-                      <p className="mt-1 text-sm text-[var(--color-text-secondary)]">{comments.data?.comments?.length ?? item.comments ?? 0}{'\uAC1C\uC758 \uB313\uAE00\uC774 \uC788\uC2B5\uB2C8\uB2E4.'}</p>
+                      <p className="mt-1 text-sm text-[var(--color-text-secondary)]">{comments.data?.comments?.length ?? item.comments ?? 0}{'개의 댓글이 있습니다.'}</p>
                     </div>
                   </div>
                   {user ? (
@@ -673,14 +673,14 @@ export default function DetailModal({ open, type, item, onClose, standalone = fa
                         <UserAvatar name={user.name || user.username} className="size-8" />
                         <div className="min-w-0">
                           <p className="truncate text-sm font-extrabold text-[var(--color-text-primary)]">{user.name || user.username}</p>
-                          <p className="text-xs text-[var(--color-text-tertiary)]">{'2\uC790 \uC774\uC0C1 \uC785\uB825\uD558\uBA74 \uB4F1\uB85D\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4.'}</p>
+                          <p className="text-xs text-[var(--color-text-tertiary)]">{'2자 이상 입력하면 등록할 수 있습니다.'}</p>
                         </div>
                       </div>
                       <label htmlFor="community-comment" className="sr-only">{t.comment}</label>
                       <textarea id="community-comment" value={comment} onChange={(event) => setComment(event.target.value)} placeholder={t.comment} rows={4} className="min-h-28 w-full resize-y rounded-2xl border border-emerald-100 bg-white px-4 py-3 text-sm leading-6 outline-none transition focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100" />
                       <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                        <p className="text-xs text-[var(--color-text-tertiary)]">{'\uC11C\uB85C\uC5D0\uAC8C \uB3C4\uC6C0\uB418\uB294 \uD22C\uC790 \uC758\uACAC\uC744 \uB098\uB220\uBCF4\uC138\uC694.'}</p>
-                        <button type="submit" disabled={comment.trim().length < 2 || createComment.isPending} className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-emerald-700 px-5 text-sm font-bold text-white transition hover:bg-emerald-800 disabled:bg-slate-300">{createComment.isPending ? '\uB4F1\uB85D \uC911...' : t.submit}</button>
+                        <p className="text-xs text-[var(--color-text-tertiary)]">{'서로에게 도움되는 투자 의견을 나눠보세요.'}</p>
+                        <button type="submit" disabled={comment.trim().length < 2 || createComment.isPending} className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-emerald-700 px-5 text-sm font-bold text-white transition hover:bg-emerald-800 disabled:bg-slate-300">{createComment.isPending ? '등록 중...' : t.submit}</button>
                       </div>
                     </form>
                   ) : (
@@ -698,7 +698,7 @@ export default function DetailModal({ open, type, item, onClose, standalone = fa
                       ))}
                     </div>
                   )}
-                  {comments.error && <p className="mt-5 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">{'\uB313\uAE00\uC744 \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.'}</p>}
+                  {comments.error && <p className="mt-5 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">{'댓글을 불러오지 못했습니다.'}</p>}
                   {!comments.isLoading && !comments.error && comments.data?.comments?.length > 0 ? (
                     <div className="mt-5 overflow-hidden rounded-3xl border border-emerald-100 bg-white">
                       {comments.data.comments.map((entry) => (
@@ -712,18 +712,18 @@ export default function DetailModal({ open, type, item, onClose, standalone = fa
                                   <span>{entry.createdAt}</span>
                                 </div>
                                 <div className="flex flex-wrap items-center gap-2">
-                                  {user && user.username !== entry.author && <button type="button" onClick={() => setOpenCommentReportId((current) => (current === entry.id ? null : entry.id))} className="rounded-full border border-amber-200 px-3 py-1 font-bold text-amber-600 hover:bg-amber-50 hover:text-amber-700">{openCommentReportId === entry.id ? '\uB2EB\uAE30' : '\uC2E0\uACE0'}</button>}
+                                  {user && user.username !== entry.author && <button type="button" onClick={() => setOpenCommentReportId((current) => (current === entry.id ? null : entry.id))} className="rounded-full border border-amber-200 px-3 py-1 font-bold text-amber-600 hover:bg-amber-50 hover:text-amber-700">{openCommentReportId === entry.id ? '닫기' : '신고'}</button>}
                                   {user?.username === entry.author && <button type="button" onClick={() => { if (window.confirm(t.confirmComment)) removeComment.mutate(entry.id); }} className="rounded-full border border-red-100 px-3 py-1 font-bold text-red-500 hover:bg-red-50 hover:text-red-600">{t.delete}</button>}
                                 </div>
                               </div>
                               <p className="whitespace-pre-line break-words text-sm leading-6 text-slate-700">{entry.content}</p>
                               {user && user.username !== entry.author && openCommentReportId === entry.id && (
                                 <div className="mt-3 rounded-2xl border border-amber-100 bg-amber-50/60 p-3">
-                                  <label className="text-xs font-bold text-amber-700" htmlFor={'comment-report-' + entry.id}>{'\uB313\uAE00 \uC2E0\uACE0 \uC0AC\uC720'}</label>
-                                  <input id={'comment-report-' + entry.id} value={commentReportReasons[entry.id] || ''} onChange={(event) => setCommentReportReasons((values) => ({ ...values, [entry.id]: event.target.value }))} className="mt-2 h-10 w-full rounded-xl border border-amber-100 bg-white px-3 text-sm outline-none transition focus:border-amber-300 focus:ring-4 focus:ring-amber-100" placeholder={'\uC2A4\uD338, \uC695\uC124, \uD5C8\uC704 \uC815\uBCF4 \uB4F1'} />
+                                  <label className="text-xs font-bold text-amber-700" htmlFor={'comment-report-' + entry.id}>{'댓글 신고 사유'}</label>
+                                  <input id={'comment-report-' + entry.id} value={commentReportReasons[entry.id] || ''} onChange={(event) => setCommentReportReasons((values) => ({ ...values, [entry.id]: event.target.value }))} className="mt-2 h-10 w-full rounded-xl border border-amber-100 bg-white px-3 text-sm outline-none transition focus:border-amber-300 focus:ring-4 focus:ring-amber-100" placeholder={'스팸, 욕설, 허위 정보 등'} />
                                   <div className="mt-2 flex justify-end">
                                     <button type="button" onClick={() => reportContent.mutate({ targetType: 'comment', targetId: entry.id, reason: commentReportReasons[entry.id] })} disabled={reportContent.isPending || String(commentReportReasons[entry.id] || '').trim().length < 2} className="inline-flex min-h-9 items-center justify-center rounded-xl bg-amber-500 px-3 text-xs font-bold text-white transition hover:bg-amber-600 disabled:bg-slate-300">
-                                      {reportContent.isPending ? '\uC2E0\uACE0 \uC911...' : '\uC2E0\uACE0 \uC811\uC218'}
+                                      {reportContent.isPending ? '신고 중...' : '신고 접수'}
                                     </button>
                                   </div>
                                 </div>

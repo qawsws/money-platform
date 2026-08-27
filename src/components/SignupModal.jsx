@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 
-const t = { title: '\uD68C\uC6D0\uAC00\uC785', intro: '\uD544\uC218 \uC815\uBCF4\uB97C \uC785\uB825\uD558\uACE0 \uC11C\uBE44\uC2A4\uB97C \uC2DC\uC791\uD558\uC138\uC694.', username: '\uC544\uC774\uB514', password: '\uBE44\uBC00\uBC88\uD638', confirm: '\uBE44\uBC00\uBC88\uD638 \uD655\uC778', name: '\uB2C9\uB124\uC784', email: '\uC774\uBA54\uC77C', phone: '\uD734\uB300\uD3F0 \uBC88\uD638', birth: '\uC0DD\uB144\uC6D4\uC77C', consent: '\uAC1C\uC778\uC815\uBCF4 \uC218\uC9D1 \uBC0F \uC774\uC6A9\uC5D0 \uB3D9\uC758\uD569\uB2C8\uB2E4.', cancel: '\uCDE8\uC18C', submit: '\uAC00\uC785\uD558\uAE30', loading: '\uAC00\uC785 \uC911...', mismatch: '\uBE44\uBC00\uBC88\uD638\uAC00 \uC77C\uCE58\uD558\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4.' };
+const t = { title: '회원가입', intro: '필수 정보를 입력하고 서비스를 시작하세요.', username: '아이디', password: '비밀번호', confirm: '비밀번호 확인', name: '닉네임', email: '이메일', phone: '휴대폰 번호', birth: '생년월일', consent: '개인정보 수집 및 이용에 동의합니다.', cancel: '취소', submit: '가입하기', loading: '가입 중...', mismatch: '비밀번호가 일치하지 않습니다.' };
 const initial = { username: '', password: '', passwordConfirm: '', name: '', email: '', phone: '', birthDate: '', consent: false };
 
 export default function SignupModal({ open, onClose, onSignup }) {

@@ -1,4 +1,4 @@
-﻿import { lazy, Suspense } from 'react';
+import { lazy, Suspense } from 'react';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import ScrollToTop from './components/ScrollToTop';
 
@@ -17,15 +17,15 @@ const PortfolioPage = lazy(() => import('./pages/PortfolioPage'));
 const MyPage = lazy(() => import('./pages/MyPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 
-const Loading = () => <div className="p-10 text-center text-sm text-slate-500">{'\uBD88\uB7EC\uC624\uB294 \uC911...'}</div>;
+const Loading = () => <div className="p-10 text-center text-sm text-slate-500">{'불러오는 중...'}</div>;
 const NotFound = () => (
   <section className="mx-auto grid min-h-[55vh] max-w-7xl place-items-center px-4 py-16 text-center sm:px-6 lg:px-8">
     <div className="min-w-0 max-w-full">
       <p className="text-sm font-black uppercase text-[var(--color-primary)]">404</p>
-      <h1 className="mt-3 break-words text-3xl font-black tracking-tight text-[var(--color-text-primary)]">{'\uD398\uC774\uC9C0\uB97C \uCC3E\uC744 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4.'}</h1>
-      <p className="mt-3 break-words text-sm leading-6 text-[var(--color-text-secondary)]">{'\uC694\uCCAD\uD55C \uACBD\uB85C\uAC00 \uBCC0\uACBD\uB418\uC5C8\uAC70\uB098 \uC874\uC7AC\uD558\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4.'}</p>
+      <h1 className="mt-3 break-words text-3xl font-black tracking-tight text-[var(--color-text-primary)]">{'페이지를 찾을 수 없습니다.'}</h1>
+      <p className="mt-3 break-words text-sm leading-6 text-[var(--color-text-secondary)]">{'요청한 경로가 변경되었거나 존재하지 않습니다.'}</p>
       <a href="/" className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-[var(--color-primary)] px-5 text-sm font-bold text-white transition hover:bg-[var(--color-primary-hover)]">
-        {'\uD648\uC73C\uB85C \uC774\uB3D9'}
+        {'홈으로 이동'}
       </a>
     </div>
   </section>

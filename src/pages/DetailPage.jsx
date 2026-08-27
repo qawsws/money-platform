@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import DetailModal from '../components/DetailModal';
 import Card from '../components/ui/Card';
@@ -15,8 +15,8 @@ export default function DetailPage() {
       try {
         const data = await (loaders[type]?.() ?? Promise.resolve([])); const decoded = decodeURIComponent(id);
         const found = data.find((entry) => [entry.id, entry.symbol, entry.title].some((value) => String(value) === decoded));
-        setItem(found || null); if (!found) setError('\uC0C1\uC138 \uC815\uBCF4\uB97C \uCC3E\uC744 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4.');
-      } catch { setError('\uC0C1\uC138 \uC815\uBCF4\uB97C \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.'); }
+        setItem(found || null); if (!found) setError('상세 정보를 찾을 수 없습니다.');
+      } catch { setError('상세 정보를 불러오지 못했습니다.'); }
     }
     load();
   }, [id, item, type]);
