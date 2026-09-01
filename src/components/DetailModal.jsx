@@ -208,7 +208,7 @@ function AiSummaryResult({ result }) {
         <span className="rounded-full bg-[var(--color-primary-soft)] px-3 py-1 text-xs font-extrabold text-[var(--color-primary)]">{t.aiSummary}</span>
       </div>
       <div className="mt-5 rounded-2xl border border-[var(--color-border)] bg-white p-4">
-        <h4 className="text-sm font-extrabold text-[var(--color-text-primary)]">?듭떖 ?붿빟</h4>
+        <h4 className="text-sm font-extrabold text-[var(--color-text-primary)]">{'\uD575\uC2EC \uC694\uC57D'}</h4>
         <p className="mt-2 whitespace-pre-line break-words text-sm leading-7 text-[var(--color-text-secondary)]">{result.summary || '-'}</p>
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -358,7 +358,7 @@ function DetailHero({ type, item, selected, onToggleFavorite }) {
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-[var(--color-text-secondary)]">{type === 'market' ? '현재 지수' : '현재가'}</p>
+          <p className="text-sm font-semibold text-[var(--color-text-secondary)]">{type === 'market' ? '\uD604\uC7AC \uC9C0\uC218' : '\uD604\uC7AC\uAC00'}</p>
           <p className="mt-2 break-words text-4xl font-black tracking-tight text-[var(--color-text-primary)] sm:text-5xl">{safeValue(price)}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -382,37 +382,55 @@ function TextCard({ title, children }) {
 }
 
 
+
+function newsDetailText(item) {
+  const blocks = [
+    item.summary,
+    item.content || item.description,
+    item.source || item.provider ? '\uCD9C\uCC98: ' + (item.source || item.provider) : '',
+    item.category ? '\uBD84\uB958: ' + item.category : '',
+    item.time ? '\uC2DC\uAC04: ' + item.time : '',
+  ];
+  return blocks.filter(Boolean).join('\n\n');
+}
+
 function AssetInfoCard({ type, item, profileData, loading }) {
   if (!isAsset(type)) return null;
 
   const profile = profileData?.profile || {};
   const rows = type === 'crypto'
     ? [
-        ['코인 소개', profile.intro],
-        ['출시연도', profile.launchYear],
-        ['유형/용도', profile.usageType],
-        ['네트워크/합의 방식', profile.network],
-        ['공식 홈페이지', profile.homepage, true],
+        ['\uCF54\uC778 \uC18C\uAC1C', profile.intro],
+        ['\uD2F0\uCEE4', item.symbol],
+        ['\uD604\uC7AC\uAC00', item.price],
+        ['24\uC2DC\uAC04 \uBCC0\uB3D9\uB960', item.change],
+        ['\uCD9C\uC2DC\uC5F0\uB3C4', profile.launchYear],
+        ['\uC720\uD615/\uC6A9\uB3C4', profile.usageType],
+        ['\uB124\uD2B8\uC6CC\uD06C/\uD569\uC758 \uBC29\uC2DD', profile.network],
+        ['\uACF5\uC2DD \uD648\uD398\uC774\uC9C0', profile.homepage, true],
       ]
     : [
-        ['회사/종목명', profile.companyName || item.name],
-        ['업종', profile.industry],
-        ['주요 사업', profile.business],
-        ['국가', profile.country],
-        ['거래소', profile.exchange],
-        ['공식 홈페이지', profile.homepage, true],
+        ['\uD68C\uC0AC/\uC885\uBAA9\uBA85', profile.companyName || item.name],
+        ['\uD2F0\uCEE4/\uC885\uBAA9\uCF54\uB4DC', item.symbol || item.code],
+        ['\uD604\uC7AC\uAC00', item.price],
+        ['\uBCC0\uB3D9\uB960', item.change],
+        ['\uAD6C\uBD84', type === 'korean-stock' ? '\uD55C\uAD6D \uC8FC\uC2DD' : '\uBBF8\uAD6D \uC8FC\uC2DD'],
+        ['\uC5C5\uC885', profile.industry],
+        ['\uC8FC\uC694 \uC0AC\uC5C5', profile.business],
+        ['\uAD6D\uAC00', profile.country],
+        ['\uAC70\uB798\uC18C', profile.exchange],
+        ['\uACF5\uC2DD \uD648\uD398\uC774\uC9C0', profile.homepage, true],
       ];
   const visibleRows = rows.filter((row) => row[1]);
-  const missing = rows.filter((row) => !row[1]).map(([label]) => label);
 
   return (
     <Card hover={false} className="p-5 sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-lg font-extrabold text-[var(--color-text-primary)]">자산 정보</h3>
+        <h3 className="text-lg font-extrabold text-[var(--color-text-primary)]">{'\uC790\uC0B0 \uC815\uBCF4'}</h3>
         {profileData?.source && <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">{profileData.source}</span>}
       </div>
       {loading ? (
-        <p className="mt-4 rounded-2xl bg-slate-50 p-4 text-sm font-semibold text-[var(--color-text-secondary)]">자산 정보를 불러오는 중입니다.</p>
+        <p className="mt-4 rounded-2xl bg-slate-50 p-4 text-sm font-semibold text-[var(--color-text-secondary)]">{'\uC790\uC0B0 \uC815\uBCF4\uB97C \uBD88\uB7EC\uC624\uB294 \uC911\uC785\uB2C8\uB2E4.'}</p>
       ) : visibleRows.length > 0 ? (
         <dl className="mt-4 divide-y divide-[var(--color-border)]">
           {visibleRows.map(([label, value, link]) => (
@@ -424,15 +442,11 @@ function AssetInfoCard({ type, item, profileData, loading }) {
             </div>
           ))}
         </dl>
-      ) : (
-        <p className="mt-4 rounded-2xl bg-slate-50 p-4 text-sm font-semibold text-[var(--color-text-secondary)]">현재 무료 API에서 제공되는 자산 정보가 부족합니다.</p>
-      )}
-      {missing.length > 0 && !loading && (
-        <p className="mt-4 text-xs font-semibold leading-5 text-[var(--color-text-tertiary)]">무료 API에서 제공되지 않은 항목: {missing.join(', ')}</p>
-      )}
+      ) : null}
     </Card>
   );
 }
+
 function SimpleDetailHeader({ type, item }) {
   const title = item.title || item.name || item.symbol || t.detail;
 
@@ -679,7 +693,7 @@ export default function DetailModal({ open, type, item, onClose, standalone = fa
               </Card>
             )}
 
-            {isQuote ? <AssetInfoCard type={type} item={item} profileData={assetProfile.data} loading={assetProfile.isLoading} /> : <TextCard title={type === 'community' ? '게시글 본문' : t.detail}>{item.summary || item.content || item.description}</TextCard>}
+            {isQuote ? <AssetInfoCard type={type} item={item} profileData={assetProfile.data} loading={assetProfile.isLoading} /> : <TextCard title={type === 'community' ? '게시글 본문' : t.detail}>{type === 'news' ? newsDetailText(item) : item.summary || item.content || item.description}</TextCard>}
 
             {type === 'news' && item.url && (
               <Card hover={false} className="p-5 sm:p-6">
