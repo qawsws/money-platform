@@ -9,7 +9,7 @@ const t = {
   search: '검색',
   placeholder: '종목 또는 뉴스 검색',
   portfolio: '포트폴리오',
-  favorites: '즐겨찾기',
+  favorites: '관심 자산',
   mypage: '마이페이지',
   admin: '관리자',
   login: '로그인',
@@ -25,7 +25,6 @@ const t = {
   closeMenu: '메뉴 닫기',
   userMenu: '사용자 메뉴',
 };
-
 const menuItems = [
   { to: '/market', label: t.market },
   { to: '/crypto', label: t.crypto },
@@ -192,7 +191,7 @@ export default function Header() {
   const handleSignup = async (profile) => {
     const createdUser = await signup(profile);
     setLoginInitialUsername(createdUser?.username || profile.username || '');
-    setLoginNotice('회원가입이 완료되었습니다. 비밀번호를 입력해 로그인해 주세요.');
+    setLoginNotice('회원가입이 완료되었습니다. 비밀번호를 입력해 로그인해주세요.');
     setShowLogin(true);
     return createdUser;
   };

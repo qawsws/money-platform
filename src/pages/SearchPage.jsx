@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+﻿import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ErrorMessage from '../components/ErrorMessage';
@@ -40,11 +40,11 @@ export default function SearchPage() {
     if (!keyword) return [];
     return [
       ...(market.data || []).map((item) => ({ type: 'market', label: labels.market, title: item.name, meta: item.value, item })),
-      ...(crypto.data || []).map((item) => ({ type: 'crypto', label: labels.crypto, title: item.name, meta: `${item.symbol} · ${item.price}`, item })),
-      ...(stocks.data || []).map((item) => ({ type: 'stock', label: labels.stock, title: item.symbol, meta: `${item.name} · ${item.description}`, item })),
-      ...(koreanStocks.data || []).map((item) => ({ type: 'korean-stock', label: labels.koreanStock, title: item.symbol, meta: `${item.name} · ${item.description}`, item })),
-      ...(news.data || []).map((item) => ({ type: 'news', label: labels.news, title: item.title, meta: `${item.category} · ${item.summary}`, item })),
-      ...(community.data || []).map((item) => ({ type: 'community', label: labels.community, title: item.title, meta: `${item.author} · ${item.content}`, item })),
+      ...(crypto.data || []).map((item) => ({ type: 'crypto', label: labels.crypto, title: item.name, meta: `${item.symbol} / ${item.price}`, item })),
+      ...(stocks.data || []).map((item) => ({ type: 'stock', label: labels.stock, title: item.symbol, meta: `${item.name} / ${item.description}`, item })),
+      ...(koreanStocks.data || []).map((item) => ({ type: 'korean-stock', label: labels.koreanStock, title: item.symbol, meta: `${item.name} / ${item.description}`, item })),
+      ...(news.data || []).map((item) => ({ type: 'news', label: labels.news, title: item.title, meta: `${item.category} / ${item.summary}`, item })),
+      ...(community.data || []).map((item) => ({ type: 'community', label: labels.community, title: item.title, meta: `${item.author} / ${item.content}`, item })),
     ].filter((entry) => searchable(entry.title, entry.meta).includes(keyword));
   }, [community.data, crypto.data, keyword, koreanStocks.data, market.data, news.data, stocks.data]);
 
@@ -55,18 +55,27 @@ export default function SearchPage() {
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-      <SectionHeader title={labels.title} description={keyword ? `"${query}" 검색 결과 ${results.length}개` : '헤더 검색창에 검색어를 입력해 주세요.'} />
+      <SectionHeader title={labels.title} description={keyword ? `"${query}" 검색 결과 ${results.length}개` : '상단 검색창에 종목명, 티커, 뉴스 제목을 입력해보세요.'} />
       {isLoading && <LoadingSkeleton className="h-40 p-5" />}
       {error && <ErrorMessage error={error} />}
-      {!isLoading && !error && keyword && results.length === 0 && <p className="rounded-md border border-slate-200 bg-white p-6 text-sm text-slate-500">{labels.empty}</p>}
+      {!isLoading && !error && keyword && results.length === 0 && <p className="rounded-2xl border border-slate-200 bg-white p-6 text-sm font-semibold text-slate-500">{labels.empty}</p>}
       {!isLoading && !error && results.length > 0 && (
-        <div className="overflow-hidden rounded-md border border-slate-200 bg-white">
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="border-b border-slate-100 bg-slate-50 px-5 py-4">
+            <h2 className="text-lg font-black text-slate-950">검색 결과</h2>
+            <p className="mt-1 text-sm font-semibold text-slate-500">관련 자산, 뉴스, 커뮤니티 글을 한 번에 보여줍니다.</p>
+          </div>
           <div className="divide-y divide-slate-100">
             {results.map((result, index) => (
-              <button key={`${result.type}-${index}`} type="button" onClick={() => open(result)} className="block w-full px-4 py-4 text-left hover:bg-blue-50/50">
-                <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-bold text-slate-600">{result.label}</span>
-                <b className="mt-2 block text-slate-950">{result.title}</b>
-                <p className="mt-1 line-clamp-1 text-sm text-slate-500">{result.meta}</p>
+              <button key={`${result.type}-${index}`} type="button" onClick={() => open(result)} className="block w-full px-5 py-4 text-left transition hover:bg-[var(--color-surface-muted)]">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <span className="rounded-full bg-[var(--color-primary-soft)] px-2.5 py-1 text-xs font-black text-[var(--color-primary)]">{result.label}</span>
+                    <b className="mt-2 block line-clamp-1 text-base text-slate-950">{result.title}</b>
+                    <p className="mt-1 line-clamp-2 text-sm leading-6 text-slate-500">{result.meta}</p>
+                  </div>
+                  <span className="mt-1 shrink-0 text-sm font-black text-slate-300">›</span>
+                </div>
               </button>
             ))}
           </div>

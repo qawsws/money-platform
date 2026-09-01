@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+﻿import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import AssetIcon from '../components/ui/AssetIcon';
@@ -16,7 +16,7 @@ const allocationColors = ['bg-emerald-500', 'bg-sky-500', 'bg-indigo-500', 'bg-a
 const token = () => localStorage.getItem('mp_token') || '';
 const parsePrice = (value) => Number(String(value || '').replace(/[^0-9.]/g, '')) || 0;
 const toKrw = (value, assetType) => Number(value || 0) * (assetType === 'korean-stock' ? 1 : USD_TO_KRW_RATE);
-const krw = (value) => `₩${Number(value || 0).toLocaleString('ko-KR', { maximumFractionDigits: 0 })}`;
+const krw = (value) => `${Number(value || 0).toLocaleString('ko-KR', { maximumFractionDigits: 0 })}원`;
 const assetMoney = (value, assetType) => assetType === 'korean-stock'
   ? krw(value)
   : `$${Number(value || 0).toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
@@ -35,7 +35,7 @@ function SummaryCard({ label, value, description, tone = 'text-[var(--color-text
         <p className="text-sm font-bold text-[var(--color-text-secondary)]">{label}</p>
         <p className={`mt-3 break-words text-2xl font-black tracking-tight ${featured ? 'sm:text-4xl' : 'sm:text-3xl'} ${tone}`}>{value}</p>
       </div>
-      {description && <p className="mt-4 text-xs font-medium text-[var(--color-text-tertiary)]">{description}</p>}
+      {description && <p className="mt-4 text-xs font-medium leading-5 text-[var(--color-text-tertiary)]">{description}</p>}
     </Card>
   );
 }
@@ -68,7 +68,7 @@ function AllocationPanel({ rows }) {
   if (rows.length === 0) {
     return (
       <Card hover={false} className="p-5">
-        <h2 className="text-lg font-black text-[var(--color-text-primary)]">자산 구성</h2>
+        <h2 className="text-lg font-black text-[var(--color-text-primary)]">자산 비중</h2>
         <p className="mt-2 text-sm text-[var(--color-text-secondary)]">자산을 추가하면 비중이 표시됩니다.</p>
       </Card>
     );
@@ -76,8 +76,13 @@ function AllocationPanel({ rows }) {
 
   return (
     <Card hover={false} className="p-5">
-      <h2 className="text-lg font-black text-[var(--color-text-primary)]">자산 구성</h2>
-      <p className="mt-2 text-sm text-[var(--color-text-secondary)]">현재 평가금액 기준 비중입니다.</p>
+      <div className="flex items-center justify-between gap-3 border-b border-[var(--color-border)] pb-4">
+        <div>
+          <p className="text-sm font-black text-[var(--color-primary)]">Allocation</p>
+          <h2 className="mt-1 text-xl font-black text-[var(--color-text-primary)]">자산 비중</h2>
+        </div>
+        <span className="rounded-full bg-[var(--color-background-soft)] px-3 py-1 text-xs font-black text-[var(--color-text-secondary)]">{rows.length}개</span>
+      </div>
       <div className="mt-5 space-y-4">
         {rows.map((item, index) => (
           <div key={item.itemKey}>
@@ -99,8 +104,9 @@ function HoldingForm({ assets, form, selected, selectedPrice, canSave, save, res
   return (
     <Card hover={false} className="p-5 sm:p-6">
       <div className="mb-5">
-        <h2 className="text-xl font-black text-[var(--color-text-primary)]">자산 추가 및 수정</h2>
-        <p className="mt-2 text-sm text-[var(--color-text-secondary)]">보유 수량과 평균 매수가를 입력하면 평가금액에 반영됩니다.</p>
+        <p className="text-sm font-black text-[var(--color-primary)]">자산 입력</p>
+        <h2 className="mt-1 text-xl font-black text-[var(--color-text-primary)]">보유 자산 추가 및 수정</h2>
+        <p className="mt-2 text-sm text-[var(--color-text-secondary)]">보유 수량과 평균 매수가를 입력하면 평가금액과 수익률에 반영됩니다.</p>
       </div>
       <form className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(160px,0.5fr)_minmax(160px,0.7fr)_auto]" onSubmit={(event) => { event.preventDefault(); if (canSave) save.mutate(); }}>
         <label className="block min-w-0">
@@ -108,7 +114,7 @@ function HoldingForm({ assets, form, selected, selectedPrice, canSave, save, res
           <select value={form.itemKey} onChange={(event) => setForm((prev) => ({ ...prev, itemKey: event.target.value }))} className="mt-2 h-12 w-full rounded-2xl border border-[var(--color-border)] bg-white px-4 text-sm font-bold text-[var(--color-text-primary)] focus:border-[var(--color-primary)] focus:outline-none">
             <option value="">자산을 선택하세요</option>
             {assets.map((item) => (
-              <option key={item.itemKey} value={item.itemKey}>{item.symbol || item.name} · {item.name} · {assetTypeLabel[item.assetType]}</option>
+              <option key={item.itemKey} value={item.itemKey}>{item.symbol || item.name} / {item.name} / {assetTypeLabel[item.assetType]}</option>
             ))}
           </select>
         </label>
@@ -152,7 +158,7 @@ function HoldingsTable({ rows, remove, setForm }) {
           </thead>
           <tbody className="divide-y divide-[var(--color-border)]">
             {rows.map((item) => (
-              <tr key={item.itemKey} className="bg-white">
+              <tr key={item.itemKey} className="bg-white hover:bg-[var(--color-surface-muted)]">
                 <td className="px-5 py-5">
                   <div className="flex items-center gap-3">
                     <AssetIcon symbol={item.symbol} />
@@ -205,7 +211,7 @@ function AiPortfolioPanel({ analysis, cached, onRerun, rerunning }) {
           <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--color-text-secondary)]">{result.overallSummary}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {cached && <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-[var(--color-text-secondary)]">캐시 사용</span>}
+          {cached && <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-[var(--color-text-secondary)]">저장된 분석</span>}
           <span className="rounded-full bg-[var(--color-primary-soft)] px-3 py-1 text-xs font-bold text-[var(--color-primary)]">생성 시간: {new Date(generatedAt).toLocaleString()}</span>
           <button type="button" onClick={onRerun} disabled={rerunning} className="inline-flex min-h-9 items-center justify-center rounded-full bg-[var(--color-primary)] px-3 text-xs font-bold text-white transition hover:bg-[var(--color-primary-hover)] disabled:bg-slate-300">{rerunning ? '분석 중' : '다시 분석'}</button>
         </div>
@@ -220,7 +226,7 @@ function AiPortfolioPanel({ analysis, cached, onRerun, rerunning }) {
         <div className="rounded-2xl border border-[var(--color-border)] bg-white p-4">
           <h3 className="text-base font-extrabold text-[var(--color-text-primary)]">자산 구성</h3>
           <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">{result.composition?.summary}</p>
-          {largest && <p className="mt-4 rounded-2xl bg-slate-50 p-4 text-lg font-black text-[var(--color-text-primary)]">{largest.symbol} · {largest.name} · {percent(largest.weight)}</p>}
+          {largest && <p className="mt-4 rounded-2xl bg-slate-50 p-4 text-lg font-black text-[var(--color-text-primary)]">{largest.symbol} / {largest.name} / {percent(largest.weight)}</p>}
         </div>
         <ListBox title="긍정적인 부분" items={result.strengths} />
         <ListBox title="현재 수익 현황" items={[result.performance?.summary, ...(result.performance?.positiveContributors || []), ...(result.performance?.negativeContributors || [])].filter(Boolean)} />
@@ -318,10 +324,10 @@ export default function PortfolioPage() {
   const diagnosis = rows.length === 0
     ? '아직 등록된 자산이 없습니다.'
     : topAsset?.allocation >= 60
-      ? `${topAsset.symbol} 비중이 ${percent(topAsset.allocation)}로 높습니다. 특정 종목 집중도를 확인해보세요.`
+      ? `${topAsset.symbol} 비중이 ${percent(topAsset.allocation)}로 높습니다. 특정 자산 집중도를 확인해보세요.`
       : totalProfit >= 0
         ? `전체 수익률은 ${percent(totalRate)}입니다. 현재 구성은 비교적 분산되어 있습니다.`
-        : `전체 수익률은 ${percent(totalRate)}입니다. 평균 매수가와 현재가 차이를 점검해보세요.`;
+        : `전체 수익률은 ${percent(totalRate)}입니다. 평균 매수가와 현재가 차이를 확인해보세요.`;
 
   const analysisPayload = {
     portfolioSummary: { totalInvestment: totalCost, totalEvaluation: totalValue, totalProfit, totalReturnRate: totalRate, currency: 'KRW', usdKrwRate: USD_TO_KRW_RATE },
@@ -365,7 +371,7 @@ export default function PortfolioPage() {
   return (
     <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <PageHeader eyebrow="Portfolio" title="포트폴리오" description={`${user.name || user.username}님의 실제 보유 자산 기준 요약입니다.`} />
+        <PageHeader eyebrow="Portfolio" title="포트폴리오" description={`${user.name || user.username}님의 보유 자산 요약입니다.`} />
         <a href="#portfolio-form" className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-[var(--color-primary)] px-5 text-sm font-bold text-white transition hover:bg-[var(--color-primary-hover)]">자산 추가</a>
       </div>
 
@@ -376,8 +382,8 @@ export default function PortfolioPage() {
           <section className="grid gap-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.65fr)]">
             <div className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
-                <SummaryCard featured label="총 평가금액" value={krw(totalValue)} description={`현재가 기준 총 평가금액 · 달러 자산은 1달러 ${krw(USD_TO_KRW_RATE)} 기준 환산`} />
-                <SummaryCard label="총 투자금액" value={krw(totalCost)} description="평균 매수가 기준 총 투자금액 · 원화 환산" />
+                <SummaryCard featured label="총 평가금액" value={krw(totalValue)} description={`현재가 기준 총 평가금액 / 달러 자산은 1달러 ${krw(USD_TO_KRW_RATE)} 기준 환산`} />
+                <SummaryCard label="총 투자금액" value={krw(totalCost)} description="평균 매수가 기준 총 투자금액" />
                 <SummaryCard label="보유 자산" value={`${rows.length}개`} description="등록된 보유 자산" />
                 <SummaryCard label="총 수익금" value={krw(totalProfit)} tone={toneClass(totalProfit)} description={totalProfit >= 0 ? '수익 구간' : '손실 구간'} />
                 <SummaryCard label="총 수익률" value={percent(totalRate)} tone={toneClass(totalProfit)} description="총 투자금액 대비" />
@@ -390,8 +396,8 @@ export default function PortfolioPage() {
           <section aria-live="polite">
             <Card hover={false} className={`${portfolioAi.data?.analysis ? 'hidden' : ''} p-5 sm:p-6`}>
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                <div className="min-w-0"><p className="text-xs font-bold uppercase tracking-wide text-[var(--color-primary)]">AI Portfolio</p><h2 className="mt-1 text-xl font-black text-[var(--color-text-primary)]">AI 포트폴리오 분석</h2><p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--color-text-secondary)]">현재 계산된 보유 자산 데이터를 바탕으로 구성과 집중 위험을 평가합니다.</p></div>
-                <button type="button" onClick={runPortfolioAiAnalysis} disabled={rows.length === 0 || portfolioAi.isFetching} aria-busy={portfolioAi.isFetching} className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[var(--color-primary)] px-5 text-sm font-bold text-white transition hover:bg-[var(--color-primary-hover)] disabled:cursor-not-allowed disabled:bg-slate-300 sm:w-auto">{portfolioAi.isFetching ? 'AI 분석 중' : portfolioAi.data ? '다시 분석' : 'AI로 포트폴리오 분석'}</button>
+                <div className="min-w-0"><p className="text-xs font-bold uppercase tracking-wide text-[var(--color-primary)]">AI Portfolio</p><h2 className="mt-1 text-xl font-black text-[var(--color-text-primary)]">AI 포트폴리오 분석</h2><p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--color-text-secondary)]">현재 계산된 보유 자산 데이터를 바탕으로 구성과 집중 위험을 점검합니다.</p></div>
+                <button type="button" onClick={runPortfolioAiAnalysis} disabled={rows.length === 0 || portfolioAi.isFetching} aria-busy={portfolioAi.isFetching} className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[var(--color-primary)] px-5 text-sm font-bold text-white transition hover:bg-[var(--color-primary-hover)] disabled:cursor-not-allowed disabled:bg-slate-300 sm:w-auto">{portfolioAi.isFetching ? 'AI 분석 중' : portfolioAi.data ? '다시 분석' : 'AI로 분석하기'}</button>
               </div>
               {rows.length === 0 && <p className="mt-4 rounded-2xl border border-dashed border-[var(--color-border)] bg-slate-50 p-4 text-sm font-semibold text-[var(--color-text-secondary)]">분석할 보유 자산이 없습니다.</p>}
               {analysisChanged && <p className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-800">포트폴리오가 변경되었습니다. 다시 분석해주세요.</p>}
@@ -402,8 +408,8 @@ export default function PortfolioPage() {
           <section aria-live="polite">
             <Card hover={false} className={`${lastInsights ? 'hidden' : ''} p-5 sm:p-6`}>
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                <div className="min-w-0"><p className="text-xs font-bold uppercase tracking-wide text-[var(--color-primary)]">AI Investment</p><h2 className="mt-1 text-xl font-black text-[var(--color-text-primary)]">AI 투자 인사이트</h2><p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--color-text-secondary)]">보유 자산과 관련 뉴스, 시장 데이터를 연결해 확인할 점을 정리합니다.</p></div>
-                <button type="button" onClick={() => investmentInsights.mutate()} disabled={rows.length === 0 || investmentInsights.isPending} aria-busy={investmentInsights.isPending} className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[var(--color-primary)] px-5 text-sm font-bold text-white transition hover:bg-[var(--color-primary-hover)] disabled:cursor-not-allowed disabled:bg-slate-300 sm:w-auto">{investmentInsights.isPending ? 'AI 인사이트 생성 중' : lastInsights ? '다시 보기' : 'AI로 투자 인사이트 보기'}</button>
+                <div className="min-w-0"><p className="text-xs font-bold uppercase tracking-wide text-[var(--color-primary)]">AI Investment</p><h2 className="mt-1 text-xl font-black text-[var(--color-text-primary)]">AI 투자 인사이트</h2><p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--color-text-secondary)]">보유 자산, 관련 뉴스, 시장 데이터를 연결해 확인할 내용을 정리합니다.</p></div>
+                <button type="button" onClick={() => investmentInsights.mutate()} disabled={rows.length === 0 || investmentInsights.isPending} aria-busy={investmentInsights.isPending} className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[var(--color-primary)] px-5 text-sm font-bold text-white transition hover:bg-[var(--color-primary-hover)] disabled:cursor-not-allowed disabled:bg-slate-300 sm:w-auto">{investmentInsights.isPending ? 'AI 인사이트 생성 중' : lastInsights ? '다시 보기' : 'AI 인사이트 보기'}</button>
               </div>
             </Card>
             <div className="mt-4 space-y-4">{lastInsights && <InvestmentInsightsPanel insights={lastInsights} onRerun={() => investmentInsights.mutate()} rerunning={investmentInsights.isPending} />}{investmentInsights.isError && <AiErrorBox error={investmentInsights.error} onRetry={() => investmentInsights.mutate()} />}</div>
@@ -412,7 +418,7 @@ export default function PortfolioPage() {
           <section id="portfolio-form"><HoldingForm assets={assets} form={form} selected={selected} selectedPrice={selectedPrice} canSave={canSave} save={save} reset={() => setForm(blankForm)} setForm={setForm} /></section>
 
           <section>
-            <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between"><div><h2 className="text-2xl font-black tracking-tight text-[var(--color-text-primary)]">보유 자산</h2><p className="mt-1 text-sm text-[var(--color-text-secondary)]">등록된 자산별 평가금액과 손익을 확인하세요.</p></div><span className="rounded-full bg-white px-3 py-1 text-xs font-extrabold text-[var(--color-primary)] shadow-[var(--shadow-card)]">{rows.length}개</span></div>
+            <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between"><div><h2 className="text-2xl font-black tracking-tight text-[var(--color-text-primary)]">보유 자산</h2><p className="mt-1 text-sm text-[var(--color-text-secondary)]">등록한 자산별 평가금액과 수익률을 확인하세요.</p></div><span className="rounded-full bg-white px-3 py-1 text-xs font-extrabold text-[var(--color-primary)] shadow-[var(--shadow-card)]">{rows.length}개</span></div>
             {rows.length === 0 ? <StatusCard title="아직 등록된 자산이 없습니다" description="보유 중인 주식이나 암호화폐를 추가해 포트폴리오를 구성해보세요." action={<a href="#portfolio-form" className="mt-5 inline-flex min-h-11 items-center justify-center rounded-2xl bg-[var(--color-primary)] px-5 text-sm font-bold text-white hover:bg-[var(--color-primary-hover)]">자산 추가</a>} /> : <HoldingsTable rows={rowsWithAllocation} remove={remove} setForm={setForm} />}
           </section>
         </div>

@@ -25,6 +25,7 @@ async function fetchText(url) {
   return response.text();
 }
 
+
 const reason = (error) => error?.cause?.code || error?.message || error?.name || 'unknown';
 const live = (items, provider) => items.map((item) => ({ ...item, dataSource: 'live', provider }));
 const fallback = (items, provider, error) => items.map((item) => ({ ...item, dataSource: 'fallback', provider, fallbackReason: reason(error) }));
@@ -59,6 +60,58 @@ async function yahooQuotes(items, symbols, currency = '$') {
   });
 }
 
+
+const firstText = (...values) => values.map((value) => String(value || '').trim()).find(Boolean) || '';
+const firstUrl = (values = []) => (values || []).map((value) => String(value || '').trim()).find(Boolean) || '';
+const stockCountry = (type) => type === 'korean-stock' ? '대한민국' : type === 'stock' ? '미국' : '';
+
+async function coinAssetProfile(id) {
+  const data = await fetchJson(`https://api.coingecko.com/api/v3/coins/${encodeURIComponent(id)}?localization=true&tickers=false&market_data=false&community_data=false&developer_data=false&sparkline=false`);
+  const description = stripTags(firstText(data?.description?.ko, data?.description?.en)).slice(0, 700);
+  return {
+    source: 'CoinGecko',
+    intro: description,
+    launchYear: String(data?.genesis_date || '').slice(0, 4),
+    usageType: Array.isArray(data?.categories) ? data.categories.filter(Boolean).slice(0, 3).join(', ') : '',
+    network: firstText(data?.hashing_algorithm),
+    homepage: firstUrl(data?.links?.homepage),
+  };
+}
+
+
+async function stockAssetProfile(symbol, type) {
+  const querySymbol = type === 'korean-stock' && !String(symbol).includes('.') ? `${symbol}.KS` : symbol;
+  const data = await fetchJson(`https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(querySymbol)}&quotesCount=1&newsCount=0`);
+  const quote = (data?.quotes || []).find((item) => item.symbol === querySymbol || item.symbol === symbol) || data?.quotes?.[0] || {};
+  return {
+    source: 'Yahoo Finance',
+    companyName: firstText(quote.longname, quote.shortname),
+    industry: firstText(quote.industryDisp, quote.industry),
+    business: firstText(quote.sectorDisp, quote.sector),
+    country: stockCountry(type),
+    exchange: firstText(quote.exchDisp, quote.exchange),
+  };
+}
+
+export async function getAssetProfileLive({ type = '', id = '', symbol = '' } = {}) {
+  return cached(`asset-profile:${type}:${id}:${symbol}`, async () => {
+    try {
+      if (type === 'crypto') {
+        const fallbackCoin = cryptoPrices.find((coin) => String(coin.id) === String(id) || coin.symbol === symbol || coin.coingeckoId === id);
+        const coinId = fallbackCoin?.coingeckoId || id;
+        if (!coinId) return { source: 'CoinGecko', profile: null };
+        return { source: 'CoinGecko', profile: await coinAssetProfile(coinId) };
+      }
+      if (type === 'stock' || type === 'korean-stock') {
+        if (!symbol) return { source: 'Yahoo Finance', profile: null };
+        return { source: 'Yahoo Finance', profile: await stockAssetProfile(symbol, type) };
+      }
+      return { source: '', profile: null };
+    } catch (error) {
+      return { source: type === 'crypto' ? 'CoinGecko' : 'Yahoo Finance', profile: null, fallbackReason: reason(error) };
+    }
+  });
+}
 export async function getMarketIndicesLive() {
   return cached('market-indices', async () => {
   try {
@@ -112,7 +165,7 @@ export async function getUsStocksLive() {
 export async function getKoreanStocksLive() {
   return cached('korean-stocks', async () => {
   try {
-    return live(await yahooQuotes(koreanStocks, koreanStocks.map((item) => `${item.symbol}.KS`), '₩'), 'Yahoo Finance');
+    return live(await yahooQuotes(koreanStocks, koreanStocks.map((item) => `${item.symbol}.KS`), '\u20a9'), 'Yahoo Finance');
   } catch (error) {
     return fallback(koreanStocks, 'Yahoo Finance', error);
   }
@@ -124,7 +177,7 @@ export async function getNewsLive() {
   try {
     const feeds = [
       { query: '한국 증시 OR 코스피 OR 삼성전자 OR SK하이닉스', category: '국내증시' },
-      { query: '미국증시 OR 나스닥 OR 연준 OR 비트코인', category: '해외증시' },
+      { query: '미국 증시 OR 나스닥 OR 애플 OR 비트코인', category: '해외증시' },
       { query: '투자 OR 금리 OR 환율 OR 채권', category: '경제' },
     ];
     const xmls = await Promise.all(feeds.map((feed) => fetchText(`https://news.google.com/rss/search?q=${encodeURIComponent(feed.query)}&hl=ko&gl=KR&ceid=KR:ko`).then((xml) => ({ ...feed, xml }))));
@@ -172,7 +225,8 @@ export async function getMarketDataStatus() {
   const statuses = await Promise.all([
     check('crypto', 'CoinGecko', () => fetchJson('https://api.coingecko.com/api/v3/ping')),
     check('stocks', 'Yahoo Finance', () => fetchJson('https://query1.finance.yahoo.com/v8/finance/chart/AAPL?range=1d&interval=1d')),
-    check('news', 'Google News RSS', () => fetchText(`https://news.google.com/rss/search?q=${encodeURIComponent('한국 증시')}&hl=ko&gl=KR&ceid=KR:ko`)),
+    check('asset-profile', 'Yahoo Finance / CoinGecko', () => Promise.all([stockAssetProfile('AAPL', 'stock'), coinAssetProfile('bitcoin')])),
+    check('news', 'Google News RSS', () => fetchText(`https://news.google.com/rss/search?q=${encodeURIComponent('?쒓뎅 利앹떆')}&hl=ko&gl=KR&ceid=KR:ko`)),
   ]);
   return { checkedAt: new Date().toISOString(), statuses };
 }

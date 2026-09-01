@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+﻿import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useSearch } from '../context/SearchContext';
 import { getUsStocks } from '../services/api';
@@ -10,33 +10,33 @@ import QuoteCard from './ui/QuoteCard';
 import QuoteSectionHeader from './ui/QuoteSectionHeader';
 
 const t = {
-  title: '인기 미국 주식',
-  description: '많은 투자자가 관심을 갖는 종목을 살펴보세요.',
+  title: '미국 주식',
+  description: '주요 미국 주식의 가격과 등락률을 확인하세요.',
   pageTitle: '미국 주식',
-  pageDescription: '주요 미국 주식의 현재 가격과 등락 정보를 확인하세요.',
-  favorite: '즐겨찾기',
+  pageDescription: '미국 대표 종목의 현재 가격, 등락률, 관심 등록을 한 화면에서 확인하세요.',
+  favorite: '관심 추가',
+  saved: '관심 등록됨',
   empty: '검색어와 일치하는 종목이 없습니다.',
   result: '검색 결과',
   more: '더보기',
-  error: '주식 정보를 불러오지 못했습니다.',
+  error: '미국 주식 정보를 불러오지 못했습니다.',
   retry: '다시 시도',
 };
+
+function parseChange(change) {
+  const parsed = Number(String(change || '').replace(/[^\d.-]/g, ''));
+  return Number.isFinite(parsed) ? parsed : 0;
+}
 
 function QuoteSkeletonGrid({ count = 4 }) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {Array.from({ length: count }).map((_, index) => (
-        <Card key={index} hover={false} className="min-h-[190px] p-5">
-          <div className="animate-pulse">
-            <div className="flex items-center gap-3">
-              <div className="size-10 rounded-2xl bg-slate-100" />
-              <div className="min-w-0 flex-1">
-                <div className="h-4 w-24 rounded bg-slate-100" />
-                <div className="mt-2 h-3 w-16 rounded bg-slate-100" />
-              </div>
-            </div>
-            <div className="mt-7 h-7 w-32 rounded bg-slate-100" />
-            <div className="mt-3 h-6 w-20 rounded-full bg-slate-100" />
+        <Card key={index} hover={false} className="min-h-[170px] p-5">
+          <div className="animate-pulse space-y-4">
+            <div className="h-5 w-28 rounded bg-slate-100" />
+            <div className="h-8 w-32 rounded bg-slate-100" />
+            <div className="h-4 w-20 rounded bg-slate-100" />
           </div>
         </Card>
       ))}
@@ -59,10 +59,44 @@ function FavoriteButton({ selected, label, onClick }) {
       type="button"
       aria-label={label}
       onClick={onClick}
-      className={`rounded-full border px-3 py-1 text-xs font-bold ${selected ? 'border-amber-400 bg-amber-400 text-white' : 'border-amber-200 bg-amber-50 text-amber-600 hover:bg-amber-100'}`}
+      className={`rounded-full border px-3 py-1 text-xs font-bold ${selected ? 'border-amber-400 bg-amber-400 text-white' : 'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100'}`}
     >
-      {selected ? '★' : '☆'} {t.favorite}
+      {selected ? t.saved : t.favorite}
     </button>
+  );
+}
+
+function StockSummary({ stocks }) {
+  const decorated = stocks.map((stock) => ({ ...stock, changeValue: parseChange(stock.change) }));
+  const rising = decorated.filter((stock) => stock.changeValue >= 0).length;
+  const falling = decorated.length - rising;
+  const strongest = [...decorated].sort((a, b) => Math.abs(b.changeValue) - Math.abs(a.changeValue))[0];
+
+  return (
+    <Card hover={false} className="mb-5 p-5">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <p className="text-sm font-black text-[var(--color-primary)]">미국 주식 요약</p>
+          <h2 className="mt-2 text-2xl font-black text-[var(--color-text-primary)]">대표 종목의 움직임을 확인하세요</h2>
+          <p className="mt-2 text-sm font-semibold text-[var(--color-text-secondary)]">현재 표시 중인 종목의 가격과 전일 대비 등락률을 기준으로 정리했습니다.</p>
+        </div>
+        <div className="grid grid-cols-3 gap-2 sm:min-w-[420px]">
+          <SummaryChip label="상승" value={rising} tone="up" />
+          <SummaryChip label="하락" value={falling} tone="down" />
+          <SummaryChip label="변동 큰 종목" value={strongest?.symbol || '-'} />
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function SummaryChip({ label, value, tone }) {
+  const toneClass = tone === 'up' ? 'bg-red-50 text-red-500' : tone === 'down' ? 'bg-blue-50 text-blue-600' : 'bg-[var(--color-background-soft)] text-[var(--color-text-primary)]';
+  return (
+    <div className={'rounded-xl px-4 py-3 ' + toneClass}>
+      <p className="text-xs font-black opacity-75">{label}</p>
+      <p className="mt-1 truncate text-lg font-black">{value}</p>
+    </div>
   );
 }
 
@@ -87,17 +121,18 @@ export default function StockCard({ onOpenDetail, limit = null, showMore = false
             {normalizedQuery && <p className="mb-3 text-sm text-[var(--color-text-secondary)]">{t.result}: <b className="text-[var(--color-text-primary)]">{query}</b> ({filtered.length})</p>}
             {stocks.length === 0 ? <SectionState message={t.empty} /> : (
               <>
+                {isPage && <StockSummary stocks={stocks} />}
                 {isPage && <AssetPageInsights items={stocks} label="미국 주식" basis="전일 대비 등락률 기준" />}
                 <div className={isPage ? 'mt-5 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-white p-5 shadow-sm' : ''}>
                   {isPage && (
-                  <div className="mb-4 flex flex-col gap-2 border-b border-[var(--color-border)] pb-4 sm:flex-row sm:items-end sm:justify-between">
-                    <div className="min-w-0">
-                      <h2 className="text-xl font-black tracking-tight text-[var(--color-text-primary)]">전체 미국 주식</h2>
-                      <p className="mt-1 text-sm font-semibold leading-6 text-[var(--color-text-secondary)]">현재 표시 중인 미국 주식 목록입니다.</p>
+                    <div className="mb-4 flex flex-col gap-2 border-b border-[var(--color-border)] pb-4 sm:flex-row sm:items-end sm:justify-between">
+                      <div className="min-w-0">
+                        <h2 className="text-xl font-black tracking-tight text-[var(--color-text-primary)]">미국 주식 시세</h2>
+                        <p className="mt-1 text-sm font-semibold leading-6 text-[var(--color-text-secondary)]">종목명, 티커, 현재가, 등락률을 카드로 정리했습니다.</p>
+                      </div>
+                      <span className="w-fit rounded-full bg-[var(--color-primary-soft)] px-3 py-1 text-xs font-black text-[var(--color-primary)]">{stocks.length}개</span>
                     </div>
-                    <span className="w-fit rounded-full bg-[var(--color-primary-soft)] px-3 py-1 text-xs font-black text-[var(--color-primary)]">{stocks.length}개</span>
-                  </div>
-                )}
+                  )}
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                     {stocks.map((stock) => {
                       const selected = favorites.includes(`stock:${stock.id}`);
@@ -113,7 +148,7 @@ export default function StockCard({ onOpenDetail, limit = null, showMore = false
                           icon={stock.symbol}
                           description={stock.description}
                           onOpen={() => onOpenDetail?.(stock)}
-                          favoriteAction={<FavoriteButton selected={selected} label={`${stock.name} ${t.favorite}`} onClick={(event) => { event.stopPropagation(); toggle(`stock:${stock.id}`); }} />}
+                          favoriteAction={<FavoriteButton selected={selected} label={`${stock.name} ${selected ? t.saved : t.favorite}`} onClick={(event) => { event.stopPropagation(); toggle(`stock:${stock.id}`); }} />}
                         />
                       );
                     })}
@@ -127,5 +162,3 @@ export default function StockCard({ onOpenDetail, limit = null, showMore = false
     </section>
   );
 }
-
-

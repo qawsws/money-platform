@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { createPortal } from 'react-dom';
 
 const t = { title: '로그인', username: '아이디', password: '비밀번호', cancel: '취소', submit: '로그인', loading: '로그인 중...', fallback: '로그인에 실패했습니다.' };
@@ -8,8 +8,6 @@ export default function LoginModal({ open, onClose, onLogin, initialUsername = '
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-
 
   if (!open) return null;
   const submit = async (event) => { event.preventDefault(); setLoading(true); setError(null); try { await onLogin({ username, password }); onClose(); } catch (err) { setError(err.message || t.fallback); } finally { setLoading(false); } };

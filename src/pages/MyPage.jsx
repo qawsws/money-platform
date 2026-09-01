@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import Card from '../components/ui/Card';
@@ -10,9 +10,9 @@ const token = () => localStorage.getItem('mp_token') || '';
 
 const text = {
   title: '마이페이지',
-  guest: '로그인 후 계정 정보와 활동 내역을 관리할 수 있습니다.',
+  guest: '로그인하면 계정 정보와 활동 내역을 관리할 수 있습니다.',
   profile: '프로필 요약',
-  activity: '투자 활동',
+  activity: '내 활동',
   account: '회원정보 수정',
   password: '비밀번호 변경',
   danger: '회원 탈퇴',
@@ -28,8 +28,8 @@ const text = {
   leave: '탈퇴하기',
   logout: '로그아웃',
   portfolio: '포트폴리오',
-  favorites: '즐겨찾기',
-  confirmPost: '이 글을 삭제할까요?',
+  favorites: '관심 자산',
+  confirmPost: '이 게시글을 삭제할까요?',
   confirmComment: '이 댓글을 삭제할까요?',
   confirmNews: '저장한 뉴스에서 삭제할까요?',
   confirmAccount: '정말 회원 탈퇴할까요? 저장된 계정 데이터가 삭제됩니다.',
@@ -39,11 +39,7 @@ const text = {
 function UserAvatar({ user }) {
   const initial = String(user?.name || user?.username || user?.email || '?').trim().charAt(0).toUpperCase() || '?';
 
-  return (
-    <span className="grid size-16 shrink-0 place-items-center rounded-3xl bg-[var(--color-primary-soft)] text-xl font-black text-[var(--color-primary)] sm:size-20">
-      {initial}
-    </span>
-  );
+  return <span className="grid size-16 shrink-0 place-items-center rounded-3xl bg-[var(--color-primary-soft)] text-xl font-black text-[var(--color-primary)] sm:size-20">{initial}</span>;
 }
 
 function StatusCard({ title, description, action }) {
@@ -101,9 +97,7 @@ function ProfileSummary({ user }) {
             <p className="mt-1 truncate text-sm font-semibold text-[var(--color-text-tertiary)]">@{user.username}</p>
           </div>
         </div>
-        <a href="#profile-form" className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-[var(--color-primary)] px-5 text-sm font-bold text-white transition hover:bg-[var(--color-primary-hover)]">
-          프로필 수정
-        </a>
+        <a href="#profile-form" className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-[var(--color-primary)] px-5 text-sm font-bold text-white transition hover:bg-[var(--color-primary-hover)]">프로필 수정</a>
       </div>
     </Card>
   );
@@ -114,7 +108,7 @@ function ShortcutCard({ to, label, value, description }) {
     <Card as={Link} to={to} className="group min-h-32 p-5 hover:border-[var(--color-border-strong)]">
       <div className="flex items-start justify-between gap-3">
         <span className="grid size-10 place-items-center rounded-2xl bg-[var(--color-primary-soft)] text-sm font-black text-[var(--color-primary)]">{label.charAt(0)}</span>
-        <span className="text-lg font-black text-[var(--color-text-tertiary)] transition group-hover:translate-x-0.5 group-hover:text-[var(--color-primary)]">→</span>
+        <span className="text-lg font-black text-[var(--color-text-tertiary)] transition group-hover:translate-x-0.5 group-hover:text-[var(--color-primary)]">›</span>
       </div>
       <p className="mt-4 text-sm font-bold text-[var(--color-text-secondary)]">{label}</p>
       <p className="mt-2 text-3xl font-black text-[var(--color-text-primary)]">{value}</p>
@@ -136,11 +130,7 @@ function Field({ id, label, helper, ...props }) {
   return (
     <label htmlFor={id} className="block text-sm font-bold text-[var(--color-text-primary)]">
       {label}
-      <input
-        id={id}
-        {...props}
-        className="mt-2 h-11 w-full rounded-2xl border border-[var(--color-border)] bg-white px-4 text-sm text-[var(--color-text-primary)] outline-none transition focus:border-[var(--color-primary)] focus:ring-4 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-400"
-      />
+      <input id={id} {...props} className="mt-2 h-11 w-full rounded-2xl border border-[var(--color-border)] bg-white px-4 text-sm text-[var(--color-text-primary)] outline-none transition focus:border-[var(--color-primary)] focus:ring-4 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-400" />
       {helper && <span className="mt-2 block text-xs font-medium text-[var(--color-text-tertiary)]">{helper}</span>}
     </label>
   );
@@ -167,9 +157,7 @@ function ManageSection({ title, empty, children }) {
         <div className="p-5">
           <p className="rounded-2xl border border-dashed border-[var(--color-border)] bg-slate-50 p-5 text-sm font-semibold text-[var(--color-text-secondary)]">{empty}</p>
         </div>
-      ) : (
-        <div className="divide-y divide-[var(--color-border)]">{items}</div>
-      )}
+      ) : <div className="divide-y divide-[var(--color-border)]">{items}</div>}
     </Card>
   );
 }
@@ -184,11 +172,7 @@ function ManageItem({ title, meta, onOpen, onRemove }) {
 
   return (
     <div className="flex items-center justify-between gap-4 px-5 py-4 transition hover:bg-slate-50">
-      {onOpen ? (
-        <button type="button" onClick={onOpen} className="min-w-0 flex-1 text-left focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2">
-          {content}
-        </button>
-      ) : content}
+      {onOpen ? <button type="button" onClick={onOpen} className="min-w-0 flex-1 text-left focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2">{content}</button> : content}
       {onRemove && <button type="button" onClick={onRemove} className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-xl border border-red-200 px-3 text-sm font-bold text-red-500 hover:bg-red-50">{text.remove}</button>}
     </div>
   );
@@ -209,10 +193,7 @@ export default function MyPage() {
     client.invalidateQueries({ queryKey: ['saved-news'] });
   };
 
-  const profileSave = useMutation({
-    mutationFn: () => updateProfile(token(), profile),
-    onSuccess: (res) => replaceSession(res),
-  });
+  const profileSave = useMutation({ mutationFn: () => updateProfile(token(), profile), onSuccess: (res) => replaceSession(res) });
   const passwordSave = useMutation({
     mutationFn: () => {
       if (passwords.nextPassword !== passwords.confirmPassword) throw new Error('새 비밀번호가 일치하지 않습니다.');
@@ -220,13 +201,7 @@ export default function MyPage() {
     },
     onSuccess: () => setPasswords({ currentPassword: '', nextPassword: '', confirmPassword: '' }),
   });
-  const accountRemove = useMutation({
-    mutationFn: () => deleteAccount(token(), deletePassword),
-    onSuccess: () => {
-      logout();
-      navigate('/');
-    },
-  });
+  const accountRemove = useMutation({ mutationFn: () => deleteAccount(token(), deletePassword), onSuccess: () => { logout(); navigate('/'); } });
   const removePost = useMutation({ mutationFn: (id) => deleteCommunityPost(token(), id), onSuccess: refresh });
   const removeComment = useMutation({ mutationFn: (id) => deleteCommunityComment(token(), id), onSuccess: refresh });
   const removeNews = useMutation({ mutationFn: (newsKey) => deleteSavedNews(token(), newsKey), onSuccess: refresh });
@@ -235,7 +210,7 @@ export default function MyPage() {
     return (
       <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <PageHeader eyebrow="Account" title={text.title} description={text.guest} />
-        <StatusCard title={text.guest} description="마이페이지는 로그인한 사용자에게만 표시됩니다." action={<Link to="/" className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-[var(--color-primary)] px-5 text-sm font-bold text-white hover:bg-[var(--color-primary-hover)]">메인으로 이동</Link>} />
+        <StatusCard title="로그인이 필요합니다" description="마이페이지는 로그인한 사용자에게만 표시됩니다." action={<Link to="/" className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-[var(--color-primary)] px-5 text-sm font-bold text-white hover:bg-[var(--color-primary-hover)]">메인으로 이동</Link>} />
       </main>
     );
   }
@@ -246,7 +221,7 @@ export default function MyPage() {
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-      <PageHeader eyebrow="Account" title={text.title} description={`${user.name || user.username}님의 계정 정보와 투자 활동을 관리합니다.`} />
+      <PageHeader eyebrow="Account" title={text.title} description={`${user.name || user.username}님의 계정 정보와 활동 내역을 관리합니다.`} />
       {dashboard.isLoading && <MyPageSkeleton />}
       {dashboard.error && <StatusCard title="사용자 정보를 불러오지 못했습니다" description="잠시 후 다시 시도해주세요." action={<button type="button" onClick={() => dashboard.refetch()} className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-[var(--color-primary)] px-5 text-sm font-bold text-white hover:bg-[var(--color-primary-hover)]">{text.retry}</button>} />}
       {data && (
@@ -254,10 +229,10 @@ export default function MyPage() {
           <ProfileSummary user={user} />
 
           <section>
-            <SectionTitle title={text.activity} description="투자 활동과 저장한 콘텐츠로 빠르게 이동할 수 있습니다." />
+            <SectionTitle title={text.activity} description="내가 만든 콘텐츠와 저장한 항목으로 빠르게 이동할 수 있습니다." />
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <ShortcutCard to="/portfolio" label={text.portfolio} value={counts.holdings ?? 0} description="보유 자산" />
-              <ShortcutCard to="/favorites" label={text.favorites} value={counts.favorites ?? 0} description="관심 자산" />
+              <ShortcutCard to="/favorites" label={text.favorites} value={counts.favorites ?? 0} description="관심 등록" />
               <MetricCard label="작성 게시글" value={counts.posts} />
               <MetricCard label="작성 댓글" value={counts.comments} />
             </div>
@@ -265,35 +240,27 @@ export default function MyPage() {
 
           <section className="grid gap-6 lg:grid-cols-2">
             <ManageSection title={text.posts} empty="아직 작성한 게시글이 없습니다.">
-              {data.posts.map((post) => (
-                <ManageItem key={post.id} title={post.title} meta={`${post.category} · 조회 ${post.views} · 좋아요 ${post.likes}`} onOpen={() => navigate(`/detail/community/${post.id}`, { state: { item: post } })} onRemove={() => { if (window.confirm(text.confirmPost)) removePost.mutate(post.id); }} />
-              ))}
+              {data.posts.map((post) => <ManageItem key={post.id} title={post.title} meta={`${post.category} / 조회 ${post.views} / 좋아요 ${post.likes}`} onOpen={() => navigate(`/detail/community/${post.id}`, { state: { item: post } })} onRemove={() => { if (window.confirm(text.confirmPost)) removePost.mutate(post.id); }} />)}
             </ManageSection>
 
             <ManageSection title={text.comments} empty="아직 작성한 댓글이 없습니다.">
-              {data.comments.map((comment) => (
-                <ManageItem key={comment.id} title={comment.content} meta={`글 번호 ${comment.postId} · ${comment.createdAt}`} onOpen={() => navigate(`/detail/community/${comment.postId}`)} onRemove={() => { if (window.confirm(text.confirmComment)) removeComment.mutate(comment.id); }} />
-              ))}
+              {data.comments.map((comment) => <ManageItem key={comment.id} title={comment.content} meta={`글 번호 ${comment.postId} / ${comment.createdAt}`} onOpen={() => navigate(`/detail/community/${comment.postId}`)} onRemove={() => { if (window.confirm(text.confirmComment)) removeComment.mutate(comment.id); }} />)}
             </ManageSection>
           </section>
 
           <section className="grid gap-6 lg:grid-cols-2">
             <ManageSection title={text.notes} empty={text.empty}>
-              {data.notes.map((note) => (
-                <ManageItem key={note.itemKey} title={note.itemKey} meta={note.note} onOpen={() => navigate(`/detail/${note.itemKey.replace(':', '/')}`)} />
-              ))}
+              {data.notes.map((note) => <ManageItem key={note.itemKey} title={note.itemKey} meta={note.note} onOpen={() => navigate(`/detail/${note.itemKey.replace(':', '/')}`)} />)}
             </ManageSection>
 
             <ManageSection title={text.news} empty={text.empty}>
-              {data.news.map((news) => (
-                <ManageItem key={news.newsKey} title={news.title} meta={news.category || news.summary} onOpen={() => navigate(`/detail/news/${encodeURIComponent(news.newsKey)}`, { state: { item: news } })} onRemove={() => { if (window.confirm(text.confirmNews)) removeNews.mutate(news.newsKey); }} />
-              ))}
+              {data.news.map((news) => <ManageItem key={news.newsKey} title={news.title} meta={news.category || news.summary} onOpen={() => navigate(`/detail/news/${encodeURIComponent(news.newsKey)}`, { state: { item: news } })} onRemove={() => { if (window.confirm(text.confirmNews)) removeNews.mutate(news.newsKey); }} />)}
             </ManageSection>
           </section>
 
           <section className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.8fr)]">
             <Card as="form" hover={false} id="profile-form" onSubmit={(event) => { event.preventDefault(); profileSave.mutate(); }} className="p-5 sm:p-6">
-              <SectionTitle title={text.account} description="회원가입 시 입력한 닉네임과 기본 정보를 수정합니다." />
+              <SectionTitle title={text.account} description="닉네임과 연락처 등 기본 정보를 수정합니다." />
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field id="profile-name" label="닉네임" value={profile.name} onChange={updateProfileField('name')} required />
                 <Field id="profile-phone" label="전화번호" value={profile.phone} onChange={updateProfileField('phone')} required />
@@ -325,9 +292,7 @@ export default function MyPage() {
           <section className="grid gap-6 lg:grid-cols-2">
             <Card hover={false} className="p-5 sm:p-6">
               <SectionTitle title={text.logout} description="현재 기기에서 로그아웃합니다." />
-              <button type="button" onClick={() => { logout(); navigate('/'); }} className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-[var(--color-border)] px-5 text-sm font-bold text-[var(--color-text-secondary)] hover:bg-slate-50">
-                {text.logout}
-              </button>
+              <button type="button" onClick={() => { logout(); navigate('/'); }} className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-[var(--color-border)] px-5 text-sm font-bold text-[var(--color-text-secondary)] hover:bg-slate-50">{text.logout}</button>
             </Card>
 
             <Card hover={false} className="border-red-200 bg-red-50/60 p-5 sm:p-6">

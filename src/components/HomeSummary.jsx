@@ -1,471 +1,109 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+﻿import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getAnnouncements, getCommunityPosts, getCryptoPrices, getKoreanStocks, getMarketIndices, getNews, getPortfolio, getUsStocks } from '../services/api';
 
-const t = {
-  greeting: '시장 흐름을 한눈에 확인하세요',
-  dashboard: '오늘의 시장',
-  subtitle: '주요 지수, 미국 주식, 한국 주식, 암호화폐, 시장 뉴스를 한 화면에서 확인하세요.',
-  totalAssets: '확인 자산',
-  breadth: '시장 등락',
-  performance: '시장별 등락 분포',
-  allocation: '자산군 비중',
-  watchlist: '변동률 랭킹',
-  watchlistHint: '오늘 등락폭이 큰 자산 순',
-  heroHint: '시장별 주요 자산',
-  news: '주요 뉴스',
-  ai: 'AI 투자 인사이트',
-  aiText: '보유 자산과 관련 뉴스, 시장 데이터를 연결해 확인할 점을 정리합니다.',
-  portfolio: '포트폴리오에서 보기',
-  refresh: '새로고침',
-  refreshing: '업데이트 중',
-  updatedNow: '현재 데이터 기준',
-  empty: '표시할 시장 데이터가 없습니다.',
-  error: '시장 정보를 불러오지 못했습니다.',
-  retry: '다시 시도',
-  noData: '데이터 없음',
-  viewAll: '더보기',
-  community: '커뮤니티',
-  notices: '공지',
-  noticeHint: '중요한 공지를 제목으로 먼저 확인하세요',
-  noticeEmpty: '현재 등록된 공지가 없습니다.',
-  viewNotice: '내용 보기',
-  close: '닫기',
-  loginPortfolioTitle: '내 자산 비중은 로그인 후 확인할 수 있어요',
-  loginPortfolioText: '포트폴리오에 보유 자산을 추가하면 자산군별 비중을 볼 수 있습니다.',
-};
-
 const USD_TO_KRW_RATE = 1380;
-const parseChange = (item) => Number.parseFloat(String(item?.change || '').replace('%', '').replace('+', ''));
-const parsePrice = (value) => Number(String(value ?? '').replace(/[^0-9.-]/g, '')) || 0;
-const token = () => localStorage.getItem('mp_token') || '';
-const isAssetPositive = (item) => Boolean(item?.isPositive) || parseChange(item) >= 0;
+const text = {
+  dashboard: '대시보드', market: '시장', portfolio: '포트폴리오', coin: '암호화폐', news: '뉴스', community: '커뮤니티',
+  todaySummary: '시장 요약', marketOpen: '시장 한눈에 보기', marketSubtitle: '주요 지수와 대표 자산을 전일 또는 24시간 등락률 기준으로 확인하세요.',
+  featuredTitle: '대표 자산', featuredHelp: '미국 주식, 한국 주식, 암호화폐에서 대표 자산을 골라 보여줍니다.',
+  up: '상승', down: '하락', movingAsset: '변동 큰 자산', current: '현재가', currentBasis: '기준',
+  chartLabel: '시장 흐름', chartTitle: '지수 등락 비교', chartHelp: '주요 지수의 오늘 등락률을 한눈에 비교합니다.',
+  mainIndex: '주요 지수', mainIndexHelp: '대표 지수의 현재 수치와 시장 분위기를 확인하세요.', marketMood: '상승/하락', moreUp: '상승 우세', moreDown: '하락 우세',
+  watchlist: '관심 자산 목록', watchlistHelp: '오늘 변동률이 큰 자산을 표로 정리했습니다.', portfolioSummary: '내 자산 비중',
+  portfolioLogin: '로그인하면 내 자산을 함께 볼 수 있어요', portfolioLoginHelp: '보유 자산을 추가하면 자산군별 비중과 평가액을 확인할 수 있습니다.',
+  portfolioEmpty: '아직 추가한 자산이 없습니다.', portfolioLoading: '포트폴리오를 불러오는 중입니다.', goPortfolio: '포트폴리오 보기',
+  krStock: '한국 주식', usStock: '미국 주식', crypto: '암호화폐', index: '지수', marketNews: '시장 뉴스', noNews: '표시할 뉴스가 없습니다.',
+  communityEmpty: '등록된 커뮤니티 글이 없습니다.', notice: '공지', noticeHelp: '중요한 공지는 제목을 눌러 자세히 확인할 수 있어요.',
+  view: '내용 보기', close: '닫기', live: '실시간', guide: '오늘 시장 팁', guideTitle: '지수 흐름을 이렇게 보세요',
+  guide1: '지수는 종목을 고르는 기능이 아니라 오늘 시장의 큰 방향을 읽는 참고 정보입니다.', guide2: '개별 종목을 보기 전에는 평균 방향과 상승, 하락 랭킹을 함께 확인하세요.',
+  guide3: '실시간 데이터는 기본 데이터와 차이가 날 수 있습니다.', error: '데이터를 불러오지 못했습니다.', retry: '다시 시도',
+};
 
-const compactAsset = (item, group, type) => ({
-  ...item,
-  group,
-  type,
-  title: item?.name || item?.symbol || '-',
-  symbol: item?.symbol || item?.icon || item?.id || '-',
-  price: item?.price || item?.value || '-',
-  changeValue: parseChange(item),
-  positive: isAssetPositive(item),
-});
+const changeNumber = (item) => Number.parseFloat(String(item?.change || '').replace('%', '').replace('+', ''));
+const priceNumber = (value) => Number(String(value ?? '').replace(/[^0-9.-]/g, '')) || 0;
+const isPositive = (item) => Boolean(item?.isPositive) || changeNumber(item) >= 0;
+const formatTime = (value) => value ? `${new Intl.DateTimeFormat('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(value))} ${text.currentBasis}` : text.currentBasis;
+const typeName = (type) => type === 'market' ? text.index : type === 'korean-stock' ? text.krStock : type === 'stock' ? text.usStock : text.crypto;
+const toneColor = (positive) => positive ? 'text-[var(--color-positive)]' : 'text-[var(--color-negative)]';
 
-const uniqueAssets = (items) => {
+function compactAsset(item, groupKey, type) {
+  return { ...item, groupKey, type, title: item?.name || item?.symbol || '-', symbol: item?.symbol || item?.icon || item?.id || '-', price: item?.price || item?.value || '-', changeValue: changeNumber(item), positive: isPositive(item) };
+}
+function uniqueAssets(items) {
   const seen = new Set();
-  return items.filter((item) => {
-    if (!item) return false;
-    const key = `${item.type}-${item.symbol}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-};
-
-const selectMarketRepresentativeAssets = ({ usItems, krItems, cryptoItems }) => uniqueAssets([
-  usItems[0],
-  usItems[1],
-  krItems[0],
-  krItems[1],
-  cryptoItems[0],
-  cryptoItems[1],
-  ...usItems,
-  ...krItems,
-  ...cryptoItems,
-]).slice(0, 5);
-
-const formatUpdatedAt = (timestamp) => {
-  if (!timestamp) return t.updatedNow;
-  return `${new Intl.DateTimeFormat('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(timestamp))} 기준`;
-};
-
-const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-
+  return items.filter((item) => { if (!item) return false; const key = `${item.type}-${item.symbol}`; if (seen.has(key)) return false; seen.add(key); return true; });
+}
 function RefreshIcon({ spinning }) {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" className={`size-4 ${spinning ? 'animate-spin' : ''}`}>
-      <path d="M20 12a8 8 0 0 1-13.7 5.6M4 12A8 8 0 0 1 17.7 6.4M18 3v4h-4M6 21v-4h4" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-    </svg>
-  );
+  return <svg aria-hidden="true" viewBox="0 0 24 24" className={`size-4 ${spinning ? 'animate-spin' : ''}`}><path d="M20 12a8 8 0 0 1-13.7 5.6M4 12A8 8 0 0 1 17.7 6.4M18 3v4h-4M6 21v-4h4" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" /></svg>;
 }
-
+function ChangeText({ item, className = '' }) {
+  return <span className={`text-xs font-black ${toneColor(item?.positive)} ${className}`}>{item?.change || '-'}</span>;
+}
 function MiniSpark({ positive }) {
-  const stroke = positive ? '#ef4444' : '#2563eb';
-  const points = positive ? '0,18 12,13 25,15 38,8 50,11 63,6 76,10 90,4' : '0,5 12,9 25,7 38,14 50,11 63,18 76,15 90,21';
-  return <svg viewBox="0 0 90 24" className="h-7 w-20" aria-hidden="true"><polyline points={points} fill="none" stroke={stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+  const stroke = positive ? '#16a34a' : '#ef4444';
+  const points = positive ? '0,14 12,12 24,13 36,8 48,10 60,6 76,9 92,4' : '0,6 12,8 24,7 36,13 48,11 60,17 76,14 92,19';
+  return <svg viewBox="0 0 92 24" className="h-5 w-[72px] shrink-0" aria-hidden="true"><polyline points={points} fill="none" stroke={stroke} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 }
-
-function ChangeText({ item }) {
-  return <span className={`text-xs font-black ${item.positive ? 'text-[var(--color-positive)]' : 'text-[var(--color-negative)]'}`}>{item.change || '-'}</span>;
-}
-
 function DashboardSkeleton() {
-  return (
-    <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-      <div className="animate-pulse rounded-[28px] border border-[var(--color-border)] bg-white p-4 shadow-[var(--shadow-card)]">
-        <div className="grid gap-4 lg:grid-cols-[190px_minmax(0,1fr)]">
-          <div className="hidden min-h-[640px] rounded-2xl bg-slate-100 lg:block" />
-          <div className="space-y-4">
-            <div className="h-16 rounded-2xl bg-slate-100" />
-            <div className="h-24 rounded-2xl bg-slate-100" />
-            <div className="grid gap-4 lg:grid-cols-[minmax(0,1.45fr)_330px]"><div className="h-96 rounded-2xl bg-slate-100" /><div className="h-96 rounded-2xl bg-slate-100" /></div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+  return <section className="mx-auto max-w-[1180px] px-4 py-4"><div className="grid animate-pulse gap-2.5 lg:grid-cols-[205px_minmax(0,1fr)]"><div className="hidden min-h-[720px] rounded-[20px] bg-slate-100 lg:block" /><div className="space-y-2.5"><div className="h-56 rounded-[20px] bg-slate-100" /><div className="grid gap-2.5 xl:grid-cols-[1fr_300px]"><div className="h-80 rounded-[20px] bg-slate-100" /><div className="h-80 rounded-[20px] bg-slate-100" /></div></div></div></section>;
 }
-
-function Sidebar({ counts }) {
-  const items = [
-    { label: '홈', icon: 'H', to: '/' },
-    { label: '시장', icon: 'M', to: '/market' },
-    { label: '포트폴리오', icon: 'P', to: '/portfolio' },
-    { label: '뉴스', icon: 'N', to: '/news' },
-    { label: '커뮤니티', icon: 'C', to: '/community' },
-  ];
-  return (
-    <aside className="hidden rounded-3xl border border-[var(--color-border)] bg-[var(--color-background-soft)] p-4 lg:block">
-      <div className="flex items-center gap-3 px-2 py-2">
-        <span className="grid size-10 place-items-center rounded-2xl bg-[var(--color-primary)] text-sm font-black text-white">MP</span>
-        <div><p className="text-sm font-black text-[var(--color-text-primary)]">MoneyPlatform</p><p className="text-xs font-semibold text-[var(--color-text-secondary)]">{'투자 정보 플랫폼'}</p></div>
-      </div>
-      <nav className="mt-8 space-y-1" aria-label="Dashboard sections">
-        {items.map((item, index) => (
-          <Link key={item.label} to={item.to} className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-bold hover:bg-white hover:text-[var(--color-primary)] hover:shadow-sm ${index === 0 ? 'bg-white text-[var(--color-primary)] shadow-sm' : 'text-[var(--color-text-secondary)]'}`}>
-            <span className="grid size-7 place-items-center rounded-xl bg-[var(--color-primary-soft)] text-xs text-[var(--color-primary)]">{item.icon}</span>
-            {item.label}
-          </Link>
-        ))}
-      </nav>
-      <div className="mt-8 rounded-2xl bg-white p-4 shadow-sm">
-        <p className="text-xs font-bold text-[var(--color-text-secondary)]">{'확인 자산'}</p>
-        <p className="mt-2 text-3xl font-black tabular-nums text-[var(--color-text-primary)]">{counts.total}</p>
-        <div className="mt-4 grid grid-cols-2 gap-2 text-xs font-bold">
-          <span className="rounded-xl bg-[var(--color-positive-soft)] px-2 py-2 text-[var(--color-positive)]">{'상승'} {counts.positive}</span>
-          <span className="rounded-xl bg-[var(--color-negative-soft)] px-2 py-2 text-[var(--color-negative)]">{'하락'} {counts.negative}</span>
-        </div>
-      </div>
-    </aside>
-  );
+function Sidebar() {
+  const items = [{ to: '/', label: text.dashboard, icon: 'D' }, { to: '/portfolio', label: text.portfolio, icon: 'P' }, { to: '/market', label: text.market, icon: 'M' }, { to: '/crypto', label: text.coin, icon: 'C' }, { to: '/news', label: text.news, icon: 'N' }, { to: '/community', label: text.community, icon: 'B' }];
+  return <aside className="hidden min-h-[660px] rounded-[18px] border border-[var(--color-border)] bg-white p-3 shadow-sm lg:flex lg:flex-col"><div className="flex items-center gap-2.5 rounded-[16px] bg-[var(--color-background-soft)] px-3 py-4"><span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-[var(--color-primary)] text-sm font-black text-white">MP</span><div className="min-w-0"><p className="text-[13px] font-black leading-tight text-[var(--color-text-primary)]">MoneyPlatform</p><p className="text-[10px] font-bold leading-4 text-[var(--color-text-secondary)]">투자 정보 대시보드</p></div></div><nav className="mt-3 space-y-2" aria-label="home dashboard menu">{items.map((item, index) => <Link key={item.to} to={item.to} className={`flex items-center gap-2.5 rounded-2xl px-3 py-3 text-sm font-black transition ${index === 0 ? 'bg-[var(--color-primary)] text-white shadow-sm' : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-primary-soft)] hover:text-[var(--color-primary)]'}`}><span className={`grid size-7 shrink-0 place-items-center rounded-xl text-xs ${index === 0 ? 'bg-white/20 text-white' : 'bg-[var(--color-background-soft)] text-[var(--color-primary)]'}`}>{item.icon}</span><span className="truncate">{item.label}</span></Link>)}</nav></aside>;
 }
-
-function TickerBar({ items, onOpen }) {
-  return (
-    <div className="overflow-hidden rounded-2xl border border-[var(--color-border)] bg-white">
-      <div className="flex overflow-x-auto px-2 py-2">
-        {items.map((item) => (
-          <button key={`${item.type}-${item.symbol}`} type="button" aria-label={`Open ${item.type} market detail`} onClick={() => onOpen(item)} className="flex min-w-max items-center gap-2 rounded-xl px-3 py-2 hover:bg-[var(--color-background-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]">
-            <span className="size-2 rounded-full bg-[var(--color-text-primary)]" />
-            <span className="text-xs font-black text-[var(--color-text-primary)]">{item.symbol}</span>
-            <ChangeText item={item} />
-          </button>
-        ))}
-      </div>
-    </div>
-  );
+function HeroSummary({ positive, negative, leader, updatedAt, isFetching, onRefresh }) {
+  return <section className="rounded-[18px] border border-[var(--color-border)] bg-white p-4 shadow-sm"><div className="flex flex-wrap items-center justify-between gap-4"><div className="min-w-0"><p className="text-xs font-black text-[var(--color-primary)]">{text.todaySummary}</p><h1 className="mt-1 text-xl font-black leading-tight text-[var(--color-text-primary)] sm:text-2xl">{text.marketOpen}</h1><p className="mt-1 text-xs font-bold text-[var(--color-text-secondary)]">{text.marketSubtitle}</p></div><div className="flex flex-wrap items-center justify-end gap-2"><span className="rounded-full bg-red-50 px-3 py-1.5 text-xs font-black text-[var(--color-positive)]">{text.up} {positive}</span><span className="rounded-full bg-blue-50 px-3 py-1.5 text-xs font-black text-[var(--color-negative)]">{text.down} {negative}</span><span className="rounded-full bg-[var(--color-background-soft)] px-3 py-1.5 text-xs font-black text-[var(--color-text-secondary)]">{text.movingAsset} {leader?.symbol || '-'}</span><button type="button" onClick={onRefresh} className="inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-4 py-1.5 text-sm font-black text-white hover:bg-[var(--color-primary-hover)]"><span>{formatTime(updatedAt)}</span><RefreshIcon spinning={isFetching} /></button></div></div></section>;
 }
-
-function NoticePanel({ items, selected, onSelect, onClose }) {
-  return (
-    <section className="rounded-2xl border border-amber-200 bg-amber-50/80 p-4 shadow-sm">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="h-5 w-1 rounded-full bg-amber-500" />
-            <h2 className="text-base font-black text-[var(--color-text-primary)]">{t.notices}</h2>
-          </div>
-          <p className="mt-1 text-xs font-bold text-amber-800">{t.noticeHint}</p>
-        </div>
-      </div>
-      <div className="mt-3 grid gap-2 lg:grid-cols-2">
-        {items.length === 0 ? (
-          <p className="rounded-2xl bg-white/70 px-3 py-3 text-sm font-bold text-[var(--color-text-secondary)]">{t.noticeEmpty}</p>
-        ) : items.map((notice) => (
-          <button
-            key={notice.id}
-            type="button"
-            onClick={() => onSelect(notice)}
-            className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-2xl bg-white px-3 py-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-card-hover)] focus:outline-none focus:ring-2 focus:ring-amber-300"
-          >
-            <span className={`shrink-0 rounded-full px-2 py-1 text-xs font-black ${notice.priority === 'important' ? 'bg-amber-500 text-white' : 'bg-amber-100 text-amber-800'}`}>
-              {notice.priority === 'important' ? '중요' : '공지'}
-            </span>
-            <span className="min-w-0 truncate text-sm font-black text-[var(--color-text-primary)]">{notice.title}</span>
-            <span className="shrink-0 text-xs font-black text-amber-700">{t.viewNotice}</span>
-          </button>
-        ))}
-      </div>
-
-      {selected && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 px-4 py-6 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="home-notice-title">
-          <article className="w-full max-w-2xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl">
-            <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-5 py-4">
-              <div className="min-w-0">
-                <span className={`inline-flex rounded-full px-2 py-1 text-xs font-black ${selected.priority === 'important' ? 'bg-amber-500 text-white' : 'bg-amber-50 text-amber-800'}`}>
-                  {selected.priority === 'important' ? '중요' : '공지'}
-                </span>
-                <h2 id="home-notice-title" className="mt-3 break-words text-xl font-black text-[var(--color-text-primary)]">{selected.title}</h2>
-              </div>
-              <button type="button" onClick={onClose} className="shrink-0 rounded-full border border-slate-200 px-3 py-1.5 text-sm font-bold text-[var(--color-text-secondary)] hover:bg-slate-50">
-                {t.close}
-              </button>
-            </div>
-            <div className="max-h-[65vh] overflow-y-auto px-5 py-5">
-              <p className="whitespace-pre-line break-words text-sm leading-7 text-[var(--color-text-secondary)]">{selected.content}</p>
-            </div>
-          </article>
-        </div>
-      )}
-    </section>
-  );
+function FeaturedAssets({ items, onOpen }) {
+  const visible = items.slice(0, 5);
+  return <section className="rounded-[18px] border border-[var(--color-border)] bg-white p-3 shadow-sm"><div className="mb-2 flex items-center justify-between border-b border-[var(--color-border)] pb-2"><div><h2 className="text-base font-black text-[var(--color-text-primary)]">{text.featuredTitle}</h2><p className="text-xs font-bold text-[var(--color-text-secondary)]">{text.featuredHelp}</p></div><span className="rounded-full bg-[var(--color-background-soft)] px-3 py-1 text-xs font-black text-[var(--color-text-secondary)]">핵심 {visible.length}개</span></div><div className="flex gap-2 overflow-x-auto pb-2 [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-300">{visible.map((item) => <button key={`${item.type}${item.symbol}`} type="button" onClick={() => onOpen(item)} className="grid min-h-[104px] min-w-[178px] grid-rows-[auto_1fr_auto] rounded-xl border border-[var(--color-border)] bg-white p-2.5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"><div className="flex min-w-0 items-start justify-between gap-2"><span className="min-w-0"><strong className="block truncate text-[13px] font-black text-[var(--color-text-primary)]" title={item.title}>{item.title}</strong><span className="text-xs font-bold text-[var(--color-text-secondary)]">{item.symbol}</span></span><MiniSpark positive={item.positive} /></div><span className="mt-2 self-end text-xs font-black text-[var(--color-text-secondary)]">{text.current}</span><div className="mt-1 flex items-end justify-between gap-2"><strong className="truncate text-lg font-black text-[var(--color-text-primary)]">{item.price}</strong><ChangeText item={item} /></div></button>)}</div></section>;
 }
-function AssetHeroCard({ item, onOpen }) {
-  if (!item) return null;
-  const accent = item.positive ? '#16a34a' : '#2563eb';
-  return (
-    <button type="button" aria-label={`Open ${item.type} featured detail`} onClick={() => onOpen(item)} className="min-w-[220px] rounded-2xl border border-[var(--color-border)] bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-card-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]" style={{ borderTop: `3px solid ${accent}` }}>
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0"><p className="truncate text-sm font-black text-[var(--color-text-primary)]">{item.title}</p><p className="text-xs font-bold text-[var(--color-text-secondary)]">{item.symbol}</p></div>
-        <span className="rounded-full bg-[var(--color-background-soft)] px-2 py-1 text-xs font-black text-[var(--color-text-secondary)]">{item.group}</span>
-      </div>
-      <div className="mt-5 flex items-end justify-between gap-4">
-        <div><p className="text-xs font-bold text-[var(--color-text-secondary)]">{'현재가'}</p><p className="mt-1 text-2xl font-black tabular-nums text-[var(--color-text-primary)]">{item.price}</p></div>
-        <MiniSpark positive={item.positive} />
-      </div>
-    </button>
-  );
+function IndexChart({ items }) {
+  const indices = items.filter((item) => item.type === 'market').slice(0, 4);
+  const maxAbs = Math.max(...indices.map((item) => Math.abs(item.changeValue || 0)), 1);
+  const count = Math.max(indices.length - 1, 1);
+  const xAt = (index) => 8 + (304 / count) * index;
+  const yAt = (item) => 108 - (item.changeValue / maxAbs) * 58;
+  const line = indices.map((item, index) => `${xAt(index)},${yAt(item)}`).join(' ');
+  return <section className="rounded-[18px] border border-[var(--color-border)] bg-white p-4 shadow-sm"><p className="text-xs font-black text-[var(--color-text-secondary)]">{text.chartLabel}</p><h2 className="mt-1 text-2xl font-black text-[var(--color-text-primary)]">{text.chartTitle}</h2><p className="mt-1 text-xs font-bold text-[var(--color-text-secondary)]">{text.chartHelp}</p><div className="mt-3 rounded-[16px] border border-[var(--color-border)] bg-[linear-gradient(180deg,#f8fbff_0%,#ffffff_100%)] p-4"><svg viewBox="0 0 320 210" className="h-[260px] w-full" aria-label="market movement chart"><defs><linearGradient id="dashboardChartFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="#38bdf8" stopOpacity="0.24" /><stop offset="100%" stopColor="#38bdf8" stopOpacity="0" /></linearGradient></defs>{[34, 71, 108, 145].map((y) => <line key={y} x1="8" y1={y} x2="312" y2={y} stroke="#e5edf6" strokeWidth="1" />)}<line x1="8" y1="108" x2="312" y2="108" stroke="#cbd5e1" strokeWidth="2" />{line && <polygon points={`8,166 ${line} 312,166`} fill="url(#dashboardChartFill)" />}<polyline points={line} fill="none" stroke="#0ea5e9" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />{indices.map((item, index) => <g key={`${item.type}${item.symbol}`}><circle cx={xAt(index)} cy={yAt(item)} r="4.2" fill="white" stroke="#0ea5e9" strokeWidth="3.4" /><text x={xAt(index)} y="196" textAnchor="middle" fill="#64748b" fontSize="9" fontWeight="800">{item.symbol}</text></g>)}</svg></div></section>;
 }
-
-function SummaryCard({ total, positive, negative, topGainers, topLosers }) {
-  const positiveWidth = total ? clamp((positive / total) * 100, 0, 100) : 0;
-  return (
-    <section className="rounded-2xl border border-[var(--color-border)] bg-white p-5 shadow-sm">
-      <p className="text-sm font-black text-[var(--color-text-secondary)]">{t.breadth}</p>
-      <div className="mt-3 flex items-end justify-between gap-4">
-        <div><p className="text-4xl font-black tabular-nums text-[var(--color-text-primary)]">{total}</p><p className="mt-1 text-xs font-bold text-[var(--color-text-secondary)]">{t.totalAssets}</p></div>
-        <div className="text-right"><p className="text-sm font-black text-[var(--color-positive)]">{'상승'} {positive}</p><p className="mt-1 text-sm font-black text-[var(--color-negative)]">{'하락'} {negative}</p></div>
-      </div>
-      <div className="mt-5 h-3 overflow-hidden rounded-full bg-[var(--color-negative-soft)]"><div className="h-full bg-[var(--color-positive)]" style={{ width: positiveWidth + '%' }} /></div>
-      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-        <RankList title={'상승 TOP 5'} items={topGainers} positive />
-        <RankList title={'하락 TOP 5'} items={topLosers} />
-      </div>
-    </section>
-  );
+function IndexPanel({ item, positive, negative, leader }) {
+  const total = Math.max(positive + negative, 1);
+  const ratio = Math.round((positive / total) * 100);
+  const rows = [[text.current, item?.price || '-'], [text.marketMood, positive >= negative ? text.moreUp : text.moreDown], [text.movingAsset, leader?.symbol || '-'], [text.up, String(positive)], [text.down, String(negative)]];
+  return <section className="rounded-[18px] border border-[var(--color-border)] bg-white p-4 shadow-sm"><p className="text-xs font-black text-[var(--color-text-secondary)]">{text.mainIndex}</p><h2 className="mt-1 text-2xl font-black text-[var(--color-text-primary)]">{item?.title || text.index}</h2><p className="mt-2 text-sm font-bold leading-6 text-[var(--color-text-secondary)]">{text.mainIndexHelp}</p><div className="mt-3 space-y-2 text-sm font-bold">{rows.map(([label, value]) => <div key={label} className="flex justify-between border-b border-[var(--color-border)] pb-2 last:border-b-0"><span className="text-[var(--color-text-secondary)]">{label}</span><strong className="text-right text-[var(--color-text-primary)]">{value}</strong></div>)}</div><div className="mt-3"><div className="mb-2 flex justify-between text-xs font-black"><span className="text-[var(--color-positive)]">{text.up} {positive}</span><span className="text-[var(--color-negative)]">{text.down} {negative}</span></div><div className="h-3 overflow-hidden rounded-full bg-blue-100"><div className="h-full rounded-full bg-[var(--color-positive)]" style={{ width: `${ratio}%` }} /></div></div></section>;
 }
-
-function RankList({ title, items, positive = false }) {
-  return (
-    <div className="rounded-2xl bg-[var(--color-background-soft)] p-3">
-      <p className="text-xs font-black text-[var(--color-text-secondary)]">{title}</p>
-      <div className="mt-2 space-y-2">
-        {items.length === 0 ? <p className="py-2 text-xs font-bold text-[var(--color-text-secondary)]">{t.noData}</p> : items.map((item, index) => (
-          <div key={title + '-' + item.type + '-' + item.symbol} className="grid grid-cols-[1.25rem_minmax(0,1fr)_auto] items-center gap-2 text-xs">
-            <span className="grid size-5 place-items-center rounded-full bg-white font-black text-[var(--color-text-secondary)]">{index + 1}</span>
-            <div className="min-w-0"><p className="truncate font-black text-[var(--color-text-primary)]">{item.symbol}</p><p className="truncate font-bold text-[var(--color-text-secondary)]">{item.group}</p></div>
-            <span className={(positive ? 'text-[var(--color-positive)]' : 'text-[var(--color-negative)]') + ' font-black'}>{item.change}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+function Watchlist({ items, onOpen }) {
+  return <section className="rounded-[18px] border border-[var(--color-border)] bg-white p-4 shadow-sm"><div className="flex items-center justify-between border-b border-[var(--color-border)] pb-3"><div><h2 className="text-lg font-black text-[var(--color-text-primary)]">{text.watchlist}</h2><p className="text-xs font-bold text-[var(--color-text-secondary)]">{text.watchlistHelp}</p></div><span className="rounded-full bg-[var(--color-background-soft)] px-3 py-1 text-xs font-black text-[var(--color-text-secondary)]">Top 5</span></div><div className="mt-3 grid gap-2">{items.slice(0, 5).map((item, index) => <button key={`${item.type}${item.symbol}`} type="button" onClick={() => onOpen(item)} className="grid w-full grid-cols-[32px_minmax(0,1fr)_96px_72px] items-center gap-3 rounded-2xl border border-transparent bg-slate-50 px-3 py-3 text-left transition hover:border-[var(--color-border)] hover:bg-white hover:shadow-sm max-md:grid-cols-[30px_minmax(0,1fr)_68px]"><span className="grid size-8 place-items-center rounded-full bg-white text-xs font-black text-[var(--color-primary)] shadow-sm">{index + 1}</span><span className="min-w-0"><strong className="block truncate text-sm font-black text-[var(--color-text-primary)]">{item.title}</strong><span className="mt-0.5 block truncate text-xs font-bold text-[var(--color-text-secondary)]">{item.symbol} / {typeName(item.type)}</span></span><strong className="text-right text-sm font-black text-[var(--color-text-primary)] max-md:hidden">{item.price}</strong><ChangeText item={item} className="text-right" /></button>)}</div></section>;
 }
-
-function ChartPanel({ groups }) {
-  const rows = groups.map((group) => {
-    const positive = group.items.filter((item) => item.positive).length;
-    const negative = group.items.filter((item) => !item.positive).length;
-    const total = group.items.length;
-    return {
-      ...group,
-      positive,
-      negative,
-      total,
-      positiveWidth: total ? clamp((positive / total) * 100, 0, 100) : 0,
-      negativeWidth: total ? clamp((negative / total) * 100, 0, 100) : 0,
-    };
-  });
-  const total = rows.reduce((sum, row) => sum + row.total, 0);
-
-  return (
-    <section className="rounded-2xl border border-[var(--color-border)] bg-white p-5 shadow-sm">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-sm font-black text-[var(--color-text-secondary)]">{t.performance}</p>
-          <h2 className="mt-2 text-2xl font-black text-[var(--color-text-primary)]">{'시장군별 상승/하락 비교'}</h2>
-          <p className="mt-2 text-sm font-semibold leading-6 text-[var(--color-text-secondary)]">{'지수·주식은 전일 종가 대비, 암호화폐는 24시간 변동률 기준입니다.'}</p>
-        </div>
-        <div className="hidden rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-[var(--color-text-secondary)] sm:block">{'총'} {total}{'개'}</div>
-      </div>
-      <div className="mt-5 space-y-4">
-        {rows.map((row) => (
-          <div key={row.label} className="rounded-2xl bg-[var(--color-background-soft)] p-4">
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-sm font-black text-[var(--color-text-primary)]">{row.label}</p>
-              <p className="text-xs font-black text-[var(--color-text-secondary)]">{'하락'} {row.negative}{'개'} / {'상승'} {row.positive}{'개'}</p>
-            </div>
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              <div>
-                <div className="h-3 overflow-hidden rounded-full bg-white"><div className="ml-auto h-full rounded-full bg-[var(--color-negative)]" style={{ width: row.negativeWidth + '%' }} /></div>
-                <div className="mt-1 flex justify-between text-[11px] font-bold text-[var(--color-negative)]"><span>{'하락'}</span><span>{row.negativeWidth.toFixed(0)}%</span></div>
-              </div>
-              <div>
-                <div className="h-3 overflow-hidden rounded-full bg-white"><div className="h-full rounded-full bg-[var(--color-positive)]" style={{ width: row.positiveWidth + '%' }} /></div>
-                <div className="mt-1 flex justify-between text-[11px] font-bold text-[var(--color-positive)]"><span>{'상승'}</span><span>{row.positiveWidth.toFixed(0)}%</span></div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
+function NoticeSection({ items, selected, onSelect, onClose }) {
+  return <section className="rounded-[18px] border border-amber-200 bg-amber-50/60 p-4 shadow-sm"><div className="flex items-center justify-between border-b border-amber-200 pb-2"><div><p className="text-xs font-black text-amber-700">{text.notice}</p><h2 className="text-base font-black text-[var(--color-text-primary)]">{text.noticeHelp}</h2></div></div><div className="mt-3 grid min-h-[168px] content-start gap-2">{items.length === 0 ? <p className="rounded-xl border border-amber-100 bg-white px-3 py-4 text-sm font-bold text-[var(--color-text-secondary)]">등록된 공지가 없습니다.</p> : items.slice(0, 3).map((item) => <button key={item.id} type="button" onClick={() => onSelect(item)} className="flex min-h-[46px] items-center justify-between gap-3 rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-left shadow-sm hover:bg-amber-50"><span className="min-w-0 truncate text-sm font-black text-[var(--color-text-primary)]">{item.title}</span><span className="shrink-0 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-black text-amber-700">{text.view}</span></button>)}</div>{selected && <div className="mt-3 rounded-xl border border-amber-200 bg-white p-3"><div className="flex items-start justify-between gap-2"><h3 className="text-sm font-black text-[var(--color-text-primary)]">{selected.title}</h3><button type="button" onClick={onClose} className="rounded-full bg-amber-50 px-2 py-1 text-xs font-black text-amber-700">{text.close}</button></div><p className="mt-2 max-h-36 overflow-y-auto whitespace-pre-wrap text-sm font-bold leading-6 text-[var(--color-text-secondary)]">{selected.content}</p></div>}</section>;
 }
-
-function Watchlist({ title, items, onOpen, to, description }) {
-  return (
-    <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h2 className="text-base font-black text-[var(--color-text-primary)]">{title}</h2>
-          {description && <p className="mt-1 text-xs font-bold text-[var(--color-text-secondary)]">{description}</p>}
-        </div>
-        {to && <Link to={to} className="shrink-0 rounded-full bg-[var(--color-primary-soft)] px-3 py-1 text-xs font-black text-[var(--color-primary)]">{t.viewAll}</Link>}
-      </div>
-      <div className="mt-3 divide-y divide-[var(--color-border)]">
-        {items.length === 0 ? <p className="py-8 text-sm font-bold text-[var(--color-text-secondary)]">{t.noData}</p> : items.map((item, index) => (
-          <button key={`${item.type}-${item.symbol}`} type="button" aria-label={`Open ${item.type} watch item`} onClick={() => onOpen(item)} className="grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-2xl px-2 py-3 text-left hover:bg-[var(--color-background-soft)]">
-            <span className="grid size-7 place-items-center rounded-full bg-slate-100 text-xs font-black text-[var(--color-text-secondary)]">{index + 1}</span>
-            <div className="min-w-0"><p className="truncate text-sm font-black text-[var(--color-text-primary)]">{item.title}</p><p className="text-xs font-bold text-[var(--color-text-secondary)]">{item.symbol} / {item.group}</p></div>
-            <div className="text-right"><p className="text-sm font-black tabular-nums text-[var(--color-text-primary)]">{item.price}</p><ChangeText item={item} /></div>
-          </button>
-        ))}
-      </div>
-    </section>
-  );
+function TipCard() {
+  return <section className="rounded-[18px] border border-[var(--color-border)] bg-white p-4 shadow-sm"><div className="flex items-center justify-between border-b border-[var(--color-border)] pb-2"><div><p className="text-xs font-black text-[var(--color-text-secondary)]">{text.guide}</p><h2 className="text-lg font-black text-[var(--color-text-primary)]">{text.guideTitle}</h2></div><span className="rounded-full bg-[var(--color-primary-soft)] px-3 py-1 text-xs font-black text-[var(--color-primary)]">TIP</span></div><div className="divide-y divide-[var(--color-border)] text-sm font-bold leading-6 text-[var(--color-text-secondary)]">{[text.guide1, text.guide2, text.guide3].map((item) => <p key={item} className="py-3">{item}</p>)}</div></section>;
 }
-
-function Allocation({ groups, totalValue, holdingCount, loading }) {
-  const safeTotal = totalValue || groups.reduce((sum, group) => sum + group.value, 0) || 1;
-  const gradient = groups.reduce((acc, group) => {
-    const startAt = acc.cursor;
-    const endAt = acc.cursor + (group.value / safeTotal) * 100;
-    return { cursor: endAt, parts: [...acc.parts, group.hex + ' ' + startAt + '% ' + endAt + '%'] };
-  }, { cursor: 0, parts: [] }).parts.join(', ');
-
-  return (
-    <section className="rounded-2xl border border-[var(--color-border)] bg-white p-4 shadow-sm">
-      <div className="flex items-center justify-between gap-3">
-        <div><p className="text-xs font-black uppercase text-emerald-700">Portfolio</p><h2 className="mt-1 text-base font-black text-[var(--color-text-primary)]">{'내 자산군 비중'}</h2></div>
-        <span className="rounded-full bg-[var(--color-background-soft)] px-2.5 py-1 text-xs font-black text-[var(--color-text-secondary)]">{holdingCount}{'개'}</span>
-      </div>
-      {loading ? (
-        <div className="mt-5 space-y-3"><div className="h-32 animate-pulse rounded-2xl bg-slate-100" /><div className="h-12 animate-pulse rounded-2xl bg-slate-100" /></div>
-      ) : groups.length === 0 ? (
-        <div className="mt-5 rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-background-soft)] p-4">
-          <p className="text-sm font-black text-[var(--color-text-primary)]">{'등록된 보유 자산이 없어요'}</p>
-          <p className="mt-2 text-xs font-semibold leading-5 text-[var(--color-text-secondary)]">{'포트폴리오에 자산을 추가하면 평가금액 기준 비중이 표시됩니다.'}</p>
-          <Link to="/portfolio" className="mt-4 inline-flex h-10 w-full items-center justify-center rounded-full bg-emerald-700 px-4 text-sm font-black text-white hover:bg-emerald-800">{'자산 추가하기'}</Link>
-        </div>
-      ) : (
-        <>
-          <div className="mt-5 grid grid-cols-[120px_minmax(0,1fr)] items-center gap-4">
-            <div className="grid size-28 place-items-center rounded-full shadow-inner" style={{ background: 'conic-gradient(' + (gradient || '#e5e7eb 0% 100%') + ')' }}>
-              <div className="grid size-20 place-items-center rounded-full bg-white text-center shadow-sm">
-                <div><p className="text-[11px] font-bold text-[var(--color-text-secondary)]">{'평가금액'}</p><p className="text-lg font-black text-[var(--color-text-primary)]">100%</p></div>
-              </div>
-            </div>
-            <div className="space-y-2">
-              {groups.map((group) => {
-                const percent = Math.round((group.value / safeTotal) * 100);
-                return (
-                  <div key={group.label}>
-                    <div className="mb-1 flex items-center justify-between text-xs font-black"><span className="flex items-center gap-2 text-[var(--color-text-secondary)]"><span className="size-2.5 rounded-full" style={{ backgroundColor: group.hex }} />{group.label}</span><span className="text-[var(--color-text-primary)]">{percent}%</span></div>
-                    <div className="h-2 overflow-hidden rounded-full bg-[var(--color-background-soft)]"><div className="h-full rounded-full" style={{ width: percent + '%', backgroundColor: group.hex }} /></div>
-                    <p className="mt-1 text-[11px] font-bold text-[var(--color-text-tertiary)]">{group.count}{'개'} / {group.formatted}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-          <Link to="/portfolio" className="mt-5 inline-flex h-10 w-full items-center justify-center rounded-full bg-emerald-700 px-4 text-sm font-black text-white hover:bg-emerald-800">{'포트폴리오에서 자세히 보기'}</Link>
-        </>
-      )}
-    </section>
-  );
+function PortfolioSummary({ holdings, assetByKey, totalValue, holdingCount, loading, user }) {
+  if (!user) return <section className="rounded-[18px] border border-slate-900 bg-slate-950 p-4 text-white shadow-sm"><p className="text-xs font-black text-emerald-300">PORTFOLIO</p><h2 className="mt-1 text-lg font-black leading-6">{text.portfolioLogin}</h2><p className="mt-2 text-xs font-bold leading-5 text-slate-300">{text.portfolioLoginHelp}</p><Link to="/portfolio" className="mt-3 inline-flex h-9 w-full items-center justify-center rounded-full bg-white px-3 text-xs font-black text-slate-950">{text.goPortfolio}</Link></section>;
+  const holdingsView = (holdings || []).map((holding) => { const current = assetByKey.get(holding.itemKey); const type = holding.assetType || String(holding.itemKey || '').split(':')[0]; const label = type === 'korean-stock' ? text.krStock : type === 'stock' ? text.usStock : text.crypto; const price = priceNumber(current?.price) || Number(holding.averagePrice) || 0; const value = Number(holding.quantity || 0) * price * (type === 'korean-stock' ? 1 : USD_TO_KRW_RATE); const color = type === 'korean-stock' ? '#10b981' : type === 'stock' ? '#6366f1' : '#f59e0b'; return { key: holding.id || holding.itemKey, title: current?.title || holding.symbol || String(holding.itemKey || '-').split(':').pop(), label, value, color }; }).filter((item) => item.value > 0).sort((a, b) => b.value - a.value);
+  const total = totalValue || holdingsView.reduce((sum, item) => sum + item.value, 0) || 1;
+  const mainItems = holdingsView.slice(0, 4);
+  const otherItems = holdingsView.slice(4);
+  const chartItems = otherItems.length ? [...mainItems, { key: 'other', title: '기타', label: '나머지 자산', value: otherItems.reduce((sum, item) => sum + item.value, 0), color: '#94a3b8' }] : mainItems;
+  const gradient = chartItems.reduce((acc, item) => { const start = acc.cursor; const width = Math.max(2, (item.value / total) * 100); const end = Math.min(start + width, 100); return { cursor: start + width, values: [...acc.values, `${item.color} ${start}% ${end}%`] }; }, { cursor: 0, values: [] }).values.join(', ');
+  return <section className="rounded-[18px] border border-[var(--color-border)] bg-white p-4 shadow-sm"><div className="flex items-start justify-between gap-2"><div><p className="text-xs font-black text-[var(--color-primary)]">PORTFOLIO</p><h2 className="mt-1 text-lg font-black text-[var(--color-text-primary)]">{text.portfolioSummary}</h2></div><span className="rounded-full bg-[var(--color-background-soft)] px-3 py-1 text-xs font-black text-[var(--color-text-secondary)]">{holdingCount}개</span></div>{loading ? <p className="mt-3 rounded-xl bg-[var(--color-background-soft)] p-3 text-xs font-bold text-[var(--color-text-secondary)]">{text.portfolioLoading}</p> : holdingsView.length === 0 ? <p className="mt-3 rounded-xl bg-[var(--color-background-soft)] p-3 text-xs font-bold text-[var(--color-text-secondary)]">{text.portfolioEmpty}</p> : <div className="mt-4 rounded-2xl bg-slate-50 p-4"><div className="grid gap-5 sm:grid-cols-[160px_minmax(0,1fr)] sm:items-center"><div className="relative grid size-[150px] shrink-0 place-items-center rounded-full" style={{ background: `conic-gradient(${gradient})` }}><div className="absolute inset-0 rounded-full" style={{ background: 'repeating-conic-gradient(from 0deg, transparent 0deg 4deg, white 4deg 6deg)', opacity: 0.9, WebkitMask: 'radial-gradient(farthest-side, transparent 60%, #000 61%)', mask: 'radial-gradient(farthest-side, transparent 60%, #000 61%)' }} /><div className="relative grid size-[86px] place-items-center rounded-full bg-white text-center shadow-sm"><span className="block text-[10px] font-black text-[var(--color-text-tertiary)]">총 평가</span><strong className="-mt-5 block text-base font-black text-[var(--color-text-primary)]">{Math.round(total / 1000000)}백만</strong></div></div><div className="min-w-0 grid gap-2 sm:grid-cols-2">{chartItems.map((item) => { const percent = Math.max(1, Math.round((item.value / total) * 100)); return <div key={item.key} className="grid grid-cols-[10px_minmax(0,1fr)_42px] items-center gap-2"><span className="size-2.5 rounded-full" style={{ backgroundColor: item.color }} /><div className="min-w-0"><p className="truncate text-xs font-black text-[var(--color-text-primary)]">{item.title}</p><p className="truncate text-[11px] font-bold text-[var(--color-text-tertiary)]">{item.label}</p></div><span className="text-right text-xs font-black text-[var(--color-text-primary)]">{percent}%</span></div>; })}</div></div></div>}<Link to="/portfolio" className="mt-4 inline-flex h-9 w-full items-center justify-center rounded-full bg-[var(--color-primary)] px-3 text-xs font-black text-white hover:bg-[var(--color-primary-hover)]">{text.goPortfolio}</Link></section>;
 }
-function NewsPanel({ items, onOpen }) {
-  return (
-    <section className="overflow-hidden rounded-2xl border border-[var(--color-border)] bg-white p-4 shadow-sm">
-      <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-3">
-        <div className="flex items-center gap-2"><span className="h-5 w-1 rounded-full bg-amber-500" /><h2 className="text-base font-black text-[var(--color-text-primary)]">{t.news}</h2></div>
-        <Link to="/news" className="rounded-full bg-[var(--color-primary-soft)] px-3 py-1 text-xs font-black text-amber-700">{t.viewAll}</Link>
-      </div>
-      <div className="mt-2 divide-y divide-[var(--color-border)]">
-        {items.length === 0 ? <p className="py-8 text-sm font-bold text-[var(--color-text-secondary)]">{t.noData}</p> : items.map((item) => (
-          <button key={item.id} type="button" onClick={() => onOpen(item)} className="block w-full rounded-xl px-2 py-3 text-left hover:bg-amber-50/70">
-            <p className="text-xs font-black text-amber-700">{item.category || '뉴스'} {item.time ? `/ ${item.time}` : ''}</p>
-            <p className="mt-1 line-clamp-2 text-sm font-black leading-6 text-[var(--color-text-primary)]">{item.title}</p>
-          </button>
-        ))}
-      </div>
-    </section>
-  );
+function NewsCard({ items, onOpen }) {
+  return <section className="rounded-[18px] border border-[var(--color-border)] bg-white p-4 shadow-sm"><div className="flex items-center justify-between border-b border-[var(--color-border)] pb-2"><h2 className="text-base font-black text-[var(--color-text-primary)]">{text.marketNews}</h2><Link to="/news" className="rounded-full bg-amber-50 px-3 py-1 text-xs font-black text-amber-700">{text.view}</Link></div><div className="divide-y divide-[var(--color-border)]">{items.length === 0 ? <p className="py-5 text-sm font-bold text-[var(--color-text-secondary)]">{text.noNews}</p> : items.slice(0, 5).map((item) => <button key={item.id} type="button" onClick={() => onOpen(item)} className="block w-full py-2 text-left"><p className="line-clamp-2 text-sm font-black leading-5 text-[var(--color-text-primary)]">{item.title}</p><p className="mt-1 text-xs font-bold text-[var(--color-text-tertiary)]">{item.category || '국내증시'} / {item.time || text.live}</p></button>)}</div></section>;
 }
-
-function PortfolioLoginPrompt() {
-  return (
-    <section className="rounded-2xl border border-[var(--color-border)] bg-white p-5 shadow-sm">
-      <p className="text-xs font-black uppercase text-emerald-700">Portfolio</p>
-      <h2 className="mt-2 text-lg font-black leading-7 text-[var(--color-text-primary)]">{'내 자산 비중은 로그인 후 확인할 수 있어요'}</h2>
-      <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">{'보유 자산을 등록하면 평가금액 기준으로 한국 주식, 미국 주식, 암호화폐 비중을 볼 수 있습니다.'}</p>
-      <div className="mt-5 space-y-2">
-        {['평가금액 기준 비중', '자산군별 보유 개수', '수익/손실 확인'].map((item) => <p key={item} className="rounded-2xl bg-[var(--color-background-soft)] px-3 py-2 text-xs font-black text-[var(--color-text-secondary)]">{item}</p>)}
-      </div>
-      <div className="mt-5 grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
-        <Link to="/portfolio" className="inline-flex h-10 items-center justify-center rounded-full bg-emerald-700 px-4 text-sm font-black text-white hover:bg-emerald-800">{'포트폴리오 보기'}</Link>
-        <Link to="/favorites" className="inline-flex h-10 items-center justify-center rounded-full border border-[var(--color-border)] px-4 text-sm font-black text-[var(--color-text-primary)] hover:bg-[var(--color-background-soft)]">{'관심자산 보기'}</Link>
-      </div>
-    </section>
-  );
-}
-
-function CommunityPanel({ items }) {
-  return (
-    <section className="overflow-hidden rounded-2xl border border-[var(--color-border)] bg-white p-4 shadow-sm">
-      <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-3">
-        <div className="flex items-center gap-2"><span className="h-5 w-1 rounded-full bg-emerald-500" /><h2 className="text-base font-black text-[var(--color-text-primary)]">{t.community}</h2></div>
-        <Link to="/community" className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-700">{t.viewAll}</Link>
-      </div>
-      <div className="mt-2 divide-y divide-[var(--color-border)]">
-        {items.length === 0 ? <p className="py-8 text-sm font-bold text-[var(--color-text-secondary)]">{t.noData}</p> : items.map((item) => (
-          <Link key={item.id} to="/community" className="block rounded-xl px-2 py-3 hover:bg-emerald-50/70">
-            <p className="text-xs font-black text-emerald-700">{item.category || '자유'} / {item.authorName || item.author || '익명'}</p>
-            <p className="mt-1 line-clamp-2 text-sm font-black leading-6 text-[var(--color-text-primary)]">{item.title}</p>
-            <p className="mt-1 text-xs font-bold text-[var(--color-text-secondary)]">{'조회'} {item.views || 0} / {'댓글'} {item.comments || item.commentCount || 0}</p>
-          </Link>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function AiPanel() {
-  return (
-    <section className="rounded-3xl bg-[var(--color-text-primary)] p-5 text-white shadow-sm">
-      <p className="text-xs font-black uppercase text-emerald-200">{t.ai}</p>
-      <h2 className="mt-2 text-xl font-black">{'투자 점검'}</h2>
-      <p className="mt-2 text-sm leading-6 text-slate-300">{t.aiText}</p>
-      <Link to="/portfolio" className="mt-5 inline-flex h-10 items-center justify-center rounded-full bg-white px-4 text-sm font-black text-[var(--color-text-primary)]">{t.portfolio}</Link>
-    </section>
-  );
+function CommunityCard({ items }) {
+  return <section className="rounded-[18px] border border-[var(--color-border)] bg-white p-4 shadow-sm"><div className="flex items-center justify-between border-b border-[var(--color-border)] pb-2"><div><p className="text-xs font-black text-[var(--color-primary)]">COMMUNITY</p><h2 className="text-base font-black text-[var(--color-text-primary)]">{text.community}</h2></div><Link to="/community" className="rounded-full bg-[var(--color-primary-soft)] px-3 py-1 text-xs font-black text-[var(--color-primary)]">{text.view}</Link></div><div className="mt-3 grid min-h-[220px] content-start gap-2">{items.length === 0 ? <p className="rounded-2xl bg-slate-50 p-4 text-sm font-bold leading-6 text-[var(--color-text-secondary)]">{text.communityEmpty}</p> : items.slice(0, 3).map((item) => <Link key={item.id} to={`/detail/community/${encodeURIComponent(String(item.id))}`} className="block rounded-2xl border border-transparent bg-slate-50 px-3 py-3.5 hover:border-[var(--color-border)] hover:bg-white hover:shadow-sm"><p className="text-xs font-black text-[var(--color-primary)]">{item.category || '자유'} / {item.authorName || item.author || '사용자'}</p><p className="mt-1 line-clamp-2 text-sm font-black leading-5 text-[var(--color-text-primary)]">{item.title}</p><p className="mt-2 text-xs font-bold text-[var(--color-text-tertiary)]">댓글과 의견은 커뮤니티에서 이어서 확인하세요.</p></Link>)}</div><Link to="/community" className="mt-3 inline-flex h-9 w-full items-center justify-center rounded-full border border-[var(--color-border)] text-xs font-black text-[var(--color-primary)] hover:bg-[var(--color-primary-soft)]">커뮤니티 둘러보기</Link></section>;
 }
 
 export default function HomeSummary({ onOpenDetail }) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [selectedNotice, setSelectedNotice] = useState(null);
   const market = useQuery({ queryKey: ['market', 'indices'], queryFn: getMarketIndices });
   const crypto = useQuery({ queryKey: ['crypto'], queryFn: getCryptoPrices });
@@ -480,97 +118,27 @@ export default function HomeSummary({ onOpenDetail }) {
   const isFetching = queries.some((query) => query.isFetching);
   const error = queries.find((query) => query.error)?.error;
   const updatedAt = Math.max(...queries.map((query) => query.dataUpdatedAt || 0));
-
-  const indices = (market.data || []).map((item) => compactAsset(item, '지수', 'market'));
-  const cryptoItems = (crypto.data || []).map((item) => compactAsset(item, '암호화폐', 'crypto'));
-  const usItems = (stocks.data || []).map((item) => compactAsset(item, '미국 주식', 'stock'));
-  const krItems = (koreanStocks.data || []).map((item) => compactAsset(item, '한국 주식', 'korean-stock'));
+  const indices = (market.data || []).map((item) => compactAsset(item, 'index', 'market'));
+  const cryptoItems = (crypto.data || []).map((item) => compactAsset(item, 'crypto', 'crypto'));
+  const usItems = (stocks.data || []).map((item) => compactAsset(item, 'us', 'stock'));
+  const krItems = (koreanStocks.data || []).map((item) => compactAsset(item, 'kr', 'korean-stock'));
   const quoteAssets = [...cryptoItems, ...usItems, ...krItems];
   const assets = [...indices, ...quoteAssets].filter((item) => Number.isFinite(item.changeValue));
   const positive = assets.filter((item) => item.positive).length;
   const negative = assets.filter((item) => !item.positive).length;
-  const topGainers = assets.filter((item) => item.changeValue >= 0).sort((a, b) => b.changeValue - a.changeValue).slice(0, 5);
-  const topLosers = assets.filter((item) => item.changeValue < 0).sort((a, b) => a.changeValue - b.changeValue).slice(0, 5);
-  const heroAssets = selectMarketRepresentativeAssets({ usItems, krItems, cryptoItems });
-  const tickerItems = indices.slice(0, 4);
-  const watchItems = [...usItems, ...cryptoItems, ...krItems].sort((a, b) => Math.abs(b.changeValue) - Math.abs(a.changeValue)).slice(0, 5);
-  const noticeItems = (announcements.data || []).slice(0, 3);
-  const breadthGroups = [
-    { label: '지수', items: indices },
-    { label: '미국 주식', items: usItems },
-    { label: '한국 주식', items: krItems },
-    { label: '암호화폐', items: cryptoItems },
-  ].filter((group) => group.items.length > 0);
+  const leader = [...assets].sort((a, b) => Math.abs(b.changeValue) - Math.abs(a.changeValue))[0];
+  const featuredAssets = uniqueAssets([usItems[0], usItems[1], krItems[0], cryptoItems[0], usItems[2], krItems[1], ...quoteAssets]).slice(0, 6);
+  const chartItems = [...indices, ...featuredAssets].filter((item) => Number.isFinite(item.changeValue));
+  const movers = [...quoteAssets].filter((item) => Number.isFinite(item.changeValue)).sort((a, b) => Math.abs(b.changeValue) - Math.abs(a.changeValue)).slice(0, 8);
+  const rotatingIndex = indices.length ? Math.floor((updatedAt || 0) / 86400000) % indices.length : 0;
+  const leadingIndex = indices[rotatingIndex];
   const assetByKey = new Map(quoteAssets.map((item) => [`${item.type}:${item.id}`, item]));
   const portfolioHoldings = portfolio.data?.holdings || [];
-  const portfolioTotals = portfolioHoldings.reduce((acc, holding) => {
-    const current = assetByKey.get(holding.itemKey);
-    const type = holding.assetType || String(holding.itemKey || '').split(':')[0];
-    const label = type === 'korean-stock' ? '한국 주식' : type === 'stock' ? '미국 주식' : '암호화폐';
-    const currentPrice = parsePrice(current?.price);
-    const fallbackPrice = Number(holding.averagePrice) || 0;
-    const price = currentPrice || fallbackPrice;
-    const value = Number(holding.quantity || 0) * price * (type === 'korean-stock' ? 1 : USD_TO_KRW_RATE);
-    const previous = acc.get(label) || { label, value: 0, count: 0 };
-    acc.set(label, { ...previous, value: previous.value + value, count: previous.count + 1 });
-    return acc;
-  }, new Map());
-  const portfolioColors = { '한국 주식': '#10b981', '미국 주식': '#8b5cf6', '암호화폐': '#f59e0b' };
-  const portfolioGroups = [...portfolioTotals.values()].filter((group) => group.value > 0).map((group) => ({ ...group, hex: portfolioColors[group.label] || '#64748b', formatted: `₩${Math.round(group.value).toLocaleString('ko-KR')}` }));
-  const portfolioTotalValue = portfolioGroups.reduce((sum, group) => sum + group.value, 0);
-
-  const refetchAll = () => queries.forEach((query) => query.refetch());
+  const portfolioTotal = portfolioHoldings.reduce((sum, holding) => { const current = assetByKey.get(holding.itemKey); const type = holding.assetType || String(holding.itemKey || '').split(':')[0]; const price = priceNumber(current?.price) || Number(holding.averagePrice) || 0; return sum + Number(holding.quantity || 0) * price * (type === 'korean-stock' ? 1 : USD_TO_KRW_RATE); }, 0);
+  const refresh = () => queries.forEach((query) => query.refetch());
   const openAsset = (item) => onOpenDetail?.(item.type, item);
-  const openNews = (item) => onOpenDetail?.('news', item);
-
   if (isLoading) return <DashboardSkeleton />;
-
-  return (
-    <section className="mx-auto max-w-7xl px-3 py-5 sm:px-6 lg:px-8">
-      <div className="rounded-3xl border border-[var(--color-border)] bg-white p-3 shadow-[0_18px_48px_rgba(15,23,42,0.06)]">
-        <div className="grid gap-4 lg:grid-cols-[210px_minmax(0,1fr)]">
-          <Sidebar counts={{ total: assets.length, positive, negative }} />
-          <main className="min-w-0 space-y-4">
-            <div className="flex flex-col gap-3 rounded-2xl border border-[var(--color-border)] bg-white px-5 py-5 shadow-sm md:flex-row md:items-center md:justify-between">
-              <div className="min-w-0">
-                <p className="text-xs font-black uppercase text-[var(--color-primary)]">{t.dashboard}</p>
-                <h1 className="mt-1 text-2xl font-black tracking-tight text-[var(--color-text-primary)] sm:text-3xl">{t.greeting}</h1>
-                <p className="mt-1 text-sm font-semibold text-[var(--color-text-secondary)]">{error ? String(error?.message || error) : t.subtitle}</p>
-              </div>
-              <div className="flex shrink-0 items-center gap-2">
-                <span className="rounded-full bg-[var(--color-background-soft)] px-3 py-2 text-xs font-bold text-[var(--color-text-secondary)]">{formatUpdatedAt(updatedAt)}</span>
-                <button type="button" onClick={refetchAll} disabled={isFetching} aria-label={isFetching ? t.refreshing : t.refresh} className="grid size-10 place-items-center rounded-full bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)] disabled:opacity-50"><RefreshIcon spinning={isFetching} /></button>
-              </div>
-            </div>
-
-            <NoticePanel items={noticeItems} selected={selectedNotice} onSelect={setSelectedNotice} onClose={() => setSelectedNotice(null)} />
-
-            {tickerItems.length > 0 && <TickerBar items={tickerItems} onOpen={openAsset} />}
-
-            {error ? (
-              <div className="rounded-3xl border border-amber-200 bg-amber-50 p-5"><p className="font-bold text-amber-800">{t.error}</p><button type="button" onClick={refetchAll} className="mt-4 rounded-full bg-white px-4 py-2 text-sm font-bold text-amber-800 shadow-sm">{t.retry}</button></div>
-            ) : assets.length === 0 ? (
-              <div className="rounded-3xl border border-dashed border-[var(--color-border)] bg-white p-8 text-center text-sm font-bold text-[var(--color-text-secondary)]">{t.empty}</div>
-            ) : (
-              <>
-                <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-background-soft)] p-3"><div className="mb-3 flex items-center justify-between gap-3 px-1"><p className="text-sm font-black text-[var(--color-text-primary)]">{'시장별 주요 자산'}</p><span className="rounded-full bg-white px-3 py-1 text-xs font-black text-[var(--color-text-secondary)] shadow-sm">{t.heroHint}</span></div><div className="flex gap-3 overflow-x-auto pb-1">{heroAssets.map((item) => <AssetHeroCard key={`${item.type}-${item.symbol}`} item={item} onOpen={openAsset} />)}</div></div>
-                <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_340px]">
-                  <div className="space-y-4">
-                    <div className="grid gap-4 lg:grid-cols-[320px_minmax(0,1fr)]"><SummaryCard total={assets.length} positive={positive} negative={negative} topGainers={topGainers} topLosers={topLosers} /><ChartPanel groups={breadthGroups} /></div>
-                    <div className="grid gap-4 lg:grid-cols-2"><Watchlist title={'미국 주식'} items={usItems.slice(0, 5)} onOpen={openAsset} to="/stocks/us" /><Watchlist title={'한국 주식'} items={krItems.slice(0, 5)} onOpen={openAsset} to="/stocks/kr" /></div>
-                    <div className="grid gap-4 lg:grid-cols-2"><NewsPanel items={(news.data || []).slice(0, 4)} onOpen={openNews} /><CommunityPanel items={(community.data || []).slice(0, 4)} /></div>
-                  </div>
-                  <aside className="space-y-4"><Watchlist title={t.watchlist} description={t.watchlistHint} items={watchItems} onOpen={openAsset} />{user ? <Allocation groups={portfolioGroups} totalValue={portfolioTotalValue} holdingCount={portfolioHoldings.length} loading={portfolio.isLoading} /> : <PortfolioLoginPrompt />}<Watchlist title={'암호화폐'} items={cryptoItems.slice(0, 5)} onOpen={openAsset} to="/crypto" /><AiPanel /></aside>
-                </div>
-              </>
-            )}
-          </main>
-        </div>
-      </div>
-    </section>
-  );
+  return <section className="mx-auto max-w-[1180px] px-2 py-3 sm:px-3 lg:px-4"><div className="grid gap-2.5 lg:grid-cols-[205px_minmax(0,1fr)]"><Sidebar /><main className="min-w-0 space-y-2.5">{error ? <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5"><p className="font-bold text-amber-800">{text.error}</p><button type="button" onClick={refresh} className="mt-3 rounded-full bg-white px-4 py-2 text-sm font-bold text-amber-800 shadow-sm">{text.retry}</button></div> : assets.length === 0 ? <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-white p-8 text-center text-sm font-bold text-[var(--color-text-secondary)]">{text.error}</div> : <><HeroSummary positive={positive} negative={negative} leader={leader} updatedAt={updatedAt} isFetching={isFetching} onRefresh={refresh} /><FeaturedAssets items={featuredAssets} onOpen={openAsset} /><div className="grid gap-2.5 xl:grid-cols-[minmax(0,1fr)_300px]"><IndexChart items={chartItems} /><IndexPanel item={leadingIndex} positive={positive} negative={negative} leader={leader} /></div><div className="grid items-start gap-2.5 xl:grid-cols-[minmax(0,1fr)_300px]"><div className="space-y-2.5"><Watchlist items={movers} onOpen={openAsset} /><PortfolioSummary holdings={portfolioHoldings} assetByKey={assetByKey} totalValue={portfolioTotal} holdingCount={portfolioHoldings.length} loading={portfolio.isLoading} user={user} /><NoticeSection items={(announcements.data || []).slice(0, 3)} selected={selectedNotice} onSelect={setSelectedNotice} onClose={() => setSelectedNotice(null)} /></div><div className="space-y-2.5"><NewsCard items={(news.data || []).slice(0, 4)} onOpen={(item) => onOpenDetail?.('news', item)} /><CommunityCard items={(community.data || []).slice(0, 3)} /><TipCard /></div></div></>}</main></div></section>;
 }
-
-
 
 

@@ -18,6 +18,7 @@ export const getCryptoPrices = () => request('/api/crypto');
 export const getUsStocks = () => request('/api/stocks/us');
 export const getKoreanStocks = () => request('/api/stocks/kr');
 export const getNews = () => request('/api/news');
+export const getAssetProfile = ({ type, id, symbol }) => request('/api/asset-profile?type=' + encodeURIComponent(type || '') + '&id=' + encodeURIComponent(id || '') + '&symbol=' + encodeURIComponent(symbol || ''));
 export const getCommunityPosts = () => request('/api/community');
 export const getAnnouncements = () => request('/api/announcements');
 

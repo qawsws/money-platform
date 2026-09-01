@@ -1,6 +1,6 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createCommunityComment, createContentReport, deleteCommunityComment, deleteCommunityPost, getAssetNote, getCommunityComments, getSavedNews, postCommunityLike, postCommunityUnlike, postNewsAiSummary, saveAssetNote, toggleSavedNews } from '../services/api';
+import { createCommunityComment, createContentReport, deleteCommunityComment, deleteCommunityPost, getAssetNote, getAssetProfile, getCommunityComments, getSavedNews, postCommunityLike, postCommunityUnlike, postNewsAiSummary, saveAssetNote, toggleSavedNews } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useFavoritesStore } from '../store/favoritesStore';
 import AssetIcon from './ui/AssetIcon';
@@ -15,14 +15,14 @@ const t = {
   news: '뉴스',
   community: '커뮤니티',
   detail: '상세 정보',
-  favorite: '즐겨찾기',
-  remove: '즐겨찾기 해제',
+  favorite: '관심 추가',
+  remove: '관심 해제',
   close: '닫기',
   back: '목록으로 돌아가기',
   comments: '댓글',
   comment: '댓글 작성',
   emptyComments: '아직 댓글이 없습니다.',
-  login: '로그인 후 댓글을 작성할 수 있습니다.',
+  login: '로그인하면 댓글을 작성할 수 있습니다.',
   submit: '등록',
   delete: '삭제',
   report: '신고',
@@ -36,7 +36,7 @@ const t = {
   confirmPost: '이 글을 삭제할까요?',
   source: '원문 보기',
   memo: '내 메모',
-  memoPlaceholder: '이 종목을 보며 기억할 투자 아이디어를 적어보세요.',
+  memoPlaceholder: '이 종목을 보며 기억할 점이나 투자 아이디어를 적어보세요.',
   memoSaved: '메모가 저장되었습니다.',
   saveNews: '뉴스 저장',
   removeNews: '뉴스 저장 해제',
@@ -58,7 +58,6 @@ const t = {
   like: '좋아요',
   liked: '좋아요 완료',
 };
-
 const quoteTypes = ['market', 'crypto', 'stock', 'korean-stock'];
 const token = () => localStorage.getItem('mp_token') || '';
 const isAsset = (type) => type === 'crypto' || type === 'stock' || type === 'korean-stock';
@@ -209,7 +208,7 @@ function AiSummaryResult({ result }) {
         <span className="rounded-full bg-[var(--color-primary-soft)] px-3 py-1 text-xs font-extrabold text-[var(--color-primary)]">{t.aiSummary}</span>
       </div>
       <div className="mt-5 rounded-2xl border border-[var(--color-border)] bg-white p-4">
-        <h4 className="text-sm font-extrabold text-[var(--color-text-primary)]">핵심 요약</h4>
+        <h4 className="text-sm font-extrabold text-[var(--color-text-primary)]">?듭떖 ?붿빟</h4>
         <p className="mt-2 whitespace-pre-line break-words text-sm leading-7 text-[var(--color-text-secondary)]">{result.summary || '-'}</p>
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -272,37 +271,59 @@ function Sparkline({ values = [], positive = true, type = 'stock' }) {
   const min = Math.min(...points);
   const max = Math.max(...points);
   const range = max - min || 1;
+  const chartLeft = 8;
+  const chartRight = 96;
+  const chartTop = 10;
+  const chartBottom = 70;
+  const chartWidth = chartRight - chartLeft;
+  const chartHeight = chartBottom - chartTop;
+  const xAt = (index) => chartLeft + (index / (points.length - 1)) * chartWidth;
+  const yAt = (value) => chartBottom - ((value - min) / range) * chartHeight;
   const path = points.map((value, index) => {
-    const x = (index / (points.length - 1)) * 100;
-    const y = 48 - ((value - min) / range) * 38;
+    const x = xAt(index);
+    const y = yAt(value);
     return `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
   }).join(' ');
-  const fillPath = `${path} L 100 54 L 0 54 Z`;
+  const fillPath = `${path} L ${chartRight} ${chartBottom} L ${chartLeft} ${chartBottom} Z`;
   const stroke = positive ? 'var(--color-positive)' : 'var(--color-negative)';
-  const fill = positive ? 'rgba(239, 68, 68, 0.08)' : 'rgba(37, 99, 235, 0.08)';
-  const basis = type === 'crypto' ? '최근 가격 이력과 24시간 변동률 기준입니다.' : '최근 가격 이력과 전일 종가 대비 등락률 기준입니다.';
+  const fill = positive ? 'rgba(239, 68, 68, 0.1)' : 'rgba(37, 99, 235, 0.1)';
+  const basis = type === 'crypto' ? '최근 가격 이력 기준입니다.' : '최근 가격 이력 기준입니다.';
+  const first = points[0];
+  const lastX = xAt(points.length - 1);
 
   return (
     <Card hover={false} className="p-5 sm:p-6">
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+      <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-extrabold text-[var(--color-text-primary)]">{t.chart}</h3>
           <p className="mt-1 text-sm text-[var(--color-text-secondary)]">{basis}</p>
         </div>
-        <span className={`rounded-full px-3 py-1 text-xs font-extrabold ${positive ? 'bg-[var(--color-positive-soft)] text-[var(--color-positive)]' : 'bg-[var(--color-negative-soft)] text-[var(--color-negative)]'}`}>
-          {positive ? '상승 흐름' : '하락 흐름'}
-        </span>
+        <div className="text-right">
+          <span className={`inline-flex rounded-full px-3 py-1 text-xs font-extrabold ${positive ? 'bg-[var(--color-positive-soft)] text-[var(--color-positive)]' : 'bg-[var(--color-negative-soft)] text-[var(--color-negative)]'}`}>
+            {positive ? '상승 흐름' : '하락 흐름'}
+          </span>
+          <p className="mt-2 text-xs font-bold text-[var(--color-text-secondary)]">최근 가격 흐름</p>
+        </div>
       </div>
-      <div className="min-h-72 overflow-hidden rounded-2xl border border-[var(--color-border)] bg-slate-50/70 p-4 sm:min-h-80 lg:min-h-[360px]">
-        <svg viewBox="0 0 100 56" className="h-64 w-full overflow-visible sm:h-72 lg:h-[320px]" role="img" aria-label="가격 흐름 차트">
+      <div className="overflow-hidden rounded-2xl border border-[var(--color-border)] bg-slate-50/70 p-4 sm:p-5">
+
+
+        <svg viewBox="0 0 104 82" className="h-72 w-full sm:h-80 lg:h-[340px]" role="img" aria-label="가격 흐름 차트">
+          {[10, 25, 40, 55, 70].map((y) => <line key={y} x1="8" x2="96" y1={y} y2={y} stroke="#dbe5f1" strokeWidth="0.45" />)}
+          <line x1="8" x2="96" y1={yAt(first)} y2={yAt(first)} stroke="#94a3b8" strokeDasharray="2 2" strokeWidth="0.5" opacity="0.8" />
           <path d={fillPath} fill={fill} />
-          <path d={path} fill="none" stroke={stroke} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.6" />
+          <path d={path} fill="none" stroke={stroke} strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
+          {points.map((value, index) => index % Math.ceil(points.length / 8) === 0 || index === points.length - 1 ? (
+            <circle key={index} cx={xAt(index)} cy={yAt(value)} r={index === points.length - 1 ? '1.65' : '1.05'} fill="#fff" stroke={stroke} strokeWidth="0.85" />
+          ) : null)}
+          <line x1={lastX} x2={lastX} y1={chartTop} y2={chartBottom} stroke="#0f172a" strokeDasharray="3 3" opacity="0.16" />
         </svg>
+
+
       </div>
     </Card>
   );
 }
-
 function DetailHero({ type, item, selected, onToggleFavorite }) {
   const title = item.title || item.name || item.symbol || t.detail;
   const subtitle = type === 'market' ? '' : item.symbol || item.code || item.category || t[type] || t.detail;
@@ -360,6 +381,58 @@ function TextCard({ title, children }) {
   );
 }
 
+
+function AssetInfoCard({ type, item, profileData, loading }) {
+  if (!isAsset(type)) return null;
+
+  const profile = profileData?.profile || {};
+  const rows = type === 'crypto'
+    ? [
+        ['코인 소개', profile.intro],
+        ['출시연도', profile.launchYear],
+        ['유형/용도', profile.usageType],
+        ['네트워크/합의 방식', profile.network],
+        ['공식 홈페이지', profile.homepage, true],
+      ]
+    : [
+        ['회사/종목명', profile.companyName || item.name],
+        ['업종', profile.industry],
+        ['주요 사업', profile.business],
+        ['국가', profile.country],
+        ['거래소', profile.exchange],
+        ['공식 홈페이지', profile.homepage, true],
+      ];
+  const visibleRows = rows.filter((row) => row[1]);
+  const missing = rows.filter((row) => !row[1]).map(([label]) => label);
+
+  return (
+    <Card hover={false} className="p-5 sm:p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h3 className="text-lg font-extrabold text-[var(--color-text-primary)]">자산 정보</h3>
+        {profileData?.source && <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">{profileData.source}</span>}
+      </div>
+      {loading ? (
+        <p className="mt-4 rounded-2xl bg-slate-50 p-4 text-sm font-semibold text-[var(--color-text-secondary)]">자산 정보를 불러오는 중입니다.</p>
+      ) : visibleRows.length > 0 ? (
+        <dl className="mt-4 divide-y divide-[var(--color-border)]">
+          {visibleRows.map(([label, value, link]) => (
+            <div key={label} className="grid gap-2 py-3 text-sm sm:grid-cols-[130px_minmax(0,1fr)]">
+              <dt className="font-semibold text-[var(--color-text-secondary)]">{label}</dt>
+              <dd className="min-w-0 break-words font-bold leading-6 text-[var(--color-text-primary)]">
+                {link ? <a href={value} target="_blank" rel="noreferrer" className="text-[var(--color-primary)] hover:underline">{value}</a> : value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      ) : (
+        <p className="mt-4 rounded-2xl bg-slate-50 p-4 text-sm font-semibold text-[var(--color-text-secondary)]">현재 무료 API에서 제공되는 자산 정보가 부족합니다.</p>
+      )}
+      {missing.length > 0 && !loading && (
+        <p className="mt-4 text-xs font-semibold leading-5 text-[var(--color-text-tertiary)]">무료 API에서 제공되지 않은 항목: {missing.join(', ')}</p>
+      )}
+    </Card>
+  );
+}
 function SimpleDetailHeader({ type, item }) {
   const title = item.title || item.name || item.symbol || t.detail;
 
@@ -405,11 +478,11 @@ function CommunityDetailHeader({ item, user, onDelete, deleting, liked, likeCoun
             <MetaChip type="comments" label={'댓글'} value={item.comments} />
             <button type="button" onClick={onLike} disabled={liking} aria-pressed={liked} className={'inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 text-xs font-black transition disabled:opacity-60 ' + likeClass}>
               <StatIcon type="likes" />
-              {liked ? '좋아요 완료' : '좋아요'} {likeCount}
+              {liked ? t.liked : t.like} {likeCount}
             </button>
             {user && !isOwner && (
               <button type="button" onClick={onToggleReport} className={'inline-flex min-h-9 items-center justify-center rounded-full border px-3 text-xs font-black transition ' + reportClass}>
-                {reportOpen ? '닫기' : '게시글 신고'}
+                {reportOpen ? '?リ린' : '寃뚯떆湲 ?좉퀬'}
               </button>
             )}
             {isOwner && (
@@ -471,7 +544,13 @@ export default function DetailModal({ open, type, item, onClose, standalone = fa
     staleTime: Infinity,
     gcTime: Infinity,
   });
-  const [memo, setMemo] = useState(null);
+  const assetProfile = useQuery({
+    queryKey: ['asset-profile', type, item?.coingeckoId || item?.id, item?.symbol],
+    queryFn: () => getAssetProfile({ type, id: item?.coingeckoId || item?.id, symbol: item?.symbol }),
+    enabled: open && Boolean(item) && isAsset(type),
+    retry: false,
+    staleTime: 10 * 60 * 1000,
+  });  const [memo, setMemo] = useState(null);
   const comments = useQuery({
     queryKey: ['community', item?.id, 'comments'],
     queryFn: () => getCommunityComments(item.id),
@@ -566,7 +645,7 @@ export default function DetailModal({ open, type, item, onClose, standalone = fa
         : [['조회', item.views], ['좋아요', item.likes], ['댓글', item.comments]];
   const infoRows = [
     type !== 'market' ? ['구분', t[type] || t.detail] : null,
-    ['심볼', item.symbol],
+    ['티커', item.symbol],
     ['코드', item.code],
     type !== 'market' ? ['카테고리', item.category] : null,
     ['시간', item.time],
@@ -600,7 +679,7 @@ export default function DetailModal({ open, type, item, onClose, standalone = fa
               </Card>
             )}
 
-            <TextCard title={type === 'community' ? '게시글 본문' : isQuote ? '자산 정보' : t.detail}>{item.summary || item.content || item.description}</TextCard>
+            {isQuote ? <AssetInfoCard type={type} item={item} profileData={assetProfile.data} loading={assetProfile.isLoading} /> : <TextCard title={type === 'community' ? '게시글 본문' : t.detail}>{item.summary || item.content || item.description}</TextCard>}
 
             {type === 'news' && item.url && (
               <Card hover={false} className="p-5 sm:p-6">
@@ -646,17 +725,17 @@ export default function DetailModal({ open, type, item, onClose, standalone = fa
                   <div className="border-b border-amber-100 bg-amber-50/70 p-5 sm:p-6">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <h3 className="text-base font-black text-amber-800">{'게시글 신고'}</h3>
-                        <p className="mt-1 text-sm text-amber-700">{'게시글 전체에 대한 신고입니다. 특정 댓글은 댓글 옆의 댓글 신고를 이용해주세요.'}</p>
+                        <h3 className="text-base font-black text-amber-800">{t.postReport}</h3>
+                        <p className="mt-1 text-sm text-amber-700">{'게시글 전체에 대한 신고입니다. 특정 댓글은 댓글의 신고 버튼을 이용해주세요.'}</p>
                       </div>
                       <button type="button" onClick={() => setOpenPostReport(false)} className="rounded-full border border-amber-200 bg-white px-3 py-1 text-xs font-black text-amber-700">{t.close}</button>
                     </div>
-                    <label className="mt-4 block text-xs font-bold text-amber-800" htmlFor="post-report-reason">{'게시글 신고 사유'}</label>
-                    <input id="post-report-reason" value={postReportReason} onChange={(event) => setPostReportReason(event.target.value)} className="mt-2 h-11 w-full rounded-2xl border border-amber-200 bg-white px-4 text-sm outline-none transition focus:border-amber-400 focus:ring-4 focus:ring-amber-100" placeholder={'스팸, 욕설, 허위 정보 등'} />
+                    <label className="mt-4 block text-xs font-bold text-amber-800" htmlFor="post-report-reason">{t.postReportReason}</label>
+                    <input id="post-report-reason" value={postReportReason} onChange={(event) => setPostReportReason(event.target.value)} className="mt-2 h-11 w-full rounded-2xl border border-amber-200 bg-white px-4 text-sm outline-none transition focus:border-amber-400 focus:ring-4 focus:ring-amber-100" placeholder={'욕설, 허위 정보, 개인정보 노출 등'} />
                     <div className="mt-3 flex justify-end">
                       <button type="button" onClick={() => reportContent.mutate({ targetType: 'post', targetId: item.id, reason: postReportReason })} disabled={reportContent.isPending || postReportReason.trim().length < 2} className="inline-flex min-h-10 items-center justify-center rounded-xl bg-amber-500 px-4 text-sm font-bold text-white transition hover:bg-amber-600 disabled:bg-slate-300">{reportContent.isPending ? '신고 중...' : '게시글 신고 접수'}</button>
                     </div>
-                    {reportContent.isSuccess && <p className="mt-2 text-xs font-semibold text-emerald-600">{'신고가 접수되었습니다.'}</p>}
+                    {reportContent.isSuccess && <p className="mt-2 text-xs font-semibold text-emerald-600">{t.reportDone}</p>}
                   </div>
                 )}
 
@@ -679,7 +758,7 @@ export default function DetailModal({ open, type, item, onClose, standalone = fa
                       <label htmlFor="community-comment" className="sr-only">{t.comment}</label>
                       <textarea id="community-comment" value={comment} onChange={(event) => setComment(event.target.value)} placeholder={t.comment} rows={4} className="min-h-28 w-full resize-y rounded-2xl border border-emerald-100 bg-white px-4 py-3 text-sm leading-6 outline-none transition focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100" />
                       <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                        <p className="text-xs text-[var(--color-text-tertiary)]">{'서로에게 도움되는 투자 의견을 나눠보세요.'}</p>
+                        <p className="text-xs text-[var(--color-text-tertiary)]">{'서로에게 도움이 되는 의견을 남겨주세요.'}</p>
                         <button type="submit" disabled={comment.trim().length < 2 || createComment.isPending} className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-emerald-700 px-5 text-sm font-bold text-white transition hover:bg-emerald-800 disabled:bg-slate-300">{createComment.isPending ? '등록 중...' : t.submit}</button>
                       </div>
                     </form>
@@ -698,7 +777,7 @@ export default function DetailModal({ open, type, item, onClose, standalone = fa
                       ))}
                     </div>
                   )}
-                  {comments.error && <p className="mt-5 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">{'댓글을 불러오지 못했습니다.'}</p>}
+                  {comments.error && <p className="mt-5 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">{'?볤???遺덈윭?ㅼ? 紐삵뻽?듬땲??'}</p>}
                   {!comments.isLoading && !comments.error && comments.data?.comments?.length > 0 ? (
                     <div className="mt-5 overflow-hidden rounded-3xl border border-emerald-100 bg-white">
                       {comments.data.comments.map((entry) => (
@@ -719,8 +798,8 @@ export default function DetailModal({ open, type, item, onClose, standalone = fa
                               <p className="whitespace-pre-line break-words text-sm leading-6 text-slate-700">{entry.content}</p>
                               {user && user.username !== entry.author && openCommentReportId === entry.id && (
                                 <div className="mt-3 rounded-2xl border border-amber-100 bg-amber-50/60 p-3">
-                                  <label className="text-xs font-bold text-amber-700" htmlFor={'comment-report-' + entry.id}>{'댓글 신고 사유'}</label>
-                                  <input id={'comment-report-' + entry.id} value={commentReportReasons[entry.id] || ''} onChange={(event) => setCommentReportReasons((values) => ({ ...values, [entry.id]: event.target.value }))} className="mt-2 h-10 w-full rounded-xl border border-amber-100 bg-white px-3 text-sm outline-none transition focus:border-amber-300 focus:ring-4 focus:ring-amber-100" placeholder={'스팸, 욕설, 허위 정보 등'} />
+                                  <label className="text-xs font-bold text-amber-700" htmlFor={'comment-report-' + entry.id}>{t.commentReportReason}</label>
+                                  <input id={'comment-report-' + entry.id} value={commentReportReasons[entry.id] || ''} onChange={(event) => setCommentReportReasons((values) => ({ ...values, [entry.id]: event.target.value }))} className="mt-2 h-10 w-full rounded-xl border border-amber-100 bg-white px-3 text-sm outline-none transition focus:border-amber-300 focus:ring-4 focus:ring-amber-100" placeholder={'욕설, 허위 정보, 개인정보 노출 등'} />
                                   <div className="mt-2 flex justify-end">
                                     <button type="button" onClick={() => reportContent.mutate({ targetType: 'comment', targetId: entry.id, reason: commentReportReasons[entry.id] })} disabled={reportContent.isPending || String(commentReportReasons[entry.id] || '').trim().length < 2} className="inline-flex min-h-9 items-center justify-center rounded-xl bg-amber-500 px-3 text-xs font-bold text-white transition hover:bg-amber-600 disabled:bg-slate-300">
                                       {reportContent.isPending ? '신고 중...' : '신고 접수'}
@@ -778,19 +857,4 @@ export default function DetailModal({ open, type, item, onClose, standalone = fa
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+﻿import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import AssetIcon from '../components/ui/AssetIcon';
 import Card from '../components/ui/Card';
@@ -9,19 +9,19 @@ import { deleteSavedNews, getCryptoPrices, getKoreanStocks, getSavedNews, getUsS
 import { useFavoritesStore } from '../store/favoritesStore';
 
 const t = {
-  title: '즐겨찾기',
-  guest: '로그인 후 관심 종목을 확인할 수 있습니다.',
-  description: '관심 있는 주식과 암호화폐의 가격 변화를 한곳에서 확인하세요.',
+  title: '관심 자산',
+  guest: '로그인하면 관심 종목과 저장한 뉴스를 확인할 수 있습니다.',
+  description: '관심 있는 주식과 암호화폐, 저장한 뉴스를 한곳에서 확인하세요.',
   crypto: '암호화폐',
   stocks: '미국 주식',
   koreanStocks: '한국 주식',
   news: '저장한 뉴스',
-  empty: '아직 즐겨찾기한 자산이 없습니다.',
-  emptyDescription: '관심 있는 주식이나 암호화폐를 즐겨찾기에 추가해보세요.',
+  empty: '아직 관심 자산이 없습니다.',
+  emptyDescription: '관심 있는 주식이나 암호화폐를 관심 자산으로 추가해보세요.',
   emptyNews: '아직 저장한 뉴스가 없습니다.',
-  remove: '즐겨찾기 해제',
+  remove: '관심 해제',
   removeNews: '뉴스 저장 해제',
-  confirm: '즐겨찾기에서 삭제할까요?',
+  confirm: '관심 자산에서 삭제할까요?',
   confirmNews: '저장한 뉴스에서 삭제할까요?',
   retry: '다시 시도',
   total: '전체 관심 항목',
@@ -103,12 +103,7 @@ function FavoriteAssetCard({ item, type, typeLabel, detailTo, detailState, onRem
 
   return (
     <Card as="article" className="relative min-h-[210px] overflow-hidden p-5 hover:border-[var(--color-border-strong)]">
-      <Link
-        to={detailTo}
-        state={detailState}
-        aria-label={`${title} ${t.viewDetail}`}
-        className="absolute inset-0 z-0 rounded-[var(--radius-card)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
-      />
+      <Link to={detailTo} state={detailState} aria-label={`${title} ${t.viewDetail}`} className="absolute inset-0 z-0 rounded-[var(--radius-card)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2" />
       <div className="relative z-10 flex h-full flex-col pointer-events-none">
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
@@ -118,21 +113,14 @@ function FavoriteAssetCard({ item, type, typeLabel, detailTo, detailState, onRem
               <p className="mt-0.5 truncate text-sm font-medium text-[var(--color-text-secondary)]">{subtitle || '-'}</p>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={(event) => { event.stopPropagation(); onRemove(); }}
-            aria-label={`${title} ${t.remove}`}
-            className="pointer-events-auto inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-amber-200 bg-amber-50 text-amber-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-500"
-          >
+          <button type="button" onClick={(event) => { event.stopPropagation(); onRemove(); }} aria-label={`${title} ${t.remove}`} className="pointer-events-auto inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-amber-200 bg-amber-50 text-amber-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-500">
             <StarIcon />
           </button>
         </div>
 
         <div className="mt-7">
           <p className="truncate text-2xl font-black tracking-tight text-[var(--color-text-primary)]">{item.price || '-'}</p>
-          <div className="mt-3">
-            <PriceChangeBadge change={item.change} isPositive={item.isPositive} />
-          </div>
+          <div className="mt-3"><PriceChangeBadge change={item.change} isPositive={item.isPositive} /></div>
         </div>
 
         <div className="mt-auto flex items-center justify-between gap-3 pt-5">
@@ -149,25 +137,14 @@ function NewsCard({ item, detailTo, detailState, onRemove, removing }) {
 
   return (
     <Card as="article" className="relative min-h-[170px] overflow-hidden p-5 hover:border-[var(--color-border-strong)]">
-      <Link
-        to={detailTo}
-        state={detailState}
-        aria-label={`${title} ${t.viewDetail}`}
-        className="absolute inset-0 z-0 rounded-[var(--radius-card)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
-      />
+      <Link to={detailTo} state={detailState} aria-label={`${title} ${t.viewDetail}`} className="absolute inset-0 z-0 rounded-[var(--radius-card)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2" />
       <div className="relative z-10 flex h-full flex-col pointer-events-none">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             {item.category && <span className="rounded-full bg-[var(--color-primary-soft)] px-3 py-1 text-xs font-extrabold text-[var(--color-primary)]">{item.category}</span>}
             <h3 className="mt-3 line-clamp-2 text-base font-extrabold leading-6 text-[var(--color-text-primary)]">{title}</h3>
           </div>
-          <button
-            type="button"
-            onClick={(event) => { event.stopPropagation(); onRemove(); }}
-            disabled={removing}
-            aria-label={`${title} ${t.removeNews}`}
-            className="pointer-events-auto inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-amber-200 bg-amber-50 text-amber-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-500 disabled:opacity-60"
-          >
+          <button type="button" onClick={(event) => { event.stopPropagation(); onRemove(); }} disabled={removing} aria-label={`${title} ${t.removeNews}`} className="pointer-events-auto inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-amber-200 bg-amber-50 text-amber-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-500 disabled:opacity-60">
             <StarIcon />
           </button>
         </div>
@@ -182,7 +159,7 @@ function AssetGroup({ title, description, query, items, type, typeLabel, empty, 
     <section>
       <SectionTitle title={title} count={items.length} description={description} />
       {query.isLoading && <LoadingGrid />}
-      {query.error && <StatusCard title="즐겨찾기 정보를 불러오지 못했습니다" description="잠시 후 다시 시도해주세요." action={<button type="button" onClick={() => query.refetch()} className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-[var(--color-primary)] px-5 text-sm font-bold text-white hover:bg-[var(--color-primary-hover)]">{t.retry}</button>} />}
+      {query.error && <StatusCard title="관심 자산 정보를 불러오지 못했습니다" description="잠시 후 다시 시도해주세요." action={<button type="button" onClick={() => query.refetch()} className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-[var(--color-primary)] px-5 text-sm font-bold text-white hover:bg-[var(--color-primary-hover)]">{t.retry}</button>} />}
       {!query.isLoading && !query.error && items.length === 0 && <StatusCard title={empty} description="이 유형에 저장된 관심 자산이 없습니다." />}
       {!query.isLoading && !query.error && items.length > 0 && (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -196,9 +173,9 @@ function AssetGroup({ title, description, query, items, type, typeLabel, empty, 
 function NewsGroup({ query, items, onRemove, removing }) {
   return (
     <section>
-      <SectionTitle title={t.news} count={items.length} description="나중에 다시 볼 뉴스입니다." />
+      <SectionTitle title={t.news} count={items.length} description="나중에 다시 볼 뉴스를 모아둔 목록입니다." />
       {query.isLoading && <LoadingGrid />}
-      {query.error && <StatusCard title="저장 뉴스를 불러오지 못했습니다" description="잠시 후 다시 시도해주세요." action={<button type="button" onClick={() => query.refetch()} className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-[var(--color-primary)] px-5 text-sm font-bold text-white hover:bg-[var(--color-primary-hover)]">{t.retry}</button>} />}
+      {query.error && <StatusCard title="저장한 뉴스를 불러오지 못했습니다" description="잠시 후 다시 시도해주세요." action={<button type="button" onClick={() => query.refetch()} className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-[var(--color-primary)] px-5 text-sm font-bold text-white hover:bg-[var(--color-primary-hover)]">{t.retry}</button>} />}
       {!query.isLoading && !query.error && items.length === 0 && <StatusCard title={t.emptyNews} description="뉴스 상세 화면에서 저장한 뉴스가 여기에 표시됩니다." />}
       {!query.isLoading && !query.error && items.length > 0 && (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -232,11 +209,7 @@ export default function FavoritesPage() {
     return (
       <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <PageHeader eyebrow="Watchlist" title={t.title} description={t.guest} />
-        <StatusCard
-          title={t.guest}
-          description="즐겨찾기는 로그인한 사용자 기준으로 저장됩니다."
-          action={<Link to="/" className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-[var(--color-primary)] px-5 text-sm font-bold text-white hover:bg-[var(--color-primary-hover)]">메인으로 이동</Link>}
-        />
+        <StatusCard title="로그인이 필요합니다" description="관심 자산은 로그인한 사용자 기준으로 저장됩니다." action={<Link to="/" className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-[var(--color-primary)] px-5 text-sm font-bold text-white hover:bg-[var(--color-primary-hover)]">메인으로 이동</Link>} />
       </main>
     );
   }
@@ -252,49 +225,13 @@ export default function FavoritesPage() {
       </section>
 
       {totalItems === 0 && !hasLoadError && !crypto.isLoading && !stocks.isLoading && !koreanStocks.isLoading && !savedNews.isLoading ? (
-        <StatusCard
-          title={t.empty}
-          description={t.emptyDescription}
-          action={<div className="flex flex-col gap-2 sm:flex-row sm:justify-center"><Link to="/stocks/us" className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-[var(--color-primary)] px-5 text-sm font-bold text-white hover:bg-[var(--color-primary-hover)]">미국 주식 보기</Link><Link to="/crypto" className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-[var(--color-border)] px-5 text-sm font-bold text-[var(--color-text-secondary)] hover:bg-slate-50">암호화폐 보기</Link></div>}
-        />
+        <StatusCard title={t.empty} description={t.emptyDescription} action={<div className="flex flex-col gap-2 sm:flex-row sm:justify-center"><Link to="/stocks/us" className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-[var(--color-primary)] px-5 text-sm font-bold text-white hover:bg-[var(--color-primary-hover)]">미국 주식 보기</Link><Link to="/crypto" className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-[var(--color-border)] px-5 text-sm font-bold text-[var(--color-text-secondary)] hover:bg-slate-50">암호화폐 보기</Link></div>} />
       ) : (
         <div className="space-y-10">
-          <AssetGroup
-            title={t.crypto}
-            description="즐겨찾기한 암호화폐입니다."
-            query={crypto}
-            items={coins}
-            type="crypto"
-            typeLabel={t.crypto}
-            empty={t.empty}
-            onRemove={(item) => { if (window.confirm(t.confirm)) toggle(`crypto:${item.id}`); }}
-          />
-          <AssetGroup
-            title={t.stocks}
-            description="즐겨찾기한 미국 주식입니다."
-            query={stocks}
-            items={shares}
-            type="stock"
-            typeLabel={t.stocks}
-            empty={t.empty}
-            onRemove={(item) => { if (window.confirm(t.confirm)) toggle(`stock:${item.id}`); }}
-          />
-          <AssetGroup
-            title={t.koreanStocks}
-            description="즐겨찾기한 한국 주식입니다."
-            query={koreanStocks}
-            items={koreanShares}
-            type="korean-stock"
-            typeLabel={t.koreanStocks}
-            empty={t.empty}
-            onRemove={(item) => { if (window.confirm(t.confirm)) toggle(`korean-stock:${item.id}`); }}
-          />
-          <NewsGroup
-            query={savedNews}
-            items={savedNewsItems}
-            removing={removeNews.isPending}
-            onRemove={(item) => { if (window.confirm(t.confirmNews)) removeNews.mutate(item.newsKey); }}
-          />
+          <AssetGroup title={t.crypto} description="관심 등록한 암호화폐입니다." query={crypto} items={coins} type="crypto" typeLabel={t.crypto} empty={t.empty} onRemove={(item) => { if (window.confirm(t.confirm)) toggle(`crypto:${item.id}`); }} />
+          <AssetGroup title={t.stocks} description="관심 등록한 미국 주식입니다." query={stocks} items={shares} type="stock" typeLabel={t.stocks} empty={t.empty} onRemove={(item) => { if (window.confirm(t.confirm)) toggle(`stock:${item.id}`); }} />
+          <AssetGroup title={t.koreanStocks} description="관심 등록한 한국 주식입니다." query={koreanStocks} items={koreanShares} type="korean-stock" typeLabel={t.koreanStocks} empty={t.empty} onRemove={(item) => { if (window.confirm(t.confirm)) toggle(`korean-stock:${item.id}`); }} />
+          <NewsGroup query={savedNews} items={savedNewsItems} removing={removeNews.isPending} onRemove={(item) => { if (window.confirm(t.confirmNews)) removeNews.mutate(item.newsKey); }} />
         </div>
       )}
     </main>
