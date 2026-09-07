@@ -4,31 +4,31 @@ export function createNewsSummaryPrompt(news) {
   return `
 ${commonAiRules}
 
-아래 금융 뉴스를 한국어로 분석하세요.
+\uC544\uB798 \uAE08\uC735 \uB274\uC2A4\uB97C \uD55C\uAD6D\uC5B4\uB85C \uBD84\uC11D\uD558\uC138\uC694.
 
-반환 JSON 형식:
+\uBC18\uD658 JSON \uD615\uC2DD:
 {
-  "summary": "핵심 요약 한 문단",
-  "positives": ["긍정적 요인"],
-  "negatives": ["부정적 요인"],
-  "relatedAssets": ["관련 자산 심볼 또는 이름"],
-  "caution": "투자자가 추가 확인해야 할 사항"
+  "summary": "\uD575\uC2EC \uC694\uC57D 2~3\uBB38\uC7A5",
+  "positives": ["\uAE0D\uC815 \uC694\uC778"],
+  "negatives": ["\uBD80\uC815 \uC694\uC778"],
+  "relatedAssets": ["\uAD00\uB828 \uC790\uC0B0 \uD2F0\uCEE4 \uB610\uB294 \uC774\uB984"],
+  "caution": "\uC0AC\uC6A9\uC790\uAC00 \uCD94\uAC00\uB85C \uD655\uC778\uD574\uC57C \uD560 \uC0AC\uD56D"
 }
 
-작성 기준:
-- summary는 2~3문장 이내로 작성합니다.
-- positives와 negatives는 각각 최대 4개까지만 작성합니다.
-- relatedAssets는 뉴스에 직접 언급되거나 명확히 관련된 자산만 포함합니다.
-- 모르는 자산 심볼은 추측하지 마세요.
-- caution에는 추가로 확인해야 할 공시, 실적, 거시지표, 원문 확인 포인트를 적습니다.
-- 뉴스 원문에 없는 전망, 실적, 금리, 가격 정보를 추가하지 마세요.
+\uC791\uC131 \uAE30\uC900:
+- summary\uB294 2~3\uBB38\uC7A5 \uC774\uB0B4\uB85C \uC791\uC131\uD569\uB2C8\uB2E4.
+- positives\uC640 negatives\uB294 \uAC01\uAC01 \uCD5C\uB300 4\uAC1C\uAE4C\uC9C0\uB9CC \uC791\uC131\uD569\uB2C8\uB2E4.
+- relatedAssets\uB294 \uB274\uC2A4\uC5D0 \uC9C1\uC811 \uC5B8\uAE09\uB418\uAC70\uB098 \uBA85\uD655\uD788 \uAD00\uB828\uB41C \uC790\uC0B0\uB9CC \uD3EC\uD568\uD569\uB2C8\uB2E4.
+- \uBAA8\uB974\uB294 \uC790\uC0B0 \uD2F0\uCEE4\uB294 \uCD94\uCE21\uD558\uC9C0 \uB9C8\uC138\uC694.
+- caution\uC5D0\uB294 \uCD94\uAC00\uB85C \uD655\uC778\uD574\uC57C \uD560 \uACF5\uC2DC, \uC2E4\uC801, \uAE08\uB9AC, \uC6D0\uBB38 \uD655\uC778 \uD3EC\uC778\uD2B8\uB97C \uC801\uC2B5\uB2C8\uB2E4.
+- \uB274\uC2A4 \uC6D0\uBB38\uC5D0 \uC5C6\uB294 \uC804\uB9DD, \uC2E4\uC801, \uAE08\uB9AC, \uAC00\uACA9 \uC815\uBCF4\uB97C \uCD94\uAC00\uD558\uC9C0 \uB9C8\uC138\uC694.
 
-뉴스 데이터:
-제목: ${news.title || ''}
-요약/본문: ${news.summary || news.content || news.description || ''}
-카테고리: ${news.category || ''}
-출처: ${news.source || news.provider || ''}
-관련 종목 정보: ${(news.relatedAssets || []).join(', ')}
-원문 URL: ${news.url || ''}
+\uB274\uC2A4 \uB370\uC774\uD130:
+\uC81C\uBAA9: ${news.title || ''}
+\uC694\uC57D/\uBCF8\uBB38: ${news.summary || news.content || news.description || ''}
+\uCE74\uD14C\uACE0\uB9AC: ${news.category || ''}
+\uCD9C\uCC98: ${news.source || news.provider || ''}
+\uAD00\uB828 \uC885\uBAA9 \uC815\uBCF4: ${(news.relatedAssets || []).join(', ')}
+\uC6D0\uBB38 URL: ${news.url || ''}
 `;
 }
