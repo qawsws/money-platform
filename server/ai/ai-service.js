@@ -24,9 +24,6 @@ const investmentDisclaimer = '투자 참고 정보이며 투자 권유가 아닙
 const inFlight = new Map();
 
 export function assertAiAvailable() {
-  if (String(process.env.AI_ENABLED || '').toLowerCase() === 'false') {
-    throw new AiError('AI_DISABLED', AI_MESSAGES.disabled, 503);
-  }
   if (!process.env.OPENAI_API_KEY) {
     throw new AiError('MISSING_API_KEY', AI_MESSAGES.config, 503);
   }
