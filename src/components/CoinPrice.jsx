@@ -1,4 +1,4 @@
-﻿import { useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { getCryptoPrices } from '../services/api';
 import { useFavoritesStore } from '../store/favoritesStore';
@@ -58,39 +58,6 @@ function FavoriteButton({ selected, label, onClick }) {
   );
 }
 
-function CryptoSummary({ coins }) {
-  const rising = coins.filter((coin) => coin.isPositive).length;
-  const falling = coins.length - rising;
-  const first = coins[0];
-
-  return (
-    <Card hover={false} className="mb-5 p-5">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <p className="text-sm font-black text-[var(--color-primary)]">코인 시세 요약</p>
-          <h2 className="mt-2 text-2xl font-black text-[var(--color-text-primary)]">24시간 변동률 기준으로 확인하세요</h2>
-          <p className="mt-2 text-sm font-semibold text-[var(--color-text-secondary)]">현재 표시 중인 코인의 가격, 등락률, 관심 등록을 한 화면에서 볼 수 있습니다.</p>
-        </div>
-        <div className="grid grid-cols-3 gap-2 sm:min-w-[420px]">
-          <div className="rounded-xl bg-[var(--color-background-soft)] px-4 py-3">
-            <p className="text-xs font-black text-[var(--color-text-secondary)]">표시 코인</p>
-            <p className="mt-1 text-lg font-black text-[var(--color-text-primary)]">{coins.length}개</p>
-          </div>
-          <div className="rounded-xl bg-red-50 px-4 py-3">
-            <p className="text-xs font-black text-red-500">상승</p>
-            <p className="mt-1 text-lg font-black text-red-500">{rising}</p>
-          </div>
-          <div className="rounded-xl bg-blue-50 px-4 py-3">
-            <p className="text-xs font-black text-blue-600">하락</p>
-            <p className="mt-1 text-lg font-black text-blue-600">{falling}</p>
-          </div>
-        </div>
-      </div>
-      {first && <p className="mt-4 border-t border-[var(--color-border)] pt-4 text-sm font-semibold text-[var(--color-text-secondary)]">대표 표시: {first.name} {first.price}</p>}
-    </Card>
-  );
-}
-
 export default function CoinPrice({ onOpenDetail, limit = null, showMore = false }) {
   const { data = [], isLoading, error, refetch } = useQuery({ queryKey: ['crypto'], queryFn: getCryptoPrices });
   const favorites = useFavoritesStore((state) => state.favorites);
@@ -107,7 +74,6 @@ export default function CoinPrice({ onOpenDetail, limit = null, showMore = false
         {!isLoading && !error && (
           coins.length === 0 ? <SectionState message={t.empty} /> : (
             <>
-              {isPage && <CryptoSummary coins={coins} />}
               {isPage && <AssetPageInsights items={coins} label="암호화폐" basis="24시간 변동률 기준" />}
               <div className={isPage ? 'mt-5 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-white p-5 shadow-sm' : ''}>
                 {isPage && (

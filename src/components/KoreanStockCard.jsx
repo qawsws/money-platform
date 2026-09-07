@@ -1,4 +1,4 @@
-﻿import { useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useSearch } from '../context/SearchContext';
 import { getKoreanStocks } from '../services/api';
@@ -23,10 +23,6 @@ const t = {
   retry: '다시 시도',
 };
 
-function parseChange(change) {
-  const parsed = Number(String(change || '').replace(/[^\d.-]/g, ''));
-  return Number.isFinite(parsed) ? parsed : 0;
-}
 
 function QuoteSkeletonGrid({ count = 4 }) {
   return (
@@ -66,40 +62,6 @@ function FavoriteButton({ selected, label, onClick }) {
   );
 }
 
-function StockSummary({ stocks }) {
-  const decorated = stocks.map((stock) => ({ ...stock, changeValue: parseChange(stock.change) }));
-  const rising = decorated.filter((stock) => stock.changeValue >= 0).length;
-  const falling = decorated.length - rising;
-  const strongest = [...decorated].sort((a, b) => Math.abs(b.changeValue) - Math.abs(a.changeValue))[0];
-
-  return (
-    <Card hover={false} className="mb-5 p-5">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <p className="text-sm font-black text-[var(--color-primary)]">한국 주식 요약</p>
-          <h2 className="mt-2 text-2xl font-black text-[var(--color-text-primary)]">국내 대표 종목의 움직임을 확인하세요</h2>
-          <p className="mt-2 text-sm font-semibold text-[var(--color-text-secondary)]">현재 표시 중인 종목의 현재가와 전일 대비 등락률을 기준으로 정리했습니다.</p>
-        </div>
-        <div className="grid grid-cols-3 gap-2 sm:min-w-[420px]">
-          <SummaryChip label="상승" value={rising} tone="up" />
-          <SummaryChip label="하락" value={falling} tone="down" />
-          <SummaryChip label="변동 큰 종목" value={strongest?.symbol || '-'} />
-        </div>
-      </div>
-    </Card>
-  );
-}
-
-function SummaryChip({ label, value, tone }) {
-  const toneClass = tone === 'up' ? 'bg-red-50 text-red-500' : tone === 'down' ? 'bg-blue-50 text-blue-600' : 'bg-[var(--color-background-soft)] text-[var(--color-text-primary)]';
-  return (
-    <div className={'rounded-xl px-4 py-3 ' + toneClass}>
-      <p className="text-xs font-black opacity-75">{label}</p>
-      <p className="mt-1 truncate text-lg font-black">{value}</p>
-    </div>
-  );
-}
-
 export default function KoreanStockCard({ onOpenDetail, limit = null, showMore = false }) {
   const { data = [], isLoading, error, refetch } = useQuery({ queryKey: ['stocks', 'kr'], queryFn: getKoreanStocks });
   const { query } = useSearch();
@@ -121,7 +83,6 @@ export default function KoreanStockCard({ onOpenDetail, limit = null, showMore =
             {normalizedQuery && <p className="mb-3 text-sm text-[var(--color-text-secondary)]">{t.result}: <b className="text-[var(--color-text-primary)]">{query}</b> ({filtered.length})</p>}
             {stocks.length === 0 ? <SectionState message={t.empty} /> : (
               <>
-                {isPage && <StockSummary stocks={stocks} />}
                 {isPage && <AssetPageInsights items={stocks} label="한국 주식" basis="전일 대비 등락률 기준" />}
                 <div className={isPage ? 'mt-5 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-white p-5 shadow-sm' : ''}>
                   {isPage && (

@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createCommunityComment, createContentReport, deleteCommunityComment, deleteCommunityPost, getAssetNote, getAssetProfile, getCommunityComments, getSavedNews, postCommunityLike, postCommunityUnlike, postNewsAiSummary, saveAssetNote, toggleSavedNews } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -835,12 +835,14 @@ export default function DetailModal({ open, type, item, onClose, standalone = fa
           </div>
 
           <aside className="min-w-0 space-y-6">
-            <Card hover={false} className="p-5 sm:p-6">
-              <h3 className="text-lg font-extrabold text-[var(--color-text-primary)]">{t.metrics}</h3>
-              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
-                {rows.map(([label, value, change]) => <MetricCard key={label} label={label} value={value} change={change} isPositive={item.isPositive} />)}
-              </div>
-            </Card>
+            {type !== 'news' && (
+              <Card hover={false} className="p-5 sm:p-6">
+                <h3 className="text-lg font-extrabold text-[var(--color-text-primary)]">{t.metrics}</h3>
+                <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                  {rows.map(([label, value, change]) => <MetricCard key={label} label={label} value={value} change={change} isPositive={item.isPositive} />)}
+                </div>
+              </Card>
+            )}
 
             {infoRows.length > 0 && (
               <Card hover={false} className="p-5 sm:p-6">
