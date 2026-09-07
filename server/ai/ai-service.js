@@ -46,11 +46,19 @@ function sanitizeNewsPayload(payload = {}) {
   };
 }
 
+function extractJsonObject(content) {
+  const text = String(content || '').trim().replace(/^```(?:json)?\s*/i, '').replace(/```$/i, '').trim();
+  if (text.startsWith('{') && text.endsWith('}')) return text;
+  const start = text.indexOf('{');
+  const end = text.lastIndexOf('}');
+  return start >= 0 && end > start ? text.slice(start, end + 1) : text;
+}
+
 function parseAiContent(content, validate, trace) {
   let parsed;
   const parseEnd = trace?.startStep?.('jsonParsing');
   try {
-    parsed = JSON.parse(content);
+    parsed = JSON.parse(extractJsonObject(content));
     parseEnd?.();
   } catch {
     parseEnd?.({ error: 'INVALID_JSON' });
@@ -79,15 +87,10 @@ async function callOpenAi({ prompt, schema, schemaName, validate, errorMessage =
     ],
     temperature: 0.2,
     max_tokens: maxOutputTokens,
-    response_format: {
-      type: 'json_schema',
-      json_schema: {
-        name: schemaName,
-        strict: true,
-        schema,
-      },
-    },
+    response_format: { type: 'json_object' },
   });
+  void schema;
+  void schemaName;
   const openAiEnd = trace?.startStep?.('openAiCall', {
     model,
     maxTokens: maxOutputTokens,

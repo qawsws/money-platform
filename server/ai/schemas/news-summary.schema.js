@@ -12,7 +12,6 @@ export const newsSummarySchema = {
 };
 
 export function validateNewsSummary(value) {
-  const keys = ['summary', 'positives', 'negatives', 'relatedAssets', 'caution'];
   const isBoundedString = (item, max) => typeof item === 'string' && item.trim().length > 0 && item.length <= max;
   const isStringArray = (items, maxItems, maxLength) => (
     Array.isArray(items)
@@ -20,7 +19,6 @@ export function validateNewsSummary(value) {
     && items.every((item) => isBoundedString(item, maxLength))
   );
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
-  if (Object.keys(value).some((key) => !keys.includes(key))) return false;
   if (!isBoundedString(value.summary, 700)) return false;
   if (!isStringArray(value.positives, 4, 180)) return false;
   if (!isStringArray(value.negatives, 4, 180)) return false;
