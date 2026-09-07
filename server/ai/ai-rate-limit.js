@@ -2,8 +2,8 @@ import { AiError, AI_MESSAGES } from './ai-errors.js';
 
 const windowMs = Number(process.env.AI_RATE_LIMIT_WINDOW_MS || 60_000);
 const maxRequests = Number(process.env.AI_RATE_LIMIT_MAX || 8);
-const maxDailyCalls = Number(process.env.AI_MAX_OPENAI_CALLS_PER_DAY || 5);
-const maxDailyCallsPerUser = Number(process.env.AI_MAX_OPENAI_CALLS_PER_USER_PER_DAY || 2);
+const maxDailyCalls = Number(process.env.AI_DAILY_LIMIT || process.env.AI_MAX_OPENAI_CALLS_PER_DAY || 30);
+const maxDailyCallsPerUser = Number(process.env.AI_USER_DAILY_LIMIT || process.env.AI_MAX_OPENAI_CALLS_PER_USER_PER_DAY || 10);
 const buckets = new Map();
 const dailyCalls = new Map();
 
@@ -50,4 +50,11 @@ export function reserveOpenAiCallBudget(userKey = 'anonymous') {
 
   dailyCalls.set(serverKey, serverCount + 1);
   dailyCalls.set(userDayKey, userCount + 1);
+  let released = false;
+  return () => {
+    if (released) return;
+    released = true;
+    dailyCalls.set(serverKey, Math.max((dailyCalls.get(serverKey) || 1) - 1, 0));
+    dailyCalls.set(userDayKey, Math.max((dailyCalls.get(userDayKey) || 1) - 1, 0));
+  };
 }

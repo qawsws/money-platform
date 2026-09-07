@@ -74,7 +74,7 @@ function parseAiContent(content, validate, trace) {
 
 async function callOpenAi({ prompt, schema, schemaName, validate, errorMessage = AI_MESSAGES.failed, userKey = 'anonymous', trace }) {
   assertAiAvailable();
-  reserveOpenAiCallBudget(userKey);
+  let releaseBudget = reserveOpenAiCallBudget(userKey);
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -114,6 +114,13 @@ async function callOpenAi({ prompt, schema, schemaName, validate, errorMessage =
     openAiEnd?.({ ok: response.ok, status: response.status, usagePresent: Boolean(data?.usage), finishReason });
 
     if (!response.ok) {
+      console.error(JSON.stringify({
+        event: 'openai_error',
+        status: response.status,
+        type: data?.error?.type || null,
+        code: data?.error?.code || null,
+        finishReason,
+      }));
       throw new AiError(
         response.status === 429 ? 'OPENAI_RATE_LIMIT' : 'OPENAI_ERROR',
         response.status === 429 ? AI_MESSAGES.rateLimit : errorMessage,
@@ -123,8 +130,11 @@ async function callOpenAi({ prompt, schema, schemaName, validate, errorMessage =
 
     const content = data?.choices?.[0]?.message?.content;
     if (!content) throw new AiError('EMPTY_RESPONSE', errorMessage, 502);
-    return parseAiContent(content, validate, trace);
+    const parsed = parseAiContent(content, validate, trace);
+    releaseBudget = null;
+    return parsed;
   } catch (error) {
+    releaseBudget?.();
     if (error instanceof AiError) throw error;
     if (error?.name === 'AbortError') {
       openAiEnd?.({ error: 'TIMEOUT' });
@@ -339,6 +349,19 @@ function enforceInvestmentFacts(aiResult) {
   };
 }
 
+function createNewsSummaryFallback(news) {
+  const summarySource = news.summary || news.content || news.description || news.title;
+  const summary = String(summarySource || '').replace(/\s+/g, ' ').trim().slice(0, 240) || '뉴스 내용을 요약할 수 있는 정보가 부족합니다.';
+  const relatedAssets = news.relatedAssets?.length ? news.relatedAssets.slice(0, 6) : [news.category].filter(Boolean);
+  return {
+    summary,
+    positives: [],
+    negatives: [],
+    relatedAssets,
+    caution: '원문 기사와 관련 공시를 함께 확인해 주세요.',
+  };
+}
+
 export async function summarizeNews(payload, { clientKey = 'anonymous' } = {}) {
   assertAiAvailable();
   const news = sanitizeNewsPayload(payload);
@@ -351,14 +374,22 @@ export async function summarizeNews(payload, { clientKey = 'anonymous' } = {}) {
   if (cached) return { result: cached, cached: true };
   assertAiRateLimit(`news-summary:${clientKey}`);
 
-  const { value } = await runCachedOpenAi(cacheKey, () => callOpenAi({
-    prompt: createNewsSummaryPrompt(news),
-    schema: newsSummarySchema,
-    schemaName: 'money_platform_news_summary',
-    validate: validateNewsSummary,
-    userKey: clientKey,
-  }));
-  return { result: value, cached: false };
+  try {
+    const { value } = await runCachedOpenAi(cacheKey, () => callOpenAi({
+      prompt: createNewsSummaryPrompt(news),
+      schema: newsSummarySchema,
+      schemaName: 'money_platform_news_summary',
+      validate: validateNewsSummary,
+      userKey: clientKey,
+    }));
+    return { result: value, cached: false };
+  } catch (error) {
+    if (['INVALID_JSON', 'INVALID_AI_RESPONSE', 'EMPTY_RESPONSE', 'AI_FAILED'].includes(error?.code)) {
+      console.error(JSON.stringify({ event: 'news_ai_fallback', code: error.code }));
+      return { result: createNewsSummaryFallback(news), cached: false, fallback: true };
+    }
+    throw error;
+  }
 }
 
 export async function analyzePortfolio(payload, { clientKey = 'anonymous', ownedItemKeys = [] } = {}) {
