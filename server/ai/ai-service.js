@@ -15,7 +15,7 @@ const timeoutMs = Number(process.env.AI_TIMEOUT_MS || 20_000);
 const maxOutputTokens = Number(process.env.AI_MAX_OUTPUT_TOKENS || 500);
 const newsPromptVersion = 'news-v3';
 const newsSchemaVersion = 'news-summary-v1';
-const portfolioPromptVersion = 'portfolio-v3';
+const portfolioPromptVersion = 'portfolio-v4';
 const portfolioSchemaVersion = 'portfolio-analysis-v1';
 const investmentPromptVersion = 'investment-insights-v2';
 const investmentSchemaVersion = 'investment-insights-v1';
@@ -162,6 +162,7 @@ async function runCachedOpenAi(cacheKey, loader) {
 
 const finite = (value) => Number.isFinite(Number(value));
 const round = (value) => Number(Number(value || 0).toFixed(4));
+const displayPercent = (value) => `${Number(value || 0).toLocaleString('ko-KR', { maximumFractionDigits: 2 })}%`;
 const cleanText = (value, max) => String(value || '').replace(/\s+/g, ' ').trim().slice(0, max);
 
 function sanitizePortfolioPayload(payload = {}) {
@@ -236,6 +237,8 @@ function createPortfolioFacts(portfolio) {
     weight: asset.weight,
     profit: asset.profit,
     returnRate: asset.returnRate,
+    weightText: displayPercent(asset.weight),
+    returnRateText: displayPercent(asset.returnRate),
   }));
   const topPositionsWeight = round(topPositions.reduce((sum, item) => sum + item.weight, 0));
   const assetTypeWeights = Object.values(portfolio.assets.reduce((acc, asset) => {
@@ -250,17 +253,18 @@ function createPortfolioFacts(portfolio) {
     weight: round(entry.weight),
     evaluationAmount: round(entry.evaluationAmount),
     profit: round(entry.profit),
+    weightText: displayPercent(entry.weight),
   })).sort((a, b) => b.weight - a.weight);
   const positiveContributors = portfolio.assets
     .filter((asset) => asset.profit > 0)
     .sort((a, b) => b.profit - a.profit)
     .slice(0, 3)
-    .map((asset) => ({ symbol: asset.symbol, name: asset.name, profit: asset.profit, returnRate: asset.returnRate, weight: asset.weight }));
+    .map((asset) => ({ symbol: asset.symbol, name: asset.name, profit: asset.profit, returnRate: asset.returnRate, weight: asset.weight, returnRateText: displayPercent(asset.returnRate), weightText: displayPercent(asset.weight) }));
   const negativeContributors = portfolio.assets
     .filter((asset) => asset.profit < 0)
     .sort((a, b) => a.profit - b.profit)
     .slice(0, 3)
-    .map((asset) => ({ symbol: asset.symbol, name: asset.name, profit: asset.profit, returnRate: asset.returnRate, weight: asset.weight }));
+    .map((asset) => ({ symbol: asset.symbol, name: asset.name, profit: asset.profit, returnRate: asset.returnRate, weight: asset.weight, returnRateText: displayPercent(asset.returnRate), weightText: displayPercent(asset.weight) }));
   const winnerProfit = round(portfolio.assets.filter((asset) => asset.profit > 0).reduce((sum, asset) => sum + asset.profit, 0));
   const loserLoss = round(portfolio.assets.filter((asset) => asset.profit < 0).reduce((sum, asset) => sum + asset.profit, 0));
   const concentrationLevel = topPositionsWeight >= 80 ? 'high' : topPositionsWeight >= 60 ? 'medium' : 'low';
@@ -271,10 +275,14 @@ function createPortfolioFacts(portfolio) {
     totalProfit: portfolio.portfolioSummary.totalProfit,
     totalReturnRate: portfolio.portfolioSummary.totalReturnRate,
     assetsCount: portfolio.assets.length,
-    largestPosition: largest ? { name: largest.name, symbol: largest.symbol, weight: largest.weight, profit: largest.profit, returnRate: largest.returnRate } : null,
+    largestPosition: largest ? { name: largest.name, symbol: largest.symbol, weight: largest.weight, profit: largest.profit, returnRate: largest.returnRate, weightText: displayPercent(largest.weight), returnRateText: displayPercent(largest.returnRate) } : null,
     topPositions,
     topPositionsWeight,
     concentrationLevel,
+    display: {
+      totalReturnRateText: displayPercent(portfolio.portfolioSummary.totalReturnRate),
+      topPositionsWeightText: displayPercent(topPositionsWeight),
+    },
     assetTypeWeights,
     profitStructure: {
       winnerProfit,
@@ -422,7 +430,9 @@ export async function summarizeNews(payload, { clientKey = 'anonymous' } = {}) {
 function createPortfolioAnalysisFallback(portfolio, facts) {
   const largest = facts.largestPosition;
   const topWeight = round(facts.topPositionsWeight);
+  const topWeightText = facts.display?.topPositionsWeightText || displayPercent(topWeight);
   const totalReturnRate = round(portfolio.portfolioSummary.totalReturnRate);
+  const totalReturnRateText = facts.display?.totalReturnRateText || displayPercent(totalReturnRate);
   const mainAssetType = facts.assetTypeWeights[0];
   const contributorText = facts.positiveContributors.length
     ? facts.positiveContributors.map((item) => item.name + '(' + item.symbol + ')').join(', ') + '\uAC00 \uC218\uC775\uC5D0 \uC8FC\uB85C \uAE30\uC5EC\uD558\uACE0 \uC788\uC2B5\uB2C8\uB2E4.'
@@ -431,10 +441,10 @@ function createPortfolioAnalysisFallback(portfolio, facts) {
     ? facts.negativeContributors.map((item) => item.name + '(' + item.symbol + ')').join(', ') + '\uC758 \uC190\uC2E4\uC774 \uC804\uCCB4 \uC131\uACFC\uB97C \uC77C\uBD80 \uB0AE\uCD94\uACE0 \uC788\uC2B5\uB2C8\uB2E4.'
     : '\uC190\uC2E4\uC774 \uD06C\uAC8C \uD655\uC778\uB418\uB294 \uC790\uC0B0\uC740 \uC81C\uD55C\uC801\uC785\uB2C8\uB2E4.';
   const concentrationText = topWeight >= 80
-    ? '\uC0C1\uC704 3\uAC1C \uC790\uC0B0 \uBE44\uC911\uC774 ' + topWeight + '%\uB85C \uB192\uC544 \uC77C\uBD80 \uC790\uC0B0\uC758 \uAC00\uACA9 \uBCC0\uB3D9\uC774 \uC804\uCCB4 \uD3C9\uAC00\uAE08\uC561\uC5D0 \uD06C\uAC8C \uBC18\uC601\uB420 \uC218 \uC788\uB294 \uAD6C\uC870\uC785\uB2C8\uB2E4.'
+    ? '\uC0C1\uC704 3\uAC1C \uC790\uC0B0 \uBE44\uC911\uC774 ' + topWeightText + '\uB85C \uB192\uC544 \uC77C\uBD80 \uC790\uC0B0\uC758 \uAC00\uACA9 \uBCC0\uB3D9\uC774 \uC804\uCCB4 \uD3C9\uAC00\uAE08\uC561\uC5D0 \uD06C\uAC8C \uBC18\uC601\uB420 \uC218 \uC788\uB294 \uAD6C\uC870\uC785\uB2C8\uB2E4.'
     : topWeight >= 60
-      ? '\uC0C1\uC704 3\uAC1C \uC790\uC0B0 \uBE44\uC911\uC774 ' + topWeight + '%\uB85C \uC911\uAC04 \uC774\uC0C1\uC758 \uC9D1\uC911\uB3C4\uAC00 \uC788\uC5B4 \uC8FC\uC694 \uC790\uC0B0\uC758 \uC190\uC775 \uBCC0\uD654\uB97C \uD568\uAED8 \uD655\uC778\uD560 \uD544\uC694\uAC00 \uC788\uC2B5\uB2C8\uB2E4.'
-      : '\uC0C1\uC704 3\uAC1C \uC790\uC0B0 \uBE44\uC911\uC774 ' + topWeight + '%\uB85C \uC0C1\uB300\uC801\uC73C\uB85C \uBD84\uC0B0\uB41C \uAD6C\uC870\uB85C \uBCFC \uC218 \uC788\uC2B5\uB2C8\uB2E4.';
+      ? '\uC0C1\uC704 3\uAC1C \uC790\uC0B0 \uBE44\uC911\uC774 ' + topWeightText + '\uB85C \uC911\uAC04 \uC774\uC0C1\uC758 \uC9D1\uC911\uB3C4\uAC00 \uC788\uC5B4 \uC8FC\uC694 \uC790\uC0B0\uC758 \uC190\uC775 \uBCC0\uD654\uB97C \uD568\uAED8 \uD655\uC778\uD560 \uD544\uC694\uAC00 \uC788\uC2B5\uB2C8\uB2E4.'
+      : '\uC0C1\uC704 3\uAC1C \uC790\uC0B0 \uBE44\uC911\uC774 ' + topWeightText + '\uB85C \uC0C1\uB300\uC801\uC73C\uB85C \uBD84\uC0B0\uB41C \uAD6C\uC870\uB85C \uBCFC \uC218 \uC788\uC2B5\uB2C8\uB2E4.';
 
   return {
     generatedAt: new Date().toISOString(),
@@ -443,18 +453,18 @@ function createPortfolioAnalysisFallback(portfolio, facts) {
       assetsCount: facts.assetsCount,
     },
     result: {
-      overallSummary: '\uCD1D\uC218\uC775\uB960\uC740 ' + totalReturnRate + '%\uC774\uBA70, \uC774 \uBD84\uC11D\uC740 \uC790\uC0B0\uBCC4 \uBE44\uC911\uACFC \uC190\uC775 \uAE30\uC5EC\uB3C4\uAC00 \uC804\uCCB4 \uD3EC\uD2B8\uD3F4\uB9AC\uC624\uC5D0 \uBBF8\uCE58\uB294 \uC601\uD5A5\uC744 \uC911\uC2EC\uC73C\uB85C \uC815\uB9AC\uD588\uC2B5\uB2C8\uB2E4.',
+      overallSummary: '\uCD1D\uC218\uC775\uB960\uC740 ' + totalReturnRateText + '\uC774\uBA70, \uC774 \uBD84\uC11D\uC740 \uC790\uC0B0\uBCC4 \uBE44\uC911\uACFC \uC190\uC775 \uAE30\uC5EC\uB3C4\uAC00 \uC804\uCCB4 \uD3EC\uD2B8\uD3F4\uB9AC\uC624\uC5D0 \uBBF8\uCE58\uB294 \uC601\uD5A5\uC744 \uC911\uC2EC\uC73C\uB85C \uC815\uB9AC\uD588\uC2B5\uB2C8\uB2E4.',
       composition: {
-        summary: largest ? largest.name + '(' + largest.symbol + ')\uC758 \uBE44\uC911\uC774 ' + largest.weight + '%\uB85C \uAC00\uC7A5 \uD06C\uBA70, ' + (mainAssetType ? mainAssetType.assetType + ' \uC790\uC0B0\uAD70\uC774 ' + mainAssetType.weight + '%\uB97C \uCC28\uC9C0\uD569\uB2C8\uB2E4. ' : '') + '\uB530\uB77C\uC11C \uB2E8\uC77C \uC790\uC0B0\uACFC \uC790\uC0B0\uAD70 \uD3B8\uC911\uC744 \uD568\uAED8 \uBCF4\uB294 \uAD6C\uC870\uC785\uB2C8\uB2E4.' : '\uBCF4\uC720 \uC790\uC0B0 \uBE44\uC911\uC744 \uAE30\uC900\uC73C\uB85C \uAD6C\uC131\uC744 \uD655\uC778\uD588\uC2B5\uB2C8\uB2E4.',
+        summary: largest ? largest.name + '(' + largest.symbol + ')\uC758 \uBE44\uC911\uC774 ' + (largest.weightText || displayPercent(largest.weight)) + '\uB85C \uAC00\uC7A5 \uD06C\uBA70, ' + (mainAssetType ? mainAssetType.assetType + ' \uC790\uC0B0\uAD70\uC774 ' + (mainAssetType.weightText || displayPercent(mainAssetType.weight)) + '\uB97C \uCC28\uC9C0\uD569\uB2C8\uB2E4. ' : '') + '\uB530\uB77C\uC11C \uB2E8\uC77C \uC790\uC0B0\uACFC \uC790\uC0B0\uAD70 \uD3B8\uC911\uC744 \uD568\uAED8 \uBCF4\uB294 \uAD6C\uC870\uC785\uB2C8\uB2E4.' : '\uBCF4\uC720 \uC790\uC0B0 \uBE44\uC911\uC744 \uAE30\uC900\uC73C\uB85C \uAD6C\uC131\uC744 \uD655\uC778\uD588\uC2B5\uB2C8\uB2E4.',
         largestPosition: facts.largestPosition,
         topPositionsWeight: facts.topPositionsWeight,
         assetTypeWeights: facts.assetTypeWeights,
-        assetTypeInsights: [concentrationText, ...(mainAssetType ? [mainAssetType.assetType + ' \uBE44\uC911\uC774 ' + mainAssetType.weight + '%\uB85C \uAC00\uC7A5 \uB192\uC544 \uD574\uB2F9 \uC790\uC0B0\uAD70\uC758 \uBCC0\uB3D9\uC131\uC774 \uC804\uCCB4\uC5D0 \uBC18\uC601\uB420 \uC218 \uC788\uC2B5\uB2C8\uB2E4.'] : [])].slice(0, 5),
+        assetTypeInsights: [concentrationText, ...(mainAssetType ? [mainAssetType.assetType + ' \uBE44\uC911\uC774 ' + (mainAssetType.weightText || displayPercent(mainAssetType.weight)) + '\uB85C \uAC00\uC7A5 \uB192\uC544 \uD574\uB2F9 \uC790\uC0B0\uAD70\uC758 \uBCC0\uB3D9\uC131\uC774 \uC804\uCCB4\uC5D0 \uBC18\uC601\uB420 \uC218 \uC788\uC2B5\uB2C8\uB2E4.'] : [])].slice(0, 5),
       },
       performance: {
         summary: '\uC804\uCCB4 \uC218\uC775\uB960\uB9CC\uBCF4\uB2E4 \uC790\uC0B0\uBCC4 \uC190\uC775 \uAE30\uC5EC\uB3C4\uB97C \uD568\uAED8 \uBCF4\uB294 \uAC83\uC774 \uC911\uC694\uD569\uB2C8\uB2E4. ' + contributorText + ' ' + lossText,
-        positiveContributors: facts.positiveContributors.map((item) => item.name + '(' + item.symbol + ')\uC740 \uC218\uC775\uB960 ' + item.returnRate + '%\uC640 \uBE44\uC911 ' + item.weight + '%\uB97C \uAE30\uC900\uC73C\uB85C \uC804\uCCB4 \uC218\uC775\uC5D0 \uAE30\uC5EC\uD558\uACE0 \uC788\uC2B5\uB2C8\uB2E4.'),
-        negativeContributors: facts.negativeContributors.map((item) => item.name + '(' + item.symbol + ')\uC740 \uC190\uC775 ' + item.profit + '\uACFC \uC218\uC775\uB960 ' + item.returnRate + '%\uB97C \uAE30\uC900\uC73C\uB85C \uC131\uACFC\uB97C \uB0AE\uCD94\uB294 \uC694\uC778\uC785\uB2C8\uB2E4.'),
+        positiveContributors: facts.positiveContributors.map((item) => item.name + '(' + item.symbol + ')\uC740 \uC218\uC775\uB960 ' + (item.returnRateText || displayPercent(item.returnRate)) + '\uC640 \uBE44\uC911 ' + (item.weightText || displayPercent(item.weight)) + '\uB97C \uAE30\uC900\uC73C\uB85C \uC804\uCCB4 \uC218\uC775\uC5D0 \uAE30\uC5EC\uD558\uACE0 \uC788\uC2B5\uB2C8\uB2E4.'),
+        negativeContributors: facts.negativeContributors.map((item) => item.name + '(' + item.symbol + ')\uC740 \uC190\uC775 ' + item.profit + '\uACFC \uC218\uC775\uB960 ' + (item.returnRateText || displayPercent(item.returnRate)) + '\uB97C \uAE30\uC900\uC73C\uB85C \uC131\uACFC\uB97C \uB0AE\uCD94\uB294 \uC694\uC778\uC785\uB2C8\uB2E4.'),
       },
       strengths: totalReturnRate > 0
         ? ['\uC804\uCCB4 \uD3EC\uD2B8\uD3F4\uB9AC\uC624\uAC00 \uC218\uC775 \uAD6C\uAC04\uC5D0 \uC788\uC5B4 \uC77C\uBD80 \uC790\uC0B0\uC758 \uAE0D\uC815\uC801 \uC131\uACFC\uAC00 \uC804\uCCB4 \uD3C9\uAC00\uAE08\uC561\uC5D0 \uBC18\uC601\uB418\uACE0 \uC788\uC2B5\uB2C8\uB2E4.']
