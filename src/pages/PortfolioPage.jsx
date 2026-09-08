@@ -224,13 +224,13 @@ function AiPortfolioPanel({ analysis, cached, onRerun, rerunning }) {
       </div>
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
         <div className="rounded-2xl border border-[var(--color-border)] bg-white p-4">
-          <h3 className="text-base font-extrabold text-[var(--color-text-primary)]">자산 구성</h3>
+          <h3 className="text-base font-extrabold text-[var(--color-text-primary)]">자산 구성 분석</h3>
           <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">{result.composition?.summary}</p>
           {largest && <p className="mt-4 rounded-2xl bg-slate-50 p-4 text-lg font-black text-[var(--color-text-primary)]">{largest.symbol} / {largest.name} / {percent(largest.weight)}</p>}
         </div>
-        <ListBox title="긍정적인 부분" items={result.strengths} />
-        <ListBox title="현재 수익 현황" items={[result.performance?.summary, ...(result.performance?.positiveContributors || []), ...(result.performance?.negativeContributors || [])].filter(Boolean)} />
-        <ListBox title="확인할 사항" items={result.checkpoints} />
+        <ListBox title="집중도 및 위험" items={(result.risks || []).map((risk) => `${risk.title}: ${risk.description}`)} />
+        <ListBox title="수익 구조 분석" items={[result.performance?.summary, ...(result.performance?.positiveContributors || []), ...(result.performance?.negativeContributors || [])].filter(Boolean)} />
+        <ListBox title="AI 체크 포인트" items={result.checkpoints} />
       </div>
       <p className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-800">{result.disclaimer}</p>
     </Card>

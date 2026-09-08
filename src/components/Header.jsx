@@ -140,11 +140,7 @@ function ProfileMenu({ user, logout, compact = false, hideLogoutItem = false }) 
       </button>
 
       {open && (
-        <div role="menu" className="absolute right-0 mt-2 w-56 overflow-hidden rounded-2xl border border-[var(--color-border)] bg-white p-1.5 shadow-[var(--shadow-card)]">
-          <div className="px-3 py-2">
-            <p className="truncate text-sm font-bold text-[var(--color-text-primary)]">{user.name || user.username}</p>
-            <p className="text-xs text-[var(--color-text-tertiary)]">{user.isAdmin ? t.admin : t.mypage}</p>
-          </div>
+        <div role="menu" className="absolute right-0 mt-2 w-56 overflow-hidden rounded-2xl border border-[var(--color-border)] bg-white p-1.5 shadow-[var(--shadow-card)]">
           {user.isAdmin && <DropdownLink to="/admin" onClick={closeMenu}>{t.admin}</DropdownLink>}
           <DropdownLink to="/mypage" onClick={closeMenu}>{t.mypage}</DropdownLink>
           <DropdownLink to="/portfolio" onClick={closeMenu}>{t.portfolio}</DropdownLink>
