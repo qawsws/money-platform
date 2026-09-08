@@ -15,12 +15,12 @@ const timeoutMs = Number(process.env.AI_TIMEOUT_MS || 20_000);
 const maxOutputTokens = Number(process.env.AI_MAX_OUTPUT_TOKENS || 500);
 const newsPromptVersion = 'news-v3';
 const newsSchemaVersion = 'news-summary-v1';
-const portfolioPromptVersion = 'portfolio-v1';
+const portfolioPromptVersion = 'portfolio-v2';
 const portfolioSchemaVersion = 'portfolio-analysis-v1';
 const investmentPromptVersion = 'investment-insights-v1';
 const investmentSchemaVersion = 'investment-insights-v1';
-const portfolioDisclaimer = 'AI 분석은 현재 포트폴리오 데이터를 정리한 참고 정보입니다. 투자 자문이나 수익 보장을 의미하지 않으며, 실제 투자 판단은 사용자가 직접 해야 합니다.';
-const investmentDisclaimer = '투자 참고 정보이며 투자 권유가 아닙니다.';
+const portfolioDisclaimer = '\uC774 \uBD84\uC11D\uC740 \uD604\uC7AC \uD3EC\uD2B8\uD3F4\uB9AC\uC624 \uB370\uC774\uD130\uB97C \uBC14\uD0D5\uC73C\uB85C \uD55C \uCC38\uACE0 \uC815\uBCF4\uC785\uB2C8\uB2E4. \uD22C\uC790 \uAD8C\uC720\uB098 \uC218\uC775 \uBCF4\uC7A5\uC774 \uC544\uB2C8\uBA70, \uCD5C\uC885 \uD310\uB2E8\uC740 \uC0AC\uC6A9\uC790\uAC00 \uC9C1\uC811 \uD574\uC57C \uD569\uB2C8\uB2E4.';
+const investmentDisclaimer = '\uD22C\uC790 \uCC38\uACE0 \uC815\uBCF4\uC774\uBA70 \uD22C\uC790 \uAD8C\uC720\uAC00 \uC544\uB2D9\uB2C8\uB2E4.';
 const inFlight = new Map();
 
 export function assertAiAvailable() {
@@ -351,14 +351,14 @@ function enforceInvestmentFacts(aiResult) {
 
 function createNewsSummaryFallback(news) {
   const summarySource = news.summary || news.content || news.description || news.title;
-  const summary = String(summarySource || '').replace(/\s+/g, ' ').trim().slice(0, 240) || '뉴스 내용을 요약할 수 있는 정보가 부족합니다.';
+  const summary = String(summarySource || '').replace(/\s+/g, ' ').trim().slice(0, 240) || '\uB274\uC2A4 \uB0B4\uC6A9\uC744 \uC694\uC57D\uD560 \uC218 \uC788\uB294 \uC815\uBCF4\uAC00 \uBD80\uC871\uD569\uB2C8\uB2E4.';
   const relatedAssets = news.relatedAssets?.length ? news.relatedAssets.slice(0, 6) : [news.category].filter(Boolean);
   return {
     summary,
     positives: [],
     negatives: [],
     relatedAssets,
-    caution: '원문 기사와 관련 공시를 함께 확인해 주세요.',
+    caution: '\uC6D0\uBB38 \uAE30\uC0AC\uC640 \uAD00\uB828 \uACF5\uC2DC\uB97C \uD568\uAED8 \uD655\uC778\uD574 \uC8FC\uC138\uC694.',
   };
 }
 
@@ -392,6 +392,38 @@ export async function summarizeNews(payload, { clientKey = 'anonymous' } = {}) {
   }
 }
 
+function createPortfolioAnalysisFallback(portfolio, facts) {
+  const largest = facts.largestPosition;
+  const totalReturnRate = round(portfolio.portfolioSummary.totalReturnRate);
+  const direction = totalReturnRate >= 0 ? '\uC218\uC775 \uAD6C\uAC04' : '\uC190\uC2E4 \uAD6C\uAC04';
+  return {
+    generatedAt: new Date().toISOString(),
+    basis: {
+      ...portfolio.portfolioSummary,
+      assetsCount: facts.assetsCount,
+    },
+    result: {
+      overallSummary: '\uD604\uC7AC \uD3EC\uD2B8\uD3F4\uB9AC\uC624\uB294 ' + facts.assetsCount + '\uAC1C \uC790\uC0B0\uC73C\uB85C \uAD6C\uC131\uB418\uC5B4 \uC788\uACE0, \uC804\uCCB4 \uC218\uC775\uB960\uC740 ' + totalReturnRate + '%\uC785\uB2C8\uB2E4. \uAC00\uC7A5 \uBE44\uC911\uC774 \uD070 \uC790\uC0B0\uACFC \uC790\uC0B0\uAD70 \uBE44\uC911\uC744 \uC911\uC2EC\uC73C\uB85C \uC810\uAC80\uD574 \uBCFC \uC218 \uC788\uC2B5\uB2C8\uB2E4.',
+      composition: {
+        summary: largest ? largest.name + '(' + largest.symbol + ')\uC758 \uBE44\uC911\uC774 ' + largest.weight + '%\uB85C \uAC00\uC7A5 \uD07D\uB2C8\uB2E4.' : '\uD3EC\uD2B8\uD3F4\uB9AC\uC624 \uAD6C\uC131\uC744 \uD655\uC778\uD588\uC2B5\uB2C8\uB2E4.',
+        largestPosition: facts.largestPosition,
+        topPositionsWeight: facts.topPositionsWeight,
+        assetTypeWeights: facts.assetTypeWeights,
+        assetTypeInsights: facts.assetTypeWeights.map((item) => item.assetType + '\uC758 \uBE44\uC911\uC740 ' + item.weight + '%\uC774\uBA70 ' + item.count + '\uAC1C \uC790\uC0B0\uC774 \uD3EC\uD568\uB429\uB2C8\uB2E4.').slice(0, 5),
+      },
+      performance: {
+        summary: '\uC804\uCCB4 \uC218\uC775\uB960\uC740 ' + totalReturnRate + '%\uB85C ' + direction + '\uC785\uB2C8\uB2E4.',
+        positiveContributors: facts.positiveContributors.map((item) => item.name + '(' + item.symbol + ')\uC774 \uC218\uC775\uC5D0 \uAE30\uC5EC\uD558\uACE0 \uC788\uC2B5\uB2C8\uB2E4.'),
+        negativeContributors: facts.negativeContributors.map((item) => item.name + '(' + item.symbol + ')\uC774 \uC190\uC2E4\uC5D0 \uC601\uD5A5\uC744 \uC8FC\uACE0 \uC788\uC2B5\uB2C8\uB2E4.'),
+      },
+      strengths: ['\uD604\uC7AC \uBCF4\uC720 \uC790\uC0B0\uC758 \uC218\uC775\uB960\uACFC \uBE44\uC911\uC744 \uD55C \uD654\uBA74\uC5D0\uC11C \uD655\uC778\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4.'],
+      risks: [{ title: '\uC9D1\uC911\uB3C4 \uC810\uAC80', description: '\uC0C1\uC704 \uBCF4\uC720 \uC790\uC0B0\uC758 \uBE44\uC911\uC774 \uB192\uC740\uC9C0 \uC8FC\uAE30\uC801\uC73C\uB85C \uD655\uC778\uD574 \uC8FC\uC138\uC694.', severity: 'medium' }],
+      checkpoints: ['\uC2E4\uC81C \uD22C\uC790 \uD310\uB2E8 \uC804\uC5D0 \uC790\uC0B0\uBCC4 \uB274\uC2A4, \uC2E4\uC801, \uC2DC\uC7A5 \uBCC0\uB3D9\uC744 \uD568\uAED8 \uD655\uC778\uD574 \uC8FC\uC138\uC694.'],
+      disclaimer: portfolioDisclaimer,
+    },
+  };
+}
+
 export async function analyzePortfolio(payload, { clientKey = 'anonymous', ownedItemKeys = [] } = {}) {
   assertAiAvailable();
   const portfolio = sanitizePortfolioPayload(payload);
@@ -407,25 +439,33 @@ export async function analyzePortfolio(payload, { clientKey = 'anonymous', owned
   if (cached) return { analysis: cached, cached: true };
   assertAiRateLimit(clientKey);
 
-  const { value } = await runCachedOpenAi(cacheKey, async () => {
-    const aiResult = await callOpenAi({
-      prompt: createPortfolioAnalysisPrompt({ summary: portfolio.portfolioSummary, facts, assets: portfolio.assets }),
-      schema: portfolioAnalysisSchema,
-      schemaName: 'money_platform_portfolio_analysis',
-      validate: validatePortfolioAnalysis,
-      errorMessage: AI_MESSAGES.portfolioFailed,
-      userKey: clientKey,
+  try {
+    const { value } = await runCachedOpenAi(cacheKey, async () => {
+      const aiResult = await callOpenAi({
+        prompt: createPortfolioAnalysisPrompt({ summary: portfolio.portfolioSummary, facts, assets: portfolio.assets }),
+        schema: portfolioAnalysisSchema,
+        schemaName: 'money_platform_portfolio_analysis',
+        validate: validatePortfolioAnalysis,
+        errorMessage: AI_MESSAGES.portfolioFailed,
+        userKey: clientKey,
+      });
+      return {
+        generatedAt: new Date().toISOString(),
+        basis: {
+          ...portfolio.portfolioSummary,
+          assetsCount: facts.assetsCount,
+        },
+        result: enforcePortfolioFacts(aiResult, facts),
+      };
     });
-    return {
-      generatedAt: new Date().toISOString(),
-      basis: {
-        ...portfolio.portfolioSummary,
-        assetsCount: facts.assetsCount,
-      },
-      result: enforcePortfolioFacts(aiResult, facts),
-    };
-  });
-  return { analysis: value, cached: false };
+    return { analysis: value, cached: false };
+  } catch (error) {
+    if (['INVALID_JSON', 'INVALID_AI_RESPONSE', 'EMPTY_RESPONSE', 'AI_FAILED'].includes(error?.code)) {
+      console.error(JSON.stringify({ event: 'portfolio_ai_fallback', code: error.code }));
+      return { analysis: createPortfolioAnalysisFallback(portfolio, facts), cached: false, fallback: true };
+    }
+    throw error;
+  }
 }
 
 export async function createInvestmentInsights(payload, { clientKey = 'anonymous', userHash = 'anonymous', trace } = {}) {
