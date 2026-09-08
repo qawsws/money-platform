@@ -17,7 +17,7 @@ const newsPromptVersion = 'news-v3';
 const newsSchemaVersion = 'news-summary-v1';
 const portfolioPromptVersion = 'portfolio-v2';
 const portfolioSchemaVersion = 'portfolio-analysis-v1';
-const investmentPromptVersion = 'investment-insights-v1';
+const investmentPromptVersion = 'investment-insights-v2';
 const investmentSchemaVersion = 'investment-insights-v1';
 const portfolioDisclaimer = '\uC774 \uBD84\uC11D\uC740 \uD604\uC7AC \uD3EC\uD2B8\uD3F4\uB9AC\uC624 \uB370\uC774\uD130\uB97C \uBC14\uD0D5\uC73C\uB85C \uD55C \uCC38\uACE0 \uC815\uBCF4\uC785\uB2C8\uB2E4. \uD22C\uC790 \uAD8C\uC720\uB098 \uC218\uC775 \uBCF4\uC7A5\uC774 \uC544\uB2C8\uBA70, \uCD5C\uC885 \uD310\uB2E8\uC740 \uC0AC\uC6A9\uC790\uAC00 \uC9C1\uC811 \uD574\uC57C \uD569\uB2C8\uB2E4.';
 const investmentDisclaimer = '\uD22C\uC790 \uCC38\uACE0 \uC815\uBCF4\uC774\uBA70 \uD22C\uC790 \uAD8C\uC720\uAC00 \uC544\uB2D9\uB2C8\uB2E4.';
@@ -468,6 +468,48 @@ export async function analyzePortfolio(payload, { clientKey = 'anonymous', owned
   }
 }
 
+
+function createInvestmentInsightsFallback(data) {
+  const summary = data.portfolioSummary || {};
+  const assets = Array.isArray(data.assets) ? data.assets : [];
+  const relatedNews = Array.isArray(data.relatedNews) ? data.relatedNews : [];
+  const market = Array.isArray(data.market) ? data.market : [];
+  const largest = [...assets].sort((a, b) => Number(b.weight || 0) - Number(a.weight || 0))[0];
+  const returnRate = round(summary.totalReturnRate);
+  return {
+    generatedAt: new Date().toISOString(),
+    basis: data.portfolioSummary,
+    result: {
+      summary: '\uBCF4\uC720 \uC790\uC0B0, \uAD00\uB828 \uB274\uC2A4, \uC8FC\uC694 \uC2DC\uC7A5 \uB370\uC774\uD130\uB97C \uAE30\uC900\uC73C\uB85C \uD655\uC778\uD55C \uCC38\uACE0 \uC815\uBCF4\uC785\uB2C8\uB2E4. \uD604\uC7AC \uD3EC\uD2B8\uD3F4\uB9AC\uC624 \uC218\uC775\uB960\uC740 ' + returnRate + '%\uC785\uB2C8\uB2E4.',
+      highlights: [
+        {
+          title: '\uD3EC\uD2B8\uD3F4\uB9AC\uC624 \uAD6C\uC131',
+          description: largest ? largest.name + '(' + largest.symbol + ')\uC758 \uBE44\uC911\uC774 ' + largest.weight + '%\uB85C \uAC00\uC7A5 \uD07D\uB2C8\uB2E4.' : '\uBCF4\uC720 \uC790\uC0B0 \uAD6C\uC131\uC744 \uAE30\uC900\uC73C\uB85C \uD655\uC778\uD588\uC2B5\uB2C8\uB2E4.',
+          type: 'portfolio',
+        },
+        {
+          title: '\uB274\uC2A4 \uD750\uB984',
+          description: relatedNews.length ? '\uAD00\uB828 \uB274\uC2A4 ' + relatedNews.length + '\uAC74\uC744 \uD568\uAED8 \uD655\uC778\uD588\uC2B5\uB2C8\uB2E4.' : '\uD604\uC7AC \uC5F0\uACB0\uB41C \uAD00\uB828 \uB274\uC2A4\uAC00 \uC801\uC5B4 \uD3EC\uD2B8\uD3F4\uB9AC\uC624 \uC790\uB8CC\uB97C \uC911\uC2EC\uC73C\uB85C \uBCF4\uC5EC\uC90D\uB2C8\uB2E4.',
+          type: 'news',
+        },
+        {
+          title: '\uC2DC\uC7A5 \uD655\uC778',
+          description: market.length ? '\uC8FC\uC694 \uC9C0\uC218 ' + market.length + '\uAC1C\uC758 \uB4F1\uB77D \uD750\uB984\uC744 \uD568\uAED8 \uBCF4\uC5EC\uC90D\uB2C8\uB2E4.' : '\uC2DC\uC7A5 \uB370\uC774\uD130\uB294 \uD655\uC778\uB41C \uBC94\uC704\uC5D0\uC11C\uB9CC \uD45C\uC2DC\uB429\uB2C8\uB2E4.',
+          type: 'market',
+        },
+      ],
+      portfolioObservation: largest ? '\uD3EC\uD2B8\uD3F4\uB9AC\uC624\uC5D0\uC11C ' + largest.name + '\uC758 \uBE44\uC911\uC774 \uAC00\uC7A5 \uD06C\uBBC0\uB85C \uC9D1\uC911\uB3C4\uB97C \uD568\uAED8 \uD655\uC778\uD560 \uD544\uC694\uAC00 \uC788\uC2B5\uB2C8\uB2E4.' : '\uBCF4\uC720 \uC790\uC0B0\uC758 \uBE44\uC911\uACFC \uC218\uC775\uB960\uC744 \uAE30\uC900\uC73C\uB85C \uD655\uC778\uD588\uC2B5\uB2C8\uB2E4.',
+      newsObservation: relatedNews.length ? '\uAD00\uB828 \uB274\uC2A4\uB294 \uCD5C\uADFC \uD45C\uC2DC\uB41C \uAE30\uC0AC\uB97C \uAE30\uC900\uC73C\uB85C \uCC38\uACE0\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4.' : '\uAD00\uB828 \uB274\uC2A4\uAC00 \uBD80\uC871\uD558\uBBC0\uB85C \uC790\uC0B0 \uAD6C\uC131 \uC815\uBCF4\uB97C \uC911\uC2EC\uC73C\uB85C \uBCF4\uC5EC\uC90D\uB2C8\uB2E4.',
+      riskChecks: [
+        '\uC0C1\uC704 \uBCF4\uC720 \uC790\uC0B0\uC758 \uBE44\uC911\uC774 \uB108\uBB34 \uD06C\uC9C0 \uC54A\uC740\uC9C0 \uD655\uC778\uD574 \uC8FC\uC138\uC694.',
+        '\uC790\uC0B0\uBCC4 \uB274\uC2A4\uC640 \uC2DC\uC7A5 \uB4F1\uB77D\uB960\uC744 \uD568\uAED8 \uD655\uC778\uD574 \uC8FC\uC138\uC694.',
+        '\uC2E4\uC81C \uD22C\uC790 \uD310\uB2E8 \uC804\uC5D0 \uC6D0\uBB38 \uAE30\uC0AC\uC640 \uACF5\uC2DC\uB97C \uD568\uAED8 \uD655\uC778\uD574 \uC8FC\uC138\uC694.',
+      ],
+      disclaimer: investmentDisclaimer,
+    },
+  };
+}
+
 export async function createInvestmentInsights(payload, { clientKey = 'anonymous', userHash = 'anonymous', trace } = {}) {
   assertAiAvailable();
   const data = sanitizeInvestmentPayload(payload);
@@ -477,24 +519,32 @@ export async function createInvestmentInsights(payload, { clientKey = 'anonymous
   if (cached) return { insights: cached, cached: true };
   assertAiRateLimit(`investment-insights:${clientKey}`);
 
-  const { value } = await runCachedOpenAi(cacheKey, async () => {
-    const promptEnd = trace?.startStep?.('promptGeneration');
-    const prompt = createInvestmentInsightsPrompt(data);
-    promptEnd?.({ promptChars: prompt.length });
-    const aiResult = await callOpenAi({
-      prompt,
-      schema: investmentInsightsSchema,
-      schemaName: 'money_platform_investment_insights',
-      validate: validateInvestmentInsights,
-      errorMessage: AI_MESSAGES.investmentFailed,
-      userKey: clientKey,
-      trace,
+  try {
+    const { value } = await runCachedOpenAi(cacheKey, async () => {
+      const promptEnd = trace?.startStep?.('promptGeneration');
+      const prompt = createInvestmentInsightsPrompt(data);
+      promptEnd?.({ promptChars: prompt.length });
+      const aiResult = await callOpenAi({
+        prompt,
+        schema: investmentInsightsSchema,
+        schemaName: 'money_platform_investment_insights',
+        validate: validateInvestmentInsights,
+        errorMessage: AI_MESSAGES.investmentFailed,
+        userKey: clientKey,
+        trace,
+      });
+      return {
+        generatedAt: new Date().toISOString(),
+        basis: data.portfolioSummary,
+        result: enforceInvestmentFacts(aiResult),
+      };
     });
-    return {
-      generatedAt: new Date().toISOString(),
-      basis: data.portfolioSummary,
-      result: enforceInvestmentFacts(aiResult),
-    };
-  });
-  return { insights: value, cached: false };
+    return { insights: value, cached: false };
+  } catch (error) {
+    if (['INVALID_JSON', 'INVALID_AI_RESPONSE', 'EMPTY_RESPONSE', 'AI_FAILED'].includes(error?.code)) {
+      console.error(JSON.stringify({ event: 'investment_ai_fallback', code: error.code }));
+      return { insights: createInvestmentInsightsFallback(data), cached: false, fallback: true };
+    }
+    throw error;
+  }
 }
