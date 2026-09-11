@@ -15,7 +15,7 @@ MoneyPlatform은 단순한 종목 목록 페이지가 아니라, 실제 사용�
 - 포트폴리오 평가금액, 수익률, 자산군 비중 계산
 - 게시글, 댓글, 좋아요, 신고, 공지 관리가 포함된 커뮤니티
 - OpenAI API를 활용한 AI 뉴스 요약, 포트폴리오 분석, 투자 인사이트
-- Render 배포와 PostgreSQL 운영 환경 구성
+- Render를 활용한 웹 서비스 배포
 
 ## 주요 기능
 
@@ -98,7 +98,6 @@ MoneyPlatform은 단순한 종목 목록 페이지가 아니라, 실제 사용�
 - AI 뉴스 요약
 - AI 포트폴리오 분석
 - AI 투자 인사이트
-- `AI_ENABLED=false`일 때 실제 OpenAI 호출 차단
 - 캐시, rate limit, 일일 호출 제한 적용
 - 실제 API Key는 GitHub에 커밋하지 않음
 
@@ -118,38 +117,25 @@ MoneyPlatform은 단순한 종목 목록 페이지가 아니라, 실제 사용�
 - Node.js
 - Express
 - SQLite
-- PostgreSQL
 - JWT 인증
 - OpenAI API
 
 ### Infra / QA
 
 - Render
-- Render PostgreSQL
 - Playwright
 - MSW
 - ESLint
 
 ## 데이터 저장 구조
 
-로컬 개발 환경에서는 SQLite를 사용합니다.
+현재 프로젝트의 사용자 데이터는 SQLite 기반으로 저장합니다.
 
 ```text
 data/money-platform.sqlite
 ```
 
-배포 환경에서는 `DATABASE_URL` 환경변수가 있으면 PostgreSQL을 사용합니다.
-
-Render 배포에서는 `render.yaml`을 통해 PostgreSQL DB가 연결되도록 구성되어 있습니다.
-
-```yaml
-DATABASE_URL:
-  fromDatabase:
-    name: money-platform-db
-    property: connectionString
-```
-
-즉, 로컬에서는 SQLite로 빠르게 개발하고, 배포 환경에서는 PostgreSQL에 사용자 데이터가 저장됩니다.
+회원, 즐겨찾기, 포트폴리오, 커뮤니티, 공지, 신고, 저장 뉴스 등 서비스 운영에 필요한 데이터는 서버의 DB 모듈에서 SQLite 테이블로 관리합니다.
 
 ## 실행 방법
 
@@ -190,10 +176,7 @@ npm run test:e2e
 실제 값은 `.env` 또는 Render Environment에만 설정합니다.
 
 ```env
-DATABASE_URL=postgresql://user:password@host:port/database
-DATABASE_SSL=true
 JWT_SECRET=change-me-long-random-secret
-AI_ENABLED=false
 OPENAI_API_KEY=optional-openai-key-placeholder
 OPENAI_MODEL=gpt-4.1-mini
 ```
@@ -201,8 +184,8 @@ OPENAI_MODEL=gpt-4.1-mini
 주의:
 
 - `.env` 파일은 Git에 올리지 않습니다.
-- OpenAI API Key, JWT Secret, DB 접속 문자열은 GitHub에 커밋하지 않습니다.
-- `AI_ENABLED=false`이면 AI 버튼을 눌러도 실제 OpenAI API를 호출하지 않습니다.
+- OpenAI API Key와 JWT Secret은 GitHub에 커밋하지 않습니다.
+- OpenAI API Key가 설정되지 않은 환경에서는 AI 기능이 안전한 오류 메시지로 처리됩니다.
 
 ## 배포
 
@@ -216,7 +199,6 @@ npm start
 Render 설정:
 
 - Web Service: `money-platform`
-- Database: `money-platform-db`
 - Branch: `master`
 - Health Check: `/api/auth/health`
 - Plan: Free
@@ -260,6 +242,10 @@ Render 설정:
 - 커뮤니티 게시글/댓글 신고 UX 개선
 - 관리자 기능 실사용 흐름 검증
 - 홈, 시장, 뉴스, 커뮤니티 UI 재정리
+
+## Codex 활용
+
+이 프로젝트는 OpenAI Codex를 활용해 기능 구현, UI 개선, 오류 수정, AI 기능 안정화, README 정리 과정을 함께 진행했습니다. 단순 자동 생성에 맡기기보다 직접 요구사항을 검토하고, 로컬 실행과 빌드 확인을 거치며 프로젝트에 맞게 수정했습니다.
 
 ## 프로젝트 성격
 
